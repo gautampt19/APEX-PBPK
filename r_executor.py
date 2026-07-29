@@ -4,7 +4,11 @@ import subprocess
 import pandas as pd
 import logging
 from typing import Dict, Any
-from .config import R_EXECUTABLE, TEMP_RUN_SCRIPT, SIMULATION_OUTPUT_CSV
+try:
+    from .config import R_EXECUTABLE, TEMP_RUN_SCRIPT, SIMULATION_OUTPUT_CSV
+except ImportError:
+    from config import R_EXECUTABLE, TEMP_RUN_SCRIPT, SIMULATION_OUTPUT_CSV
+
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 

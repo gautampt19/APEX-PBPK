@@ -2,7 +2,8 @@ import os
 
 # Base paths
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-WORKSPACE_DIR = os.path.dirname(BASE_DIR)
+WORKSPACE_DIR = BASE_DIR
+
 
 # Default input files
 DEFAULT_PDF_NAME = 's12249-023-02680-y.pdf'  # Riluzole PBPK paper

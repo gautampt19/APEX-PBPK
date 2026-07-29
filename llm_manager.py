@@ -2,7 +2,11 @@ import re
 import json
 import requests
 import logging
-from .config import OLLAMA_API_URL, OLLAMA_MODEL, OLLAMA_CONTEXT_SIZE, OLLAMA_TEMPERATURE
+try:
+    from .config import OLLAMA_API_URL, OLLAMA_MODEL, OLLAMA_CONTEXT_SIZE, OLLAMA_TEMPERATURE
+except ImportError:
+    from config import OLLAMA_API_URL, OLLAMA_MODEL, OLLAMA_CONTEXT_SIZE, OLLAMA_TEMPERATURE
+
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 

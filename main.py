@@ -5,20 +5,35 @@ import logging
 import re
 import matplotlib.pyplot as plt
 
-# Import project modules
-from .config import (
-    DEFAULT_PDF_PATH, 
-    R_SCRIPT_PATH, 
-    WORKSPACE_DIR,
-    BASE_DIR,
-    VERIFIED_RILUZOLE_PARAMS,
-    VERIFIED_RETARDANT_PARAMS
-)
-from .pdf_extractor import extract_relevant_pages
-from .llm_manager import extract_model_schema_and_params, get_model_schema_prompt
-from .r_builder import generate_r_script
-from .r_executor import execute_r_simulation
-from .validator import verify_simulation
+try:
+    from .config import (
+        DEFAULT_PDF_PATH, 
+        R_SCRIPT_PATH, 
+        WORKSPACE_DIR,
+        BASE_DIR,
+        VERIFIED_RILUZOLE_PARAMS,
+        VERIFIED_RETARDANT_PARAMS
+    )
+    from .pdf_extractor import extract_relevant_pages
+    from .llm_manager import extract_model_schema_and_params, get_model_schema_prompt
+    from .r_builder import generate_r_script
+    from .r_executor import execute_r_simulation
+    from .validator import verify_simulation
+except ImportError:
+    from config import (
+        DEFAULT_PDF_PATH, 
+        R_SCRIPT_PATH, 
+        WORKSPACE_DIR,
+        BASE_DIR,
+        VERIFIED_RILUZOLE_PARAMS,
+        VERIFIED_RETARDANT_PARAMS
+    )
+    from pdf_extractor import extract_relevant_pages
+    from llm_manager import extract_model_schema_and_params, get_model_schema_prompt
+    from r_builder import generate_r_script
+    from r_executor import execute_r_simulation
+    from validator import verify_simulation
+
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 

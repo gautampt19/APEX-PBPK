@@ -24,18 +24,30 @@ OLLAMA_MODEL = "gemma4:31b"
 OLLAMA_CONTEXT_SIZE = 16384
 OLLAMA_TEMPERATURE = 0.1
 
-# Keywords used to extract relevant pages from PBPK PDFs
-RELEVANT_KEYWORDS = [
-    'compartment', 
-    'differential equation', 
-    'ode', 
-    'parameters used', 
-    'Table I', 
-    'mass balance', 
-    'deSolve',
-    'absorption rate',
-    'partition coefficient'
+# Keywords and scoring metrics used to extract relevant pages from PBPK PDFs
+HIGH_PRIORITY_KEYWORDS = [
+    'table 1', 'table i', 'table 2', 'table ii', 'table iii',
+    'parameters used', 'physiological parameters', 'model parameters',
+    'vmax', 'km', 'clurine', 'kfeces', 'kabs', 'partition coefficient', 'desolve'
 ]
+
+MEDIUM_PRIORITY_KEYWORDS = [
+    'differential equation', 'ode', 'mass balance', 'cardiac output',
+    'blood flow', 'organ volume', 'clearance', 'absorption rate'
+]
+
+LOW_PRIORITY_KEYWORDS = [
+    'compartment', 'pbpk', 'pharmacokinetic', 'simulation'
+]
+
+PK_UNITS_PATTERNS = [
+    r'l/h', r'l/hr', r'mg/kg', r'umol/l', r'µmol/l', r'1/h', r'ml/min', r'uL/h', r'µL/h', r'nmol/h'
+]
+
+MAX_EXTRACTED_PAGES = 5
+
+RELEVANT_KEYWORDS = HIGH_PRIORITY_KEYWORDS + MEDIUM_PRIORITY_KEYWORDS + LOW_PRIORITY_KEYWORDS
+
 
 # Verified publication parameters for the known papers (to guarantee accuracy)
 VERIFIED_RILUZOLE_PARAMS = {

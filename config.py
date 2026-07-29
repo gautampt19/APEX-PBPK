@@ -27,7 +27,9 @@ OLLAMA_TEMPERATURE = 0.1
 
 # OCR configurations (baidu/Unlimited-OCR)
 ENABLE_OCR_FALLBACK = True
+FORCE_OCR = False
 OCR_MODEL_NAME = "baidu/Unlimited-OCR"
+
 
 # Keywords and scoring metrics used to extract relevant pages from PBPK PDFs
 

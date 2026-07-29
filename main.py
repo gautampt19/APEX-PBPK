@@ -81,10 +81,10 @@ def validate_extracted_parameters(params: dict, base_params: dict) -> dict:
                 
     return cleaned
 
-def run_pipeline(pdf_path: str, user_overrides: dict = None, plot: bool = True):
+def run_pipeline(pdf_path: str, user_overrides: dict = None, plot: bool = True, force_ocr: bool = False):
     """
     Runs the fully generic PBPK model generator pipeline:
-    1. Extracts text from paper PDF.
+    1. Extracts text from paper PDF (with optional Baidu Unlimited-OCR).
     2. Uses LLM to discover model architecture (schema) & parameters.
     3. Programmatically generates an R script with deSolve ODEs.
     4. Saves the R script named after the paper.
@@ -103,10 +103,11 @@ def run_pipeline(pdf_path: str, user_overrides: dict = None, plot: bool = True):
 
     # 1. Extract PDF Text
     try:
-        relevant_text = extract_relevant_pages(pdf_path)
+        relevant_text = extract_relevant_pages(pdf_path, force_ocr=force_ocr)
     except Exception as e:
         logging.error(f"Failed to parse PDF: {e}")
         sys.exit(1)
+
         
     # Save extracted paper text and full Ollama prompt to files for user inspection
     extracted_text_filename = f"{pdf_stem}_extracted_text.txt"
@@ -220,6 +221,7 @@ if __name__ == '__main__':
     parser.add_argument('--dose', type=float, help="Override dose parameter")
     parser.add_argument('--bw', type=float, help="Override body weight parameter")
     parser.add_argument('--no-plot', action='store_true', help="Disable result plotting")
+    parser.add_argument('--ocr', action='store_true', help="Force Baidu Unlimited-OCR on all PDF pages")
     
     args = parser.parse_args()
     
@@ -229,5 +231,6 @@ if __name__ == '__main__':
     if args.bw is not None:
         overrides['BW'] = args.bw
         
-    run_pipeline(args.pdf, overrides if overrides else None, not args.no_plot)
+    run_pipeline(args.pdf, overrides if overrides else None, not args.no_plot, force_ocr=args.ocr)
+
 

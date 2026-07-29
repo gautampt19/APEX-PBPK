@@ -10,6 +10,7 @@ try:
         PK_UNITS_PATTERNS,
         MAX_EXTRACTED_PAGES,
         ENABLE_OCR_FALLBACK,
+        FORCE_OCR,
         OCR_MODEL_NAME
     )
 except ImportError:
@@ -20,8 +21,10 @@ except ImportError:
         PK_UNITS_PATTERNS,
         MAX_EXTRACTED_PAGES,
         ENABLE_OCR_FALLBACK,
+        FORCE_OCR,
         OCR_MODEL_NAME
     )
+
 
 # Global lazy-loaded OCR model and processor
 _OCR_PROCESSOR = None
@@ -129,10 +132,11 @@ def calculate_page_score(text: str, page_num: int, total_pages: int) -> float:
 
     return max(0.0, score)
 
-def extract_relevant_pages(pdf_path: str) -> str:
+def extract_relevant_pages(pdf_path: str, force_ocr: bool = False) -> str:
     """
     Reads a PBPK PDF paper, scores pages using weighted keyword and numerical density analysis,
     and returns concatenated text of the highest-scoring pages.
+    Supports force_ocr mode to run Baidu Unlimited-OCR on all pages.
     """
     if not os.path.exists(pdf_path):
         raise FileNotFoundError(f"PDF paper not found at: {pdf_path}")
@@ -142,8 +146,8 @@ def extract_relevant_pages(pdf_path: str) -> str:
     num_pages = len(reader.pages)
     logging.info(f"Total pages in document: {num_pages}")
     
-    # If the document is small (<= MAX_EXTRACTED_PAGES), extract all pages directly
-    if num_pages <= MAX_EXTRACTED_PAGES:
+    # If the document is small (<= MAX_EXTRACTED_PAGES) and not forcing OCR, extract all pages directly
+    if num_pages <= MAX_EXTRACTED_PAGES and not (force_ocr or FORCE_OCR):
         logging.info(f"Document has {num_pages} pages (<= {MAX_EXTRACTED_PAGES}). Extracting all pages.")
         extracted = []
         for idx in range(num_pages):
@@ -157,15 +161,17 @@ def extract_relevant_pages(pdf_path: str) -> str:
         page = reader.pages[page_idx]
         text = page.extract_text() or ""
         
-        # Scanned page check: if text is nearly empty and OCR is enabled, try OCR
-        if len(text.strip()) < 50 and ENABLE_OCR_FALLBACK:
-            logging.info(f"Page {page_num} has minimal text layer ({len(text.strip())} chars). Attempting OCR fallback...")
+        # Trigger OCR if force_ocr is set, or if text layer is empty (<50 chars) and fallback is enabled
+        if force_ocr or FORCE_OCR or (len(text.strip()) < 50 and ENABLE_OCR_FALLBACK):
+            reason = "Force OCR requested" if (force_ocr or FORCE_OCR) else f"Minimal text layer ({len(text.strip())} chars)"
+            logging.info(f"Page {page_num}: {reason}. Running Baidu Unlimited-OCR extraction...")
             ocr_text = ocr_extract_page(pdf_path, page_num)
             if ocr_text:
                 text = ocr_text
 
         if not text.strip():
             continue
+
             
         score = calculate_page_score(text, page_num, num_pages)
         page_scores.append((page_num, score, text))

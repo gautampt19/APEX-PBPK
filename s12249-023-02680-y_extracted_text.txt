@@ -1,0 +1,354 @@
+--- START PAGE 4 ---
+ AAPS PharmSciTech (2023) 24:219
+1 3219 Page 4 of 17
+were collected from the retro-orbital route at specific time 
+intervals: 0, 0.25, 0.5, 1, 2, 3, 6, and 12 h, in heparinized 
+micro-centrifuge tubes. Immediately after blood collec-
+tion, plasma separation was done using a centrifuge at 
+7000 rpm for 5 min at 4°C. The supernatant plasma was 
+separated using a micropipette and stored at  − 20°C until 
+further processing.
+To study brain kinetics, thirty rats were divided into 
+two groups. Each rat received an oral dose equivalent to 
+10 mg/kg RLZ-PAA ASD and crushed Rilutor of RLZ. 
+Three animals each at 0.5, 1, 2, 6, and 12 h were killed 
+for brain extraction. For brain homogenate preparation, 
+the brain was weighed accurately and homogenized with 
+1:5 w/v of 50% v/v aqueous acetonitrile. The brain tissue 
+sample was then centrifuged at 10,000 rpm for 10 min, 
+and the supernatant was collected [10]. Samples of brain 
+homogenate were stored at − 80°C until further analysis. 
+The control blank plasma and brain were drawn from rats 
+before dosing, processed, and stored until analysis.
+For the preparation of the calibration curve, 90 µl of 
+a biological sample (plasma or brain homogenate) was 
+spiked with 10 µl of working solutions ultimately produc-
+ing a drug concentration ranging from 20 to 2000 ng/ml 
+[12]. The biological sample (100 µl) was taken, and ACN 
+(100 µl) was added to facilitate protein precipitation. The 
+mixture was vortexed for 1 min and then centrifuged at 
+10,000 rpm for 10 min. Supernatant (100 µl) was collected 
+and subjected to heating at 80°C under constant nitrogen 
+purge. The residue was then reconstituted with 100 µl solu-
+tion of 5-methoxypsoralen in a concentration of 20 µg/ml 
+and vortexed further for 5 min. The resultant solution was 
+then injected into HPLC for drug quantification set at the 
+parameter described above.
+Literature Data Extraction for PBPK Modeling
+Rat Literature Experimental Data
+Data were extracted from a study by Ravi et al. where an oral 
+dose of 10 mg/kg BW was administered to male Wistar rats 
+weighing 180–220 g [13]. Plasma samples were analyzed at 
+0.25, 0.5, 1, 2, 3, 4, 6, 8, 12, and 16 h post dose and analyzed 
+using HPLC method. Webplot digitizer was used for extract-
+ing the data for all literature studies [14].
+Human Literature Experimental Data
+To check PBPK model predictions, the clinical data done 
+on humans were extracted from different literature. There 
+were three independent studies in the literature where RLZ 
+tablet formulation was administered to the human popula-
+tion and plasma samples were quantified. The first study 
+was from Liboux et al. where 100 mg oral dose was given, 
+and plasma samples were quantified at various time points 
+[15]. Another study was from Chandu et al. where a tablet 
+of 50 mg was given to 54 healthy volunteers with 240 ml of 
+drinking water. Blood samples were collected, and plasma 
+was analyzed by LC-ESI-MS/MS [16]. The third study was 
+taken from Longo et al. where 50 mg RLZ tablet during 
+phase I study were administered and plasma concentration 
+for 24 h were quantified [17].
+Development and Optimization of the PBPK Model
+Perfusion-limited PBPK model with 9 compartments viz., 
+stomach, gut, liver, brain, kidney, lungs, fat, heart, rest 
+body, and plasma, were developed considering Rilutor and 
+ASD formulation (Fig.  1). The exchange of drug between 
+blood and tissue in each organ is governed by blood flow 
+also called as perfusion limited or flow limited model. The 
+model was developed in rats due to availability of literature 
+and in-house data and later extrapolated to humans which 
+can be helpful in guiding clinical studies. Oral dosing was 
+considered through gut using first-order rate constant. The 
+unbound or free fraction (fu) was considered available for 
+distribution, metabolism, and excretion from the body.
+Distribution of drug from one compartment to another 
+was controlled by partition coefficient along with blood 
+flow. The partition coefficient of RLZ was taken from lit-
+erature (wherever data available) for specific organs, and for 
+remaining organs with no data availability, QSAR (quantita-
+tive structure activity relationship) model was used. Parti-
+tion coefficient was calculated using Rodger and Rowland 
+approach for perfusion-limited model [18]. The R script 
+for Rodger and Rowland approach has been provided on 
+GITHUB for users and also can be referred through the 
+published literature [19]. The elimination of the drug was 
+through metabolism in liver and excretion using urine and 
+feces from the kidney and gut, respectively. There are six 
+major and multiple minor metabolites of RLZ which are 
+mostly metabolized in liver by hydroxylation and glucuroni-
+dation catalyzed by cytochrome P450 enzyme [20]. Among 
+all metabolizing enzymes, CYP1A2 is majorly involved in 
+riluzole clearance followed by UGT1A1. The major metabo-
+lite, N-hydroxy RLZ (RLZ-OH), generated with CYP1A2 
+enzyme was considered for this study. RLZ metabolism was 
+described through Michaelis-Menten kinetics with param-
+eters like Vmax and km using the following equation.
+The absorption parameters like gastric emptying, absorp-
+tion rate constant, and bile rate constant were optimized 
+based on experimental data. Fraction unbound (fu) was 
+extracted from literature [20]. Renal clearance was taken 
+(1)Vmet = Vmax ∗ Cliver ∗ fu
+Km + Cliver ∗ fu
+--- END PAGE 4 ---
+
+--- START PAGE 6 ---
+ AAPS PharmSciTech (2023) 24:219
+1 3219 Page 6 of 17
+Table I  Physiological and 
+Biochemical Parameters Used 
+for Rat and Human PBPK 
+Model
+Parameters Value in rat for Rilu-
+tor, ASD
+Reference
+Blood flow to organ (fraction of cardiac output)
+ Liver 0.174 [22]
+ Lung 0.021 [23]
+ Kidney 0.141 [24]
+ Heart 0.051 [21]
+ Brain 0.02 [21]
+ Fat 0.07 [25]
+Volume of organ (fraction of BW)
+ Liver 0.036 [24, 25],
+ Lung 0.006 [24]
+ Kidney 0.0073 [25, 26]
+ Heart 0.004 [26]
+ Brain 0.006 [24, 25]
+ Fat 0.07 [25]
+ Plasma 0.074 [25]
+Biochemical parameters
+ Liver:plasma 2.2 Taken from  literaturea
+ Brain:plasma 2.44 Experimentalb
+ Kidney:plasma 4.622509 Calculated using R&Re
+ Lung:plasma 5.958539 Calculated using R&Re
+ Fat:plasma 14.12276 Calculated using R&Re
+ Heart:plasma 4.251126 Calculated using R&Re
+ GE (1/h/kg0.25) 2.61 Optimized*
+ Kabs (1/h/kg0.25) 0.69, 2.19 Optimized*
+ Fu (unitless) 0.04 Experimentalc
+ FuM1 (unitless) 0.04 Considered similar as parent compound
+ Vmax (nmol/h/kg0.75) 250,000 Optimized*
+ Km (µmol/l) 140 Optimized*
+ Clurine (µl/h/kg0.25) 0.3771 Taken from  literatured
+ ClM1urine (µl/h/kg0.25) 0.3771 Considered similar as parent compound
+ Kfeces (1/h/kg0.25) 0.013, 0.011 Optimized*
+Blood flow to organ (fraction)
+ Liver 0.257 [27]
+ Lung 0.034 [26]
+ Kidney 0.177 [27]
+ Heart 0.09 [28]
+ Brain 0.117 [23]
+ Fat 0.052 [27]
+Volume of organ (fraction)
+ Liver 0.026 [24, 27]
+ Lung 0.014 [24, 29]
+ Kidney 0.004 [24]
+ Heart 0.012 [28]
+ Brain 0.021 [24, 26]
+ Fat 0.187 [24]
+ Plasma 0.03976 [23]
+Biochemical parameters
+ Liver:plasma 2.2 Similar to rat
+ Brain:plasma 2.44 Similar to rat
+ Kidney:plasma 4.622509 Similar to rat
+--- END PAGE 6 ---
+
+--- START PAGE 7 ---
+AAPS PharmSciTech (2023) 24:219 
+1 3 Page 7 of 17 219
+Model Evaluation and Local Sensitivity Analysis
+To evaluate the accuracy of the developed model pre-
+dictions, a calibrated rat model using both our in-house 
+in vivo data and rat data obtained from Ravi et al. was 
+used. By comparing the plasma and brain concentration-
+time profiles generated by our model with the observed 
+data, the model’s predictive capabilities were accessed for 
+Rilutor and ASD. PBPK model in humans was evaluated 
+with data from multiple case studies [15– 17]. The PK 
+parameters were calculated and compared for both simu-
+lated and observed data. Furthermore, the predictions 
+were made for ASD formulation in humans to evaluate 
+the PK profile in plasma and brain.
+A normalized local sensitivity analysis was performed 
+to investigate the influence of biochemical model param-
+eter on the output of the model (Eq.  3) [27]. Each param-
+eter was increased by 1% to evaluate the change in plasma 
+AUC. In Eq.  3, NSC stands for normalized sensitivity 
+coefficient, inc refers to increase in AUC or parameter 
+value, and ori refers to original value for the AUC or 
+parameter.
+Ordinary differential equations (ODE) were used to 
+develop the PBPK model which describes the PK of RLZ. 
+(3)NSC = (AUCinc − AUCori )∕AUCori
+(Paraminc − Paramori )∕Paramori
+The equations were written in GNU MCSIM (Version 
+6.1.0) and solved by integration with Rstudio (Version 
+4.2.1). All the equations have been provided in supple-
+mentary file. Monte Carlo simulation was performed with 
+20,000 iterations along with the uncertainty in biochemical 
+parameters to simulate the impact on model predictions.
+Results
+Screening of Polymers
+Nuclear Magnetic Resonance
+Figure 2 shows the overlay spectra of proton ( 1H) NMR of 
+the three physical mixtures and pure RLZ. The up-field shifts 
+of  NH2 proton at 7.64 ppm was observed in all three physical 
+mixtures. The maximum relative shift could be seen from 
+7.74 to 7.62 ppm in case of RLZ:PAA (green colored peak). 
+The doublet peak of aromatic hydrogen of RLZ appearing at 
+7.37–7.35 ppm was flattened in the physical mixture.
+Contact Angle Study
+The static contact angle of the water with the surface of vari-
+ous polymers, ASDs, and RLZ was measured and displayed 
+in Table II. Poorer wetting is associated with higher surface 
+PBPK physiologically based pharmacokinetic, RLZ riluzole
+a Longo et al. reported liver:blood partition coefficient of 2.0, with RLZ blood to plasma ratio of 1.1. 
+Hence, liver:plasma partition was considered 2.2[17]
+b Calculated using AUC brain from mice study at 10 mg/kg[30]
+c [20]
+d [17]. Author calculated renal clearance using data from Liboux et al. [15]
+e [18]
+* Optimized based on experimental data from Ravi et al. [13] in Rilutor and for ASD using our in-house 
+data for rat. For human, data from Liboux et al. [15] was used to optimize gastric emptying
+Table I  (continued) Parameters Value in rat for Rilu-
+tor, ASD
+Reference
+ Lung:plasma 5.958539 Similar to rat
+ Fat:plasma 14.12276 Similar to rat
+ Heart:plasma 4.251126 Similar to rat
+ GE (1/h/kg0.25) 2.61 Optimized*
+ Kabs (1/h/kg0.25) 0.69, 2.19 Similar to rat
+ Fu (unitless) 0.04 Similar to rat
+ FuM1 (unitless) 0.04 Considered similar as parent compound
+ Vmax (nmol/h/kg0.75) 250,000 Similar to rat
+ Km (µmol/l) 140 Similar to rat
+ Clurine (µl/h/kg0.25) 0.3771 Similar to rat
+ ClM1urine (µl/h/kg0.25) 0.3771 Considered similar as parent compound
+ Kfeces (1/h/kg0.25) 0.013, 0.011 Similar to rat
+--- END PAGE 7 ---
+
+--- START PAGE 10 ---
+ AAPS PharmSciTech (2023) 24:219
+1 3219 Page 10 of 17
+to be pH-dependent as it showed solubility of 12.43 mg/ml 
+at acidic pH of 1.2 and very low solubility of 0.33 mg/ml at 
+pH 6.8. The solubility of RLZ in FaSSGF and FaSSIF was 
+slightly higher than pH 1.2 and pH 6.8, respectively. Hence, 
+RLZ demonstrated higher solubility at pH 1.2 than pH 6.8. 
+The solubility data of RLZ in different media is shown in 
+Figure S1.
+In Vitro Dissolution Testing
+Figure 4a and b show the dissolution profile of the marketed 
+tablet of RLZ, i.e., Rilutor and ASD RLZ: PAA in different 
+ratio 30:70, 20:80, and 10:90. As seen in the dissolution 
+profile at pH 1.2 in the initial 30 min, all the ASD formu-
+lations showed 100% drug release, while Rilutor showed 
+68% drug release. All the ASD formulations showed their 
+maximum release of drug, and the profile became superim-
+posable from the initial 60 min of the dissolution except for 
+Rilutor. Additionally, model-independent similarity factor 
+ (f2) of 35, 29, and 23, for 30:70, 20:80, and 10:90 RLZ:PAA 
+ASD, respectively, give evidence of dissimilarity in the dis-
+solution profile of ASD formulations with respect to Rilu-
+tor. Dissolution profile of Rilutor in FaSSGF was 75% after 
+60 min, and complete release was observed at 120 min of 
+dissolution study. In FaSSGF RLZ:PAA 10:90, ASD showed 
+complete release after 45 min, while RLZ:PAA 20:80 ASD 
+and RLZ:PAA 30:70 ASD showed complete release after 
+60 min. Calculated  f2 value of 43, 38, and 33 for 30:70, 
+20:80, and 10:90 RLZ:PAA ASD, respectively, with respect 
+to Rilutor, proves the difference in their dissolution profile.
+Rat PBPK Model
+Plasma and Brain Concentration for Rilutor
+Rat PBPK model was used for the simulation of the single 
+dose of 10 mg/kg BW/day after oral administration. Figure 5 
+shows a simulated plasma concentration-time profile for 24 h 
+with blue line, black line, and red line representing percen-
+tile 2.5, median, and 97.5, respectively, along with experi-
+mental data in red circle from Ravi et al. [13]. It can be seen 
+that the simulated details are quite close to the observed 
+data at all time points. Figure 6 shows the plasma and brain 
+profile at 10 mg/kg BW/day of our in-house data. Simulated 
+data is within the range of 1.5–twofold of observed data 
+points for both organs. The simulation reasonably captured 
+the plasma and brain PK of RLZ for the available dosing 
+scenario; however, the model needs to be further evaluated 
+for different dosing scenarios. To the best of our knowledge, 
+no such study in literature was found for rats at a dose other 
+than 10 mg/kg for tablet. Nonetheless, the model provides 
+a starting point for predicting the PK in different dosing 
+scenarios.
+Plasma and Brain Concentration for ASD Formulation
+The simulated plasma and brain concentration for a single 
+10 mg/kg ASD formulation of RLZ is shown in Fig. 7 along 
+with the observed data points from our in-house data. For 
+optimization, only plasma concentration was used. The 
+model was reasonably able to capture the brain PK as well.
+Fig. 4  In vitro dissolution profile of RLZ PAA ASD in the ratio 10:90, 20:80, and 30:70 in comparison with Rilutor a at pH 1.2 and b in 
+FaSSGF
+--- END PAGE 10 ---
+
+--- START PAGE 13 ---
+AAPS PharmSciTech (2023) 24:219 
+1 3 Page 13 of 17 219
+Local Sensitivity Analysis for Rat and Humans
+Figure S3 shows local sensitivity analysis for rat PBPK at 
+10 mg/kg BW tablet. It was found that the rest body: plasma 
+partition coefficient was highly sensitive followed by the 
+liver: plasma partition coefficient, V max, km, and fu. In the 
+case of ASD, V max and k m were highly sensitive towards 
+AUC plasma (Figure S4). This can be due to increased dis-
+solution and absorption in ASD formulation; as a result, 
+more drug is available in plasma and liver, so metabolic 
+parameters became sensitive due to the limitation of CYP 
+enzymes. This can be one of the reasons for the sensitivity 
+of the liver: plasma partition coefficient. Fu was also sen-
+sitive, and the rest of other parameters were less than 0.5 
+(sensitivity coefficient). For the human, Rilutor, and ASD 
+PBPK model, liver: plasma partition coefficient was highly 
+sensitive parameter suggesting that increase in partition coef-
+ficient will decrease the plasma AUC (Figure S5, S6). This 
+can be possible since more drug present in liver will lead to 
+an increased metabolism and hence reduced AUC in plasma. 
+Fu and V max are also highly sensitive parameter. Another 
+interesting fact is that for human Rilutor, urinary clearance, 
+and fecal elimination were sensitive, whereas they were not 
+so sensitive parameters for ASD formulation.
+Discussion
+To comprehend the mechanism of drug dissolution and to 
+spot interactions between drug and polymer, solution 1H 
+NMR spectra were used. 1H NMR holds accountability to 
+identify the possible interactions due to any kind of chemical 
+bond formation between drug and polymer. The maximum 
+relative shift in RLZ:PAA could be due to the hydrogen 
+bonding interaction between the  NH2 group of RLZ with 
+the carbonyl oxygen of polymers. The flatness of the dou-
+blet peak of aromatic hydrogen of RLZ might occur due 
+to C-H…O non-bonding interactions between drug and the 
+polymer or the change in the electron density due to distinct 
+binding interactions between the drug with each polymer 
+[33–35]. The higher order of chemical shift corresponds to 
+the comparatively stronger non-bonding interactions [36]. 
+As the alteration in the chemical shift due to the presence of 
+PAA were more with respect to PVP VA and HPMC AS, it 
+can be inferred that PAA is showing more interactions with 
+RLZ and will stabilize its amorphous state. Similar trend 
+was obtained in contact angle study where PAA in its pure 
+form and in ASD formulation was showing least angle of 
+contact, hence more wettability as compared to other two 
+polymers [37]. PAA has been found to have a direct effect on 
+Fig. 8  Concentration-time curve for plasma at the dosing of 50 mg 
+(Plot A) and 100 mg (Plot B). The blue line, black line, and red line 
+represent the 2.5th percentile, median, and 97.5th percentile, respec-
+tively. Experimental data extracted data from Liboux et al. [15] and 
+Chandu et al. [16] is represented by red circles
+--- END PAGE 13 ---

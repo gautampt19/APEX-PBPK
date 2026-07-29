@@ -40,11 +40,14 @@ def _patch_unlimited_ocr_config(config):
     defaults = {
         # Token IDs
         'pad_token_id': getattr(config, 'eos_token_id', getattr(config, 'bos_token_id', 0)),
+        # Attention implementation — needed by DeepseekV2DecoderLayer to pick
+        # between 'mha_eager' (use_mla=False) and 'mla_eager' (use_mla=True)
+        '_attn_implementation': 'eager',
         # Attention
         'attention_bias': False,
         'attention_dropout': 0.0,
         'hidden_dropout': 0.0,
-        # Rope
+        # Rope — keep None: the code guards with `if config.rope_scaling is not None`
         'rope_theta': 10000.0,
         'rope_scaling': None,
         # MoE / routing
@@ -79,6 +82,7 @@ def _patch_unlimited_ocr_config(config):
         if not hasattr(config, attr):
             setattr(config, attr, val)
     return config
+
 
 
 

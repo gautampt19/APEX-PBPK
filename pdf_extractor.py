@@ -86,7 +86,17 @@ def _patch_unlimited_ocr_config(config):
     if getattr(config, '_attn_implementation', None) is None:
         config._attn_implementation = 'eager'
 
+    # LlamaRotaryEmbedding (used by SlidingWindowLlamaAttention) reads
+    # config.rope_parameters["rope_type"] and ["rope_theta"]
+    if getattr(config, 'rope_parameters', None) is None:
+        config.rope_parameters = {
+            'rope_type': 'default',
+            'rope_theta': getattr(config, 'rope_theta', 10000.0),
+            'factor': 1.0,
+        }
+
     return config
+
 
 
 

@@ -31,6 +31,9 @@ def load_model():
     # We must override None values (not just missing attributes) for key ones.
     force_overrides = {
         '_attn_implementation': 'eager',          # needed by mha/mla dispatch
+        # LlamaRotaryEmbedding (used by SlidingWindowLlamaAttention) accesses
+        # config.rope_parameters["rope_type"] and ["rope_theta"]
+        'rope_parameters': {'rope_type': 'default', 'rope_theta': 10000.0, 'factor': 1.0},
     }
     fill_if_missing = {
         'pad_token_id':        getattr(config, 'eos_token_id', getattr(config, 'bos_token_id', 0)),

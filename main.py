@@ -15,7 +15,7 @@ from .config import (
     VERIFIED_RETARDANT_PARAMS
 )
 from .pdf_extractor import extract_relevant_pages
-from .llm_manager import extract_model_schema_and_params
+from .llm_manager import extract_model_schema_and_params, get_model_schema_prompt
 from .r_builder import generate_r_script
 from .r_executor import execute_r_simulation
 from .validator import verify_simulation
@@ -93,12 +93,27 @@ def run_pipeline(pdf_path: str, user_overrides: dict = None, plot: bool = True):
         logging.error(f"Failed to parse PDF: {e}")
         sys.exit(1)
         
+    # Save extracted paper text and full Ollama prompt to files for user inspection
+    extracted_text_filename = f"{pdf_stem}_extracted_text.txt"
+    extracted_text_path = os.path.join(WORKSPACE_DIR, extracted_text_filename)
+    with open(extracted_text_path, 'w', encoding='utf-8') as f:
+        f.write(relevant_text)
+    print(f"[+] Extracted paper text saved to: {extracted_text_path}")
+
+    full_prompt = get_model_schema_prompt(relevant_text)
+    prompt_filename = f"{pdf_stem}_ollama_prompt.txt"
+    prompt_path = os.path.join(WORKSPACE_DIR, prompt_filename)
+    with open(prompt_path, 'w', encoding='utf-8') as f:
+        f.write(full_prompt)
+    print(f"[+] Full Ollama prompt saved to: {prompt_path}")
+
     # 2. LLM Model Architecture & Parameter Extraction
     extracted_data = {}
     try:
         extracted_data = extract_model_schema_and_params(relevant_text)
     except Exception as e:
         logging.warning(f"LLM extraction failed: {e}. Falling back to standard schema.")
+
         
     schema = extracted_data.get("schema", {})
     extracted_params = extracted_data.get("parameters", {})

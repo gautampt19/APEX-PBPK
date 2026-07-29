@@ -120,30 +120,46 @@ def load_unlimited_ocr_model(model_name: str = OCR_MODEL_NAME):
 
 def ocr_extract_page(pdf_path: str, page_num: int) -> str:
     """
-    Converts a PDF page image and parses it into Markdown using Baidu Unlimited-OCR.
+    Converts a PDF page to an image and parses it into text using Baidu Unlimited-OCR.
+    Uses the model's built-in .infer(tokenizer, prompt, image_file) API.
     """
+    import tempfile, os
     try:
         from pdf2image import convert_from_path
-        images = convert_from_path(pdf_path, first_page=page_num, last_page=page_num)
+        images = convert_from_path(pdf_path, first_page=page_num, last_page=page_num, dpi=150)
         if not images:
             return ""
         page_img = images[0]
-        
+
         tokenizer, model = load_unlimited_ocr_model()
-        if tokenizer is not None and model is not None:
-            if hasattr(model, 'chat'):
-                ocr_text = model.chat(tokenizer, page_img, ocr_type='format')
-            else:
-                inputs = tokenizer(images=page_img, return_tensors="pt")
-                device = next(model.parameters()).device
-                inputs = {k: v.to(device) for k, v in inputs.items()}
-                res = model.generate(**inputs, max_new_tokens=1024)
-                ocr_text = tokenizer.decode(res[0], skip_special_tokens=True)
+        if tokenizer is None or model is None:
+            return ""
+
+        # Save to a temp file — model.infer() takes a file path, not a PIL image
+        with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmp:
+            tmp_path = tmp.name
+            page_img.save(tmp_path, format="PNG")
+
+        try:
+            # Official API from modeling_unlimitedocr.py:
+            # model.infer(tokenizer, prompt='<image>\nFree OCR.', image_file='path')
+            ocr_text = model.infer(
+                tokenizer,
+                prompt='<image>\nFree OCR.',
+                image_file=tmp_path,
+                output_path=tempfile.gettempdir(),
+                max_length=4096,
+                temperature=0.0,
+            )
             logging.info(f"Page {page_num} successfully parsed via Baidu Unlimited-OCR.")
-            return ocr_text
+            return ocr_text if isinstance(ocr_text, str) else str(ocr_text)
+        finally:
+            os.unlink(tmp_path)
+
     except Exception as e:
         logging.warning(f"OCR processing failed for page {page_num}: {e}")
     return ""
+
 
 
 

@@ -8,7 +8,9 @@ try:
         MEDIUM_PRIORITY_KEYWORDS,
         LOW_PRIORITY_KEYWORDS,
         PK_UNITS_PATTERNS,
-        MAX_EXTRACTED_PAGES
+        MAX_EXTRACTED_PAGES,
+        ENABLE_OCR_FALLBACK,
+        OCR_MODEL_NAME
     )
 except ImportError:
     from config import (
@@ -16,8 +18,63 @@ except ImportError:
         MEDIUM_PRIORITY_KEYWORDS,
         LOW_PRIORITY_KEYWORDS,
         PK_UNITS_PATTERNS,
-        MAX_EXTRACTED_PAGES
+        MAX_EXTRACTED_PAGES,
+        ENABLE_OCR_FALLBACK,
+        OCR_MODEL_NAME
     )
+
+# Global lazy-loaded OCR model and processor
+_OCR_PROCESSOR = None
+_OCR_MODEL = None
+
+def load_unlimited_ocr_model(model_name: str = OCR_MODEL_NAME):
+    """
+    Lazy loader for Baidu Unlimited-OCR model using HuggingFace transformers.
+    """
+    global _OCR_PROCESSOR, _OCR_MODEL
+    if _OCR_MODEL is None:
+        logging.info(f"Loading Baidu Unlimited-OCR model '{model_name}'...")
+        try:
+            from transformers import AutoProcessor, AutoModelForCausalLM
+            import torch
+            device = "cuda" if torch.cuda.is_available() else "cpu"
+            _OCR_PROCESSOR = AutoProcessor.from_pretrained(model_name, trust_remote_code=True)
+            _OCR_MODEL = AutoModelForCausalLM.from_pretrained(
+                model_name,
+                trust_remote_code=True,
+                torch_dtype=torch.float16 if device == "cuda" else torch.float32
+            ).to(device)
+            logging.info(f"Baidu Unlimited-OCR model successfully loaded on {device}.")
+        except Exception as e:
+            logging.warning(f"Could not load '{model_name}': {e}. OCR fallback will use basic image rendering.")
+            return None, None
+    return _OCR_PROCESSOR, _OCR_MODEL
+
+def ocr_extract_page(pdf_path: str, page_num: int) -> str:
+    """
+    Converts a PDF page image and parses it into Markdown using Baidu Unlimited-OCR.
+    """
+    try:
+        from pdf2image import convert_from_path
+        images = convert_from_path(pdf_path, first_page=page_num, last_page=page_num)
+        if not images:
+            return ""
+        page_img = images[0]
+        
+        processor, model = load_unlimited_ocr_model()
+        if processor is not None and model is not None:
+            import torch
+            device = next(model.parameters()).device
+            inputs = processor(images=page_img, return_tensors="pt").to(device)
+            with torch.no_grad():
+                generated_ids = model.generate(**inputs, max_new_tokens=1024)
+            ocr_text = processor.batch_decode(generated_ids, skip_special_tokens=True)[0]
+            logging.info(f"Page {page_num} successfully parsed via Baidu Unlimited-OCR.")
+            return ocr_text
+    except Exception as e:
+        logging.warning(f"OCR processing failed for page {page_num}: {e}")
+    return ""
+
 
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -98,12 +155,21 @@ def extract_relevant_pages(pdf_path: str) -> str:
     for page_idx in range(num_pages):
         page_num = page_idx + 1
         page = reader.pages[page_idx]
-        text = page.extract_text()
-        if not text:
+        text = page.extract_text() or ""
+        
+        # Scanned page check: if text is nearly empty and OCR is enabled, try OCR
+        if len(text.strip()) < 50 and ENABLE_OCR_FALLBACK:
+            logging.info(f"Page {page_num} has minimal text layer ({len(text.strip())} chars). Attempting OCR fallback...")
+            ocr_text = ocr_extract_page(pdf_path, page_num)
+            if ocr_text:
+                text = ocr_text
+
+        if not text.strip():
             continue
             
         score = calculate_page_score(text, page_num, num_pages)
         page_scores.append((page_num, score, text))
+
         
     # Sort pages by score in descending order
     page_scores.sort(key=lambda x: x[1], reverse=True)

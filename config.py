@@ -24,7 +24,12 @@ OLLAMA_MODEL = "gemma4:31b"
 OLLAMA_CONTEXT_SIZE = 16384
 OLLAMA_TEMPERATURE = 0.1
 
+# OCR configurations (baidu/Unlimited-OCR)
+ENABLE_OCR_FALLBACK = True
+OCR_MODEL_NAME = "baidu/Unlimited-OCR"
+
 # Keywords and scoring metrics used to extract relevant pages from PBPK PDFs
+
 HIGH_PRIORITY_KEYWORDS = [
     'table 1', 'table i', 'table 2', 'table ii', 'table iii',
     'parameters used', 'physiological parameters', 'model parameters',

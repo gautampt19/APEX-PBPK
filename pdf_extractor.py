@@ -30,7 +30,60 @@ except ImportError:
 _OCR_TOKENIZER = None
 _OCR_MODEL = None
 
+def _patch_unlimited_ocr_config(config):
+    """
+    Patch missing attributes in UnlimitedOCRConfig that the underlying DeepSeekV2 /
+    UnlimitedOCR architecture code accesses directly on the config object during __init__.
+    Sourced by grepping all `config.<attr>` usages in modeling_deepseekv2.py and
+    modeling_unlimitedocr.py against the keys present in config.json.
+    """
+    defaults = {
+        # Token IDs
+        'pad_token_id': getattr(config, 'eos_token_id', getattr(config, 'bos_token_id', 0)),
+        # Attention
+        'attention_bias': False,
+        'attention_dropout': 0.0,
+        'hidden_dropout': 0.0,
+        # Rope
+        'rope_theta': 10000.0,
+        'rope_scaling': None,
+        # MoE / routing
+        'aux_loss_alpha': 0.001,
+        'ep_size': 1,
+        'moe_layer_freq': 1,
+        'norm_topk_prob': False,
+        'routed_scaling_factor': 1.0,
+        'scoring_func': 'softmax',
+        'seq_aux': True,
+        # Hidden act
+        'hidden_act': 'silu',
+        # Norm
+        'rms_norm_eps': 1e-6,
+        # Init
+        'initializer_range': 0.02,
+        'pretraining_tp': 1,
+        # Cache / generation
+        'use_cache': True,
+        'cache_implementation': None,
+        'tie_word_embeddings': False,
+        # Misc model flags
+        'use_return_dict': True,
+        'output_attentions': False,
+        'output_hidden_states': False,
+        'num_labels': 1,
+        'problem_type': None,
+        # Sliding window (UnlimitedOCR specific)
+        '_ring_window': None,
+    }
+    for attr, val in defaults.items():
+        if not hasattr(config, attr):
+            setattr(config, attr, val)
+    return config
+
+
+
 def load_unlimited_ocr_model(model_name: str = OCR_MODEL_NAME):
+
     """
     Lazy loader for Baidu Unlimited-OCR model using HuggingFace AutoModelForCausalLM.
     """
@@ -47,8 +100,7 @@ def load_unlimited_ocr_model(model_name: str = OCR_MODEL_NAME):
 
             device = "cuda" if torch.cuda.is_available() else "cpu"
             config = AutoConfig.from_pretrained(model_name, trust_remote_code=True)
-            if not hasattr(config, 'pad_token_id') or config.pad_token_id is None:
-                config.pad_token_id = getattr(config, 'eos_token_id', getattr(config, 'bos_token_id', 0))
+            _patch_unlimited_ocr_config(config)
 
             _OCR_TOKENIZER = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
             _OCR_MODEL = AutoModel.from_pretrained(
@@ -58,6 +110,7 @@ def load_unlimited_ocr_model(model_name: str = OCR_MODEL_NAME):
                 torch_dtype=torch.bfloat16 if torch.cuda.is_available() else torch.float32
             ).to(device).eval()
             logging.info(f"Baidu Unlimited-OCR model successfully loaded on {device}.")
+
 
 
         except Exception as e:

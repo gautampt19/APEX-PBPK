@@ -81,6 +81,11 @@ def _patch_unlimited_ocr_config(config):
     for attr, val in defaults.items():
         if not hasattr(config, attr):
             setattr(config, attr, val)
+
+    # _attn_implementation is pre-set by transformers to None — force override
+    if getattr(config, '_attn_implementation', None) is None:
+        config._attn_implementation = 'eager'
+
     return config
 
 

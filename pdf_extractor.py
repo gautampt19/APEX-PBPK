@@ -26,32 +26,31 @@ except ImportError:
     )
 
 
-# Global lazy-loaded OCR model and processor
-_OCR_PROCESSOR = None
-_OCR_MODEL = None
+# Global lazy-loaded OCR pipeline
+_OCR_PIPELINE = None
 
-def load_unlimited_ocr_model(model_name: str = OCR_MODEL_NAME):
+def load_unlimited_ocr_pipeline(model_name: str = OCR_MODEL_NAME):
     """
-    Lazy loader for Baidu Unlimited-OCR model using HuggingFace transformers.
+    Lazy loader for Baidu Unlimited-OCR pipeline using HuggingFace transformers.
     """
-    global _OCR_PROCESSOR, _OCR_MODEL
-    if _OCR_MODEL is None:
+    global _OCR_PIPELINE
+    if _OCR_PIPELINE is None:
         logging.info(f"Loading Baidu Unlimited-OCR model '{model_name}'...")
         try:
-            from transformers import AutoProcessor, AutoModelForCausalLM
+            from transformers import pipeline
             import torch
-            device = "cuda" if torch.cuda.is_available() else "cpu"
-            _OCR_PROCESSOR = AutoProcessor.from_pretrained(model_name, trust_remote_code=True)
-            _OCR_MODEL = AutoModelForCausalLM.from_pretrained(
-                model_name,
+            device = 0 if torch.cuda.is_available() else -1
+            _OCR_PIPELINE = pipeline(
+                "image-text-to-text",
+                model=model_name,
                 trust_remote_code=True,
-                torch_dtype=torch.float16 if device == "cuda" else torch.float32
-            ).to(device)
-            logging.info(f"Baidu Unlimited-OCR model successfully loaded on {device}.")
+                device=device
+            )
+            logging.info(f"Baidu Unlimited-OCR pipeline successfully loaded.")
         except Exception as e:
-            logging.warning(f"Could not load '{model_name}': {e}. OCR fallback will use basic image rendering.")
-            return None, None
-    return _OCR_PROCESSOR, _OCR_MODEL
+            logging.warning(f"Could not load '{model_name}': {e}. OCR fallback will use basic text extraction.")
+            return None
+    return _OCR_PIPELINE
 
 def ocr_extract_page(pdf_path: str, page_num: int) -> str:
     """
@@ -64,19 +63,19 @@ def ocr_extract_page(pdf_path: str, page_num: int) -> str:
             return ""
         page_img = images[0]
         
-        processor, model = load_unlimited_ocr_model()
-        if processor is not None and model is not None:
-            import torch
-            device = next(model.parameters()).device
-            inputs = processor(images=page_img, return_tensors="pt").to(device)
-            with torch.no_grad():
-                generated_ids = model.generate(**inputs, max_new_tokens=1024)
-            ocr_text = processor.batch_decode(generated_ids, skip_special_tokens=True)[0]
+        pipe = load_unlimited_ocr_pipeline()
+        if pipe is not None:
+            res = pipe(page_img)
+            if isinstance(res, list) and len(res) > 0:
+                ocr_text = res[0].get("generated_text", str(res[0]))
+            else:
+                ocr_text = str(res)
             logging.info(f"Page {page_num} successfully parsed via Baidu Unlimited-OCR.")
             return ocr_text
     except Exception as e:
         logging.warning(f"OCR processing failed for page {page_num}: {e}")
     return ""
+
 
 
 

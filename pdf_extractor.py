@@ -42,17 +42,18 @@ def load_unlimited_ocr_model(model_name: str = OCR_MODEL_NAME):
             if not hasattr(import_utils, 'is_torch_fx_available'):
                 import_utils.is_torch_fx_available = lambda: True
 
-            from transformers import AutoModelForCausalLM, AutoTokenizer
+            from transformers import AutoModel, AutoTokenizer
             import torch
 
             device = "cuda" if torch.cuda.is_available() else "cpu"
             _OCR_TOKENIZER = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
-            _OCR_MODEL = AutoModelForCausalLM.from_pretrained(
+            _OCR_MODEL = AutoModel.from_pretrained(
                 model_name,
                 trust_remote_code=True,
                 torch_dtype=torch.bfloat16 if torch.cuda.is_available() else torch.float32
             ).to(device).eval()
             logging.info(f"Baidu Unlimited-OCR model successfully loaded on {device}.")
+
         except Exception as e:
             logging.warning(f"Could not load '{model_name}': {e}. OCR fallback will use basic text extraction.")
             return None, None

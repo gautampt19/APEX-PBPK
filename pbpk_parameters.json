@@ -1,0 +1,49 @@
+{
+    "blood_flow_fraction": {
+        "Liver": 0.257,
+        "Lung": 0.034,
+        "Kidney": 0.177,
+        "Heart": 0.09,
+        "Brain": 0.117,
+        "Fat": 0.052
+    },
+    "volume_fraction": {
+        "Liver": 0.026,
+        "Lung": 0.014,
+        "Kidney": 0.004,
+        "Heart": 0.012,
+        "Brain": 0.021,
+        "Fat": 0.187,
+        "Plasma": 0.03976
+    },
+    "biochemical_parameters": {
+        "Liver:plasma": 2.2,
+        "Brain:plasma": 2.44,
+        "Kidney:plasma": 4.622509,
+        "Lung:plasma": 5.958539,
+        "Fat:plasma": 14.12276,
+        "Heart:plasma": 4.251126,
+        "GE": 2.61,
+        "Kabs": 0.69,
+        "Fu": 0.04,
+        "FuM1 (unitless)": 0.04,
+        "Vmax": 250000.0,
+        "Km": 140.0,
+        "Cl_urine": 0.3771,
+        "ClM1urine (\u03bcl/h/Kg0.25)": 0.3771,
+        "K_feces": 0.013,
+        "ClM1urine (\u03bcl/h/Kg\\( ^{0.25} \\))": 0.3771,
+        "S. no": "Components",
+        "1": "RLZ",
+        "2": "PAA",
+        "3": "PVP",
+        "4": "HPMC",
+        "5": "RLZ-PAA",
+        "6": "RLZ-PPV",
+        "7": "RLZ-HPMC"
+    },
+    "equations": {
+        "metabolism": "Vmet = (Vmax * Cliver * fu) / (Km + Cliver * fu)",
+        "allometric_scaling": "Param_human = Param_rat * (BW_human / BW_rat)^AE"
+    }
+}

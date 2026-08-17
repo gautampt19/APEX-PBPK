@@ -16,4 +16,5 @@ env/
 venv/
 ocr_output/
 .DS_Store
- 
+ pipeline_output/colpali_pages/
+papers/

@@ -21,7 +21,7 @@ R_EXECUTABLE = shutil.which("Rscript") or ("/usr/bin/Rscript" if os.path.exists(
 
 # Ollama API configurations
 OLLAMA_API_URL = "http://127.0.0.1:11434/api/generate"
-OLLAMA_MODEL = "gemma4:31b"
+OLLAMA_MODEL = "qwen3.8:latest"
 OLLAMA_CONTEXT_SIZE = 16384
 OLLAMA_TEMPERATURE = 0.1
 
@@ -29,6 +29,18 @@ OLLAMA_TEMPERATURE = 0.1
 ENABLE_OCR_FALLBACK = True
 FORCE_OCR = False
 OCR_MODEL_NAME = "baidu/Unlimited-OCR"
+
+# ColPali Visual Retrieval
+COLPALI_MODEL = "vidore/colpali-v1.3-hf"
+COLPALI_TOP_K = 5
+COLPALI_QUERIES = [
+    "Table of physiological parameters: organ blood flows, organ volumes, partition coefficients",
+    "PBPK model compartment diagram showing tissue connections and blood flow",
+    "Differential equations for mass balance, ODE system, dA/dt",
+    "Pharmacokinetic parameters: Vmax, Km, clearance, absorption rate, fraction unbound",
+    "Drug dose, body weight, cardiac output, species information",
+]
+
 
 
 # Keywords and scoring metrics used to extract relevant pages from PBPK PDFs

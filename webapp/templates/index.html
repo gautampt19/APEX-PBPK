@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APEX-PBPK — Visual PBPK Parameter Extraction</title>
+    <meta name="description" content="Upload a scientific paper PDF and extract PBPK parameters with AI-powered visual document retrieval.">
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+</head>
+<body>
+<div class="app-container">
+
+    <!-- ═══ Header ═══ -->
+    <header class="header">
+        <div class="header-brand">
+            <div>
+                <div class="header-logo">APEX-PBPK</div>
+                <div class="header-subtitle">Visual PBPK Parameter Extraction &amp; Model Builder</div>
+            </div>
+        </div>
+        <div class="header-badge">
+            <span class="dot"></span>
+            <span id="model-badge">qwen3.8:latest</span>
+        </div>
+    </header>
+
+    <!-- ═══ Main Layout ═══ -->
+    <div class="main-layout">
+
+        <!-- ── Sidebar ── -->
+        <aside class="sidebar">
+
+            <!-- Upload Card -->
+            <div class="card">
+                <div class="card-title"><span class="icon">📄</span> PDF Upload</div>
+                <div class="upload-zone" id="upload-zone">
+                    <div class="upload-icon">📁</div>
+                    <div class="upload-text">
+                        <strong>Drop PDF here</strong><br>or click to browse
+                    </div>
+                    <input type="file" id="file-input" accept=".pdf">
+                </div>
+                <div id="uploaded-info"></div>
+
+                <!-- Previously uploaded papers -->
+                <div style="margin-top: 16px;">
+                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 6px;">Previous Papers</div>
+                    <ul class="paper-list" id="paper-list"></ul>
+                </div>
+            </div>
+
+            <!-- Pipeline Controls Card -->
+            <div class="card">
+                <div class="card-title"><span class="icon">⚙️</span> Pipeline Controls</div>
+                <div class="controls">
+                    <div class="control-row">
+                        <span>ColPali Retrieval</span>
+                        <label class="toggle">
+                            <input type="checkbox" id="use-colpali" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="control-row">
+                        <span>Model</span>
+                        <select id="model-select">
+                            <option value="qwen3.8:latest" selected>qwen3.8:latest</option>
+                            <option value="gemma4:31b">gemma4:31b</option>
+                        </select>
+                    </div>
+                    <div class="control-row">
+                        <span>Top-K Pages</span>
+                        <input type="number" id="top-k" value="5" min="1" max="20">
+                    </div>
+                    <div class="control-row">
+                        <span>Backend</span>
+                        <select id="backend-select">
+                            <option value="ollama" selected>Ollama</option>
+                            <option value="vllm">vLLM</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn btn-primary" id="run-btn" disabled style="margin-top: 16px; width: 100%;">
+                    <span>▶</span> Run Pipeline
+                </button>
+                <button class="btn btn-secondary" id="toggle-log-btn" style="margin-top: 8px; width: 100%;">
+                    <span>📋</span> Toggle Log
+                </button>
+                <div class="log-viewer" id="log-viewer"></div>
+            </div>
+        </aside>
+
+        <!-- ── Content Area ── -->
+        <div class="content">
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="params">
+                    <span>📊</span> Extracted Parameters
+                </button>
+                <button class="tab-btn" data-tab="flow">
+                    <span>🔀</span> Compartment Flow
+                </button>
+                <button class="tab-btn" data-tab="colpali">
+                    <span>🔍</span> ColPali Pages
+                </button>
+                <button class="tab-btn" data-tab="rcode">
+                    <span>💻</span> R Model Code
+                </button>
+            </div>
+
+            <div class="tab-content">
+                <!-- Parameters Tab -->
+                <div class="tab-panel active" id="tab-params">
+                    <div class="empty-state" id="params-empty">
+                        <div class="empty-icon">🧬</div>
+                        <div class="empty-text">Upload a PDF and run the pipeline to extract PBPK parameters</div>
+                    </div>
+                    <div id="params-content" style="display:none;"></div>
+                </div>
+
+                <!-- Compartment Flow Tab -->
+                <div class="tab-panel" id="tab-flow">
+                    <div class="empty-state" id="flow-empty">
+                        <div class="empty-icon">🔀</div>
+                        <div class="empty-text">Compartment flow diagram will be generated from extracted parameters</div>
+                    </div>
+                    <div id="compartment-diagram" style="display:none;"></div>
+                </div>
+
+                <!-- ColPali Pages Tab -->
+                <div class="tab-panel" id="tab-colpali">
+                    <div class="empty-state" id="colpali-empty">
+                        <div class="empty-icon">🔍</div>
+                        <div class="empty-text">ColPali-retrieved page images will appear here after processing</div>
+                    </div>
+                    <div class="gallery" id="colpali-gallery" style="display:none;"></div>
+                </div>
+
+                <!-- R Code Tab -->
+                <div class="tab-panel" id="tab-rcode">
+                    <div class="empty-state" id="rcode-empty">
+                        <div class="empty-icon">💻</div>
+                        <div class="empty-text">Generated R/deSolve model code will appear here</div>
+                    </div>
+                    <div class="code-block" id="rcode-block" style="display:none;">
+                        <pre id="rcode-content"></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ Status Bar ═══ -->
+    <footer class="status-bar">
+        <div class="spinner" id="spinner"></div>
+        <span class="status-text" id="status-text">Ready</span>
+        <div class="progress-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        <span id="progress-pct" style="font-size: 0.75rem; color: var(--text-muted);">0%</span>
+    </footer>
+
+    <!-- Lightbox -->
+    <div class="lightbox" id="lightbox">
+        <img id="lightbox-img" src="" alt="Page preview">
+    </div>
+</div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

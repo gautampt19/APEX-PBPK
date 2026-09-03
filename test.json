@@ -1,0 +1,53 @@
+{
+    "blood_flow_fraction": {
+        "Rat_Liver": 0.174,
+        "Rat_Brain": 0.021,
+        "Rat_Kidney": 0.141,
+        "Rat_Lungs": 0.051,
+        "Rat_Heart": 0.02,
+        "Rat_Fat": 0.07,
+        "Human_Liver": 0.257,
+        "Human_Brain": 0.034,
+        "Human_Kidney": 0.177,
+        "Human_Lungs": 0.09,
+        "Human_Heart": 0.117,
+        "Human_Fat": 0.052
+    },
+    "volume_fraction": {
+        "Rat_Liver": 0.036,
+        "Rat_Brain": 0.006,
+        "Rat_Kidney": 0.0073,
+        "Rat_Lungs": 0.004,
+        "Rat_Heart": 0.006,
+        "Rat_Fat": 0.07,
+        "Rat_Plasma": 0.074,
+        "Human_Liver": 0.026,
+        "Human_Brain": 0.014,
+        "Human_Kidney": 0.004,
+        "Human_Lungs": 0.012,
+        "Human_Heart": 0.021,
+        "Human_Fat": 0.187,
+        "Human_Plasma": 0.03976
+    },
+    "biochemical_parameters": {
+        "Liver:plasma": 2.2,
+        "Brain:plasma": 2.44,
+        "Kidney:plasma": 4.622509,
+        "Lung:plasma": 5.958539,
+        "Fat:plasma": 14.12276,
+        "Heart:plasma": 4.251126,
+        "GE_rat": 2.61,
+        "Kabs_rat_Rilutor": 0.69,
+        "Kabs_rat_ASD": 2.19,
+        "Vmax": 250000,
+        "Kfeces_Rilutor": 0.013,
+        "Kfeces_ASD": 0.011,
+        "blood_plasma_ratio": 1.1,
+        "metabolite_modeled": "RLZ-OH (N-hydroxy RLZ)"
+    },
+    "equations": {
+        "metabolism_michaelis_menten": "Vmet = (Vmax * Cliver * fu) / (Km + Cliver * fu)",
+        "allometric_scaling": "Param = Param * (BW_human / BW_rat)^AE",
+        "normalized_sensitivity_coefficient": "NSC = ((AUCinc - AUCori)/AUCori) / ((Paraminc - Paramori)/Paramori)"
+    }
+}

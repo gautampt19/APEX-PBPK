@@ -1,0 +1,24 @@
+{
+    "blood_flow_fraction": {},
+    "volume_fraction": {},
+    "biochemical_parameters": {
+        "ciprofloxacin_logP": 0.95,
+        "ciprofloxacin_pKa_acid": 6.1,
+        "ciprofloxacin_pKa_base": 8.6,
+        "ciprofloxacin_MW": 331,
+        "ciprofloxacin_MW_effective": 314,
+        "ciprofloxacin_fu_human": 0.67,
+        "ciprofloxacin_solubility": 6.18,
+        "ciprofloxacin_CLint_CYP1A2": 17,
+        "ciprofloxacin_CL_biliary": 1.03,
+        "ciprofloxacin_CL_renal_GFR_specific": 0.266,
+        "ciprofloxacin_CL_renal_TBS": 0.57,
+        "ciprofloxacin_permeability_transcellular_intestinal": 1.0
+    },
+    "equations": {
+        "Michaelis_Menten": "v = (Vmax * [S]) / (Km + [S])",
+        "Vmax_relative_expression": "Vmax_j = kcat * E0 * erel_j = kcat_star * erel_j",
+        "bacterial_growth_rate": "dN/dt = k * N * (1 - N/Nmax) - [kill_terms]",
+        "adaptive_resistance_concentration": "Cr = C0 * (exp(-2*ke*(t-tlag)) / (2*exp(-2*kecr*(t-tlag))))"
+    }
+}

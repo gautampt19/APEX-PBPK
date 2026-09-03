@@ -1,0 +1,142 @@
+model Deepika2022_BPA_Human()
+
+#Created: Carolina Vogs, September 2025
+#Checked: Paris Mertzimekis, December 2025
+
+model notes ```
+BAP PBK (Deepika 2022):
+- Human PBK for oral absorption
+- Administration -> stomach -> gut -> liver -> blood
+- Parent only, perfusion-limited tissues
+- Intestinal Metabolism BAP -> BAPG
+- Hepatic Metabolism BAP -> BAPG and BAPS
+- Parameters taken from Table S1, Table 1 or https://doi.org/10.1016/j.scitotenv.2017.12.023
+- The absorption and metabolism parameters should have units /h in order to be consistent with the transfer equations. However, the units given in the supplemental materials of the original paper are L/h/kg^-0.25. Therefore, units were changed to /h while keeping the same values. This may result in (large) deviations from the model implementation described in the paper.
+```
+model description "https://www.ncbi.nlm.nih.gov/pubmed/35995217"
+
+#------------------------
+# Body size & base volumes
+#------------------------
+BW          = 70                # kg
+
+VLc         = 0.026             # L/kg (liver)
+VPlasmac    = 0.0428            # L/kg (plasma)
+VGc         = 0.017             # L/kg (gut)
+
+VL      := VLc*BW               # L
+VPlasma := VPlasmac*BW          # L
+VG      := VGc*BW               # L
+VRest   := BW * (0.84 - VLc - VPlasmac - VGc)  # Lumped Rest-of-body volume L
+
+#------------------------
+# Blood Flows
+#------------------------
+QC    := 20*BW^0.75            # L/h (cardiac output)
+QLc   = 0.25
+QGc   = 0.016
+
+QL    := QLc*QC                # L/h (liver)
+QRest := (1 - QLc - QGc)*QC    # L/h (rest)
+
+fup = 0.965                    # 3.5% protein binding according to Edington and Ritter (2018)
+
+#------------------------
+# Absorption & hepatic metabolism
+#------------------------
+
+#kstoC = 3.5                     # L/h/kg^(-0.25)
+#ksto := kstoC * BW ^(-0.25)    # L/h
+ksto = 3.5                      # /h
+
+#kabsC = 9                       # L/h/kg^(-0.25)
+#kabs := kabsC * BW ^(-0.25)    # L/h
+kabs = 9                        # /h
+
+#------------------------
+# Intestinal metabolism - Michaelis-Menten Kinetic
+#------------------------
+VmaxGMet1 := (22750/1000) * BW^0.75     # µmol/h
+KmGMet1 = 58                            # µmol/L
+
+#------------------------
+# Hepatic metabolism - Michaelis-Menten Kinetic
+#------------------------
+VmaxLMet1 := (680095.6/1000) * BW^0.75  # µmol/h
+KmLMet1 = 45.8                          # µmol/L
+
+VmaxLMet2 := (11657/1000) * BW^0.75     # µmol/h
+KmLMet2 = 10.1                          # µmol/L
+
+#------------------------
+# Partition coefficients
+#------------------------
+PL = 0.73
+PRest = 1
+
+#------------------------
+# Compartments (sizes)
+#------------------------
+compartment Stomach; Stomach = 1
+compartment Liver; Liver := VL
+compartment Plasma; Plasma := VPlasma
+compartment Gut; Gut := VG
+compartment Rest; Rest := VRest
+
+#------------------------
+# Species (amount states)
+#------------------------
+substanceOnly species ASt in Stomach
+substanceOnly species ALiver in Liver
+substanceOnly species APlasma in Plasma
+substanceOnly species AGut in Gut
+substanceOnly species ARest in Rest
+
+# Met1 = BAPG, Met2 = BAPS
+
+substanceOnly species AGutMet1 in Gut
+substanceOnly species ALiverMet1 in Liver
+substanceOnly species ALiverMet2 in Liver
+
+#------------------------
+# Initial conditions
+#------------------------
+ASt = 0;
+ALiver = 0;
+APlasma = 0;
+AGut = 0;
+ARest = 0;
+AGutMet1 = 0;
+ALiverMet1 = 0;
+ALiverMet2 = 0;
+
+#------------------------
+# Concentrations
+#------------------------
+CLiver := ALiver / Liver
+CPlasma := APlasma / Plasma
+CGut := AGut / Gut
+CRest := ARest / Rest
+
+#------------------------
+# Reactions / Transfers
+#------------------------
+
+# GI absorption
+ASt -> AGut;          ksto * ASt
+AGut -> ALiver;       kabs * AGut
+AGut -> AGutMet1;     VmaxGMet1 * CGut * fup / ((CGut * fup) + KmGMet1)     # Glu
+
+# Perfusion-limited exchanges (blood <-> liver & rest)
+
+APlasma -> ALiver;    QL * CPlasma * fup
+ALiver -> APlasma;    QL * fup * CLiver/PL
+
+APlasma -> ARest;     QRest * CPlasma * fup
+ARest -> APlasma;     QRest * fup * CRest/PRest
+
+# Hepatic Metabolism
+ALiver -> ALiverMet1; VmaxLMet1 * CLiver * fup / ((CLiver * fup) + KmLMet1)     # Glu
+ALiver -> ALiverMet2; VmaxLMet2 * CLiver * fup / ((CLiver * fup) + KmLMet2)     # Sul
+
+end

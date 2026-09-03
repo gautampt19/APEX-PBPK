@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APEX-PBPK — Database Viewer</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        .split-layout {
+            display: flex;
+            height: calc(100vh - 60px);
+            gap: 20px;
+            padding: 20px;
+        }
+        .sidebar {
+            width: 300px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar-header {
+            padding: 15px;
+            border-bottom: 1px solid var(--border);
+            background: var(--surface-3);
+            font-weight: 600;
+            color: var(--accent);
+            position: sticky;
+            top: 0;
+        }
+        .paper-item {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .paper-item:hover {
+            background: var(--surface-3);
+        }
+        .paper-item.active {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+        }
+        .paper-title {
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 4px;
+            word-break: break-word;
+        }
+        .paper-id {
+            font-size: 0.75rem;
+            opacity: 0.8;
+            font-family: monospace;
+        }
+        
+        .main-content {
+            flex: 1;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .main-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            background: var(--surface-3);
+        }
+        .main-header h2 {
+            margin: 0 0 5px 0;
+            font-size: 1.2rem;
+            color: var(--text-primary);
+        }
+        .main-header p {
+            margin: 0;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+        
+        .table-container {
+            flex: 1;
+            overflow: auto;
+            padding: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        th, td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        th {
+            background: var(--surface-3);
+            color: var(--accent);
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.03);
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            background: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        .badge.pbpko {
+            background: rgba(14, 165, 233, 0.15);
+            color: #0ea5e9;
+            border-color: rgba(14, 165, 233, 0.3);
+        }
+        .badge.xml-table { background: rgba(16,185,129,0.15); color:#10b981; border-color:rgba(16,185,129,0.3); }
+        .badge.colpali   { background: rgba(245,158,11,0.15);  color:#f59e0b; border-color:rgba(245,158,11,0.3);  }
+        .badge.prose     { background: rgba(168,85,247,0.15);  color:#a855f7; border-color:rgba(168,85,247,0.3);  }
+        .badge.pubchem   { background: rgba(59,130,246,0.15);   color:#3b82f6; border-color:rgba(59,130,246,0.3);   }
+        .badge.chembl    { background: rgba(236,72,153,0.15);  color:#ec4899; border-color:rgba(236,72,153,0.3);  }
+        
+        .nav-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            height: 60px;
+            background: var(--surface-2);
+            border-bottom: 1px solid var(--border);
+        }
+        .nav-header h1 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: var(--accent);
+        }
+        .nav-links a {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            margin-left: 20px;
+            transition: color 0.2s;
+        }
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+        
+        .empty-state {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+        
+        /* Spinner */
+        .loader {
+            border: 3px solid var(--surface-3);
+            border-top: 3px solid var(--accent);
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <header class="nav-header">
+        <h1>APEX-PBPK Database</h1>
+        <div class="nav-links">
+            <a href="/">← Back to Extractor</a>
+        </div>
+    </header>
+
+    <div class="split-layout">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">Extracted Papers</div>
+            <div id="papers-list">
+                <div class="loader"></div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="main-header" id="main-header" style="display: none;">
+                <h2 id="doc-title">Select a paper</h2>
+                <p id="doc-meta"></p>
+            </div>
+            <div class="table-container" id="table-container">
+                <div class="empty-state">Select a paper from the sidebar to view extracted parameters.</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function _sourcePassBadge(sp) {
+            const map = {
+                'xml_table':          ['xml-table', 'XML Table'],
+                'colpali_page':       ['colpali',   'Visual'],
+                'prose_pass':         ['prose',     'Prose'],
+                'pubchem_enrichment': ['pubchem',   'PubChem / DrugBank'],
+                'chembl_enrichment':  ['chembl',    'ChEMBL'],
+            };
+            const [cls, label] = map[sp] || ['pbpko', sp || 'unknown'];
+            return `<span class="badge ${cls}">${label}</span>`;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchPapers();
+        });
+
+        async function fetchPapers() {
+            try {
+                const res = await fetch('/api/db/papers');
+                const data = await res.json();
+                const list = document.getElementById('papers-list');
+                
+                if (data.papers.length === 0) {
+                    list.innerHTML = '<div style="padding: 20px; text-align: center; color: #888;">No papers found in database.</div>';
+                    return;
+                }
+                
+                list.innerHTML = '';
+                data.papers.forEach(p => {
+                    const el = document.createElement('div');
+                    el.className = 'paper-item';
+                    
+                    const title = document.createElement('div');
+                    title.className = 'paper-title';
+                    title.textContent = p.title || p.paper_id;
+                    
+                    const id = document.createElement('div');
+                    id.className = 'paper-id';
+                    id.textContent = p.paper_id;
+                    
+                    el.appendChild(title);
+                    el.appendChild(id);
+                    
+                    el.onclick = () => {
+                        document.querySelectorAll('.paper-item').forEach(i => i.classList.remove('active'));
+                        el.classList.add('active');
+                        fetchParameters(p.paper_id);
+                    };
+                    
+                    list.appendChild(el);
+                });
+            } catch (err) {
+                document.getElementById('papers-list').innerHTML = `<div style="padding: 20px; color: #ef4444;">Error loading papers: ${err.message}</div>`;
+            }
+        }
+
+        async function fetchParameters(paperId) {
+            const container = document.getElementById('table-container');
+            const header = document.getElementById('main-header');
+            
+            container.innerHTML = '<div class="loader"></div>';
+            
+            try {
+                const res = await fetch(`/api/db/parameters/${paperId}`);
+                const data = await res.json();
+                
+                // Update Header
+                header.style.display = 'block';
+                document.getElementById('doc-title').textContent = data.document?.title || paperId;
+                document.getElementById('doc-meta').textContent = `Processed on ${data.document?.created_at || 'Unknown'} • ${data.parameters.length} parameters extracted`;
+                
+                if (data.parameters.length === 0) {
+                    container.innerHTML = '<div class="empty-state">No parameters extracted for this paper.</div>';
+                    return;
+                }
+                
+                // Build Table
+                let html = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Table ID</th>
+                                <th>Parameter (Raw)</th>
+                                <th>Canonical Name (PBPKO)</th>
+                                <th>Value</th>
+                                <th>Dev</th>
+                                <th>Unit</th>
+                                <th>Species</th>
+                                <th>Route</th>
+                                <th>Source</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                data.parameters.forEach(p => {
+                    let canonHtml = p.canonical_name;
+                    if (p.canonical_name && p.canonical_name !== p.parameter_name) {
+                        canonHtml = `<span class="badge pbpko">${p.canonical_name}</span>`;
+                    }
+                    
+                    html += `
+                        <tr>
+                            <td style="color: var(--text-muted); font-family: monospace;">${p.table_id || '-'}</td>
+                            <td style="font-weight: 500;">${p.parameter_name || '-'}</td>
+                            <td>${canonHtml}</td>
+                            <td style="color: var(--accent); font-family: monospace;">${p.value !== null ? p.value : '-'}</td>
+                            <td style="color: var(--text-muted); font-size: 0.8rem;">${p.deviation_value !== null ? '±'+p.deviation_value : '-'}</td>
+                            <td style="font-family: monospace;">${p.unit || '-'}</td>
+                            <td>${p.species ? '<span class="badge">' + p.species + '</span>' : '-'}</td>
+                            <td>${p.route || '-'}</td>
+                            <td>${_sourcePassBadge(p.source_pass)}</td>
+                        </tr>
+                    `;
+                });
+                
+                html += `</tbody></table>`;
+                container.innerHTML = html;
+                
+            } catch (err) {
+                container.innerHTML = `<div class="empty-state" style="color: #ef4444;">Error loading parameters: ${err.message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>

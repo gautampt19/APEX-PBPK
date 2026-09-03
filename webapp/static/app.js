@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════════════════════════════════════════
-   APEX-PBPK Dashboard — Client-Side Application Logic
+   APEX-PBPK Dashboard — Client-Side Application Logic (Editable)
    ══════════════════════════════════════════════════════════════════════════ */
 
 // ── Mermaid Init ─────────────────────────────────────────────────────────
@@ -16,24 +16,21 @@ mermaid.initialize({
         fontFamily:         'Inter, sans-serif',
         fontSize:           '13px',
     },
-    flowchart: {
-        curve: 'basis',
-        padding: 20,
-        htmlLabels: true,
-        useMaxWidth: true,
-    },
+    flowchart: { curve: 'basis', padding: 20, htmlLabels: true, useMaxWidth: true }
 });
 
 // ── State ────────────────────────────────────────────────────────────────
 let currentFilename = null;
 let currentPaperName = null;
+let currentParams = null; // Holds the editable JSON parameters
 
 // ── DOM References ───────────────────────────────────────────────────────
 const uploadZone   = document.getElementById('upload-zone');
 const fileInput    = document.getElementById('file-input');
 const uploadedInfo = document.getElementById('uploaded-info');
 const paperList    = document.getElementById('paper-list');
-const runBtn       = document.getElementById('run-btn');
+const extractBtn   = document.getElementById('extract-btn');
+const generateBtn  = document.getElementById('generate-btn');
 const logViewer    = document.getElementById('log-viewer');
 const toggleLogBtn = document.getElementById('toggle-log-btn');
 const spinner      = document.getElementById('spinner');
@@ -55,55 +52,52 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
 });
 
 // ── Upload Logic ─────────────────────────────────────────────────────────
-uploadZone.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    uploadZone.classList.add('drag-over');
-});
+uploadZone.addEventListener('dragover', (e) => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
 uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
 uploadZone.addEventListener('drop', (e) => {
-    e.preventDefault();
-    uploadZone.classList.remove('drag-over');
+    e.preventDefault(); uploadZone.classList.remove('drag-over');
     if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
 });
-fileInput.addEventListener('change', () => {
-    if (fileInput.files.length) handleFile(fileInput.files[0]);
-});
+fileInput.addEventListener('change', () => { if (fileInput.files.length) handleFile(fileInput.files[0]); });
+
+function resetUI() {
+    currentParams = null;
+    generateBtn.style.display = 'none';
+    extractBtn.disabled = false;
+    document.getElementById('params-content').innerHTML = '';
+    document.getElementById('params-content').style.display = 'none';
+    document.getElementById('params-empty').style.display = 'flex';
+    document.getElementById('compartment-diagram').innerHTML = '';
+    document.getElementById('compartment-diagram').style.display = 'none';
+    document.getElementById('flow-empty').style.display = 'flex';
+    document.getElementById('colpali-gallery').innerHTML = '';
+    document.getElementById('colpali-gallery').style.display = 'none';
+    document.getElementById('colpali-empty').style.display = 'flex';
+    document.getElementById('rcode-content').textContent = '';
+    document.getElementById('rcode-block').style.display = 'none';
+    document.getElementById('rcode-empty').style.display = 'flex';
+    logViewer.innerHTML = '';
+    setProgress(0);
+}
 
 async function handleFile(file) {
-    if (!file.name.toLowerCase().endsWith('.pdf')) {
-        alert('Please upload a PDF file.');
-        return;
-    }
-
-    const formData = new FormData();
-    formData.append('file', file);
-
+    if (!file.name.toLowerCase().endsWith('.pdf')) { alert('Please upload a PDF file.'); return; }
+    resetUI();
+    const formData = new FormData(); formData.append('file', file);
     setStatus('Uploading...', 'running');
-
     try {
         const resp = await fetch('/api/upload', { method: 'POST', body: formData });
         const data = await resp.json();
-
         if (resp.ok) {
-            currentFilename = data.filename;
-            currentPaperName = data.paper_name;
-            uploadedInfo.innerHTML = `
-                <div class="uploaded-file">📄 ${data.filename}</div>
-            `;
-            runBtn.disabled = false;
-            setStatus('PDF uploaded — ready to run', '');
-            loadPaperList();
-
-            // Check if results already exist
-            loadResults(data.paper_name);
+            currentFilename = data.filename; currentPaperName = data.paper_name;
+            uploadedInfo.innerHTML = `<div class="uploaded-file">📄 ${data.filename}</div>`;
+            setStatus('PDF uploaded — ready to extract', '');
+            
+            loadResults(data.paper_name); // Check if results exist
         } else {
-            alert(data.error || 'Upload failed');
-            setStatus('Upload failed', 'failed');
+            alert(data.error || 'Upload failed'); setStatus('Upload failed', 'failed');
         }
-    } catch (err) {
-        alert('Upload error: ' + err.message);
-        setStatus('Upload error', 'failed');
-    }
+    } catch (err) { alert('Upload error: ' + err.message); setStatus('Upload error', 'failed'); }
 }
 
 // ── Paper List ───────────────────────────────────────────────────────────
@@ -114,84 +108,58 @@ async function loadPaperList() {
         paperList.innerHTML = '';
         data.papers.forEach(name => {
             const li = document.createElement('li');
-            li.textContent = name;
             li.innerHTML = `📄 ${name}`;
             if (name === currentFilename) li.classList.add('active');
             li.addEventListener('click', () => {
-                currentFilename = name;
-                currentPaperName = name.replace('.pdf', '');
+                currentFilename = name; currentPaperName = name.replace('.pdf', '');
                 uploadedInfo.innerHTML = `<div class="uploaded-file">📄 ${name}</div>`;
-                runBtn.disabled = false;
                 document.querySelectorAll('.paper-list li').forEach(l => l.classList.remove('active'));
                 li.classList.add('active');
+                resetUI();
                 loadResults(currentPaperName);
             });
             paperList.appendChild(li);
         });
-    } catch (err) {
-        console.error('Failed to load paper list:', err);
-    }
+    } catch (err) { console.error('Failed to load paper list:', err); }
 }
 
-// ── Run Pipeline ─────────────────────────────────────────────────────────
-runBtn.addEventListener('click', async () => {
+// ── Pipeline Runner ──────────────────────────────────────────────────────
+async function runPipelineStep(stepName) {
     if (!currentFilename) return;
-
     const model = document.getElementById('model-select').value;
     const useColpali = document.getElementById('use-colpali').checked;
     const topK = parseInt(document.getElementById('top-k').value) || 5;
     const backend = document.getElementById('backend-select').value;
-
     modelBadge.textContent = model;
-
-    runBtn.disabled = true;
-    logViewer.innerHTML = '';
+    
+    extractBtn.disabled = true;
+    generateBtn.disabled = true;
     logViewer.classList.add('visible');
-    setStatus('Starting pipeline...', 'running');
-    setProgress(5);
-
+    setStatus(`Starting ${stepName}...`, 'running');
+    if (stepName === 'extract') setProgress(5);
+    
     try {
         const resp = await fetch('/api/run', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                filename: currentFilename,
-                use_colpali: useColpali,
-                model: model,
-                top_k: topK,
-                backend: backend,
-            }),
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ filename: currentFilename, use_colpali: useColpali, model: model, top_k: topK, backend: backend, run_step: stepName }),
         });
         const data = await resp.json();
-
-        if (!resp.ok) {
-            setStatus('Failed to start: ' + (data.error || 'Unknown error'), 'failed');
-            runBtn.disabled = false;
-            return;
-        }
-
-        // Start SSE listener
-        listenToJob(data.job_id);
+        if (!resp.ok) throw new Error(data.error || 'Unknown error');
+        listenToJob(data.job_id, stepName);
     } catch (err) {
         setStatus('Error: ' + err.message, 'failed');
-        runBtn.disabled = false;
+        extractBtn.disabled = false;
+        if (currentParams) generateBtn.disabled = false;
     }
-});
+}
 
-function listenToJob(jobId) {
+function listenToJob(jobId, stepName) {
     const es = new EventSource(`/api/status/${jobId}`);
-
     es.onmessage = (event) => {
         const data = JSON.parse(event.data);
-
-        // Update progress
         setProgress(data.progress);
-        if (data.current_step) {
-            setStatus(data.current_step, 'running');
-        }
-
-        // Append new log lines
-        if (data.new_lines && data.new_lines.length) {
+        if (data.current_step) setStatus(data.current_step, 'running');
+        if (data.new_lines?.length) {
             data.new_lines.forEach(line => {
                 const div = document.createElement('div');
                 div.className = 'log-line';
@@ -203,32 +171,42 @@ function listenToJob(jobId) {
             });
             logViewer.scrollTop = logViewer.scrollHeight;
         }
-
-        // Check completion
-        if (data.status === 'completed') {
+        if (data.status === 'completed' || data.status === 'failed') {
             es.close();
-            setStatus('Pipeline completed!', 'completed');
-            setProgress(100);
-            runBtn.disabled = false;
             spinner.classList.remove('active');
-            loadResults(currentPaperName);
-        } else if (data.status === 'failed') {
-            es.close();
-            setStatus('Pipeline failed: ' + (data.error || ''), 'failed');
-            runBtn.disabled = false;
-            spinner.classList.remove('active');
+            extractBtn.disabled = false;
+            
+            if (data.status === 'completed') {
+                setStatus(`${stepName === 'extract' ? 'Extraction' : 'Generation'} completed!`, 'completed');
+                setProgress(100);
+                loadResults(currentPaperName); // Reload data
+            } else {
+                setStatus(`${stepName} failed: ` + (data.error || ''), 'failed');
+                if (currentParams) generateBtn.disabled = false;
+            }
         }
     };
-
-    es.onerror = () => {
-        es.close();
-        setStatus('Connection lost', 'failed');
-        runBtn.disabled = false;
-        spinner.classList.remove('active');
-    };
-
-    spinner.classList.add('active');
+    es.onerror = () => { es.close(); setStatus('Connection lost', 'failed'); extractBtn.disabled = false; spinner.classList.remove('active'); };
 }
+
+extractBtn.addEventListener('click', () => { logViewer.innerHTML = ''; runPipelineStep('extract'); });
+
+generateBtn.addEventListener('click', async () => {
+    // 1. Save params first
+    try {
+        setStatus('Saving parameters...', 'running');
+        const resp = await fetch('/api/save-params', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ paper_name: currentPaperName, parameters: currentParams })
+        });
+        if (!resp.ok) throw new Error("Failed to save parameters");
+        // 2. Run generation
+        runPipelineStep('generate');
+    } catch (e) {
+        alert(e);
+        setStatus('Save failed', 'failed');
+    }
+});
 
 // ── Load & Display Results ───────────────────────────────────────────────
 async function loadResults(paperName) {
@@ -236,174 +214,201 @@ async function loadResults(paperName) {
         const resp = await fetch(`/api/results/${paperName}`);
         if (!resp.ok) return;
         const data = await resp.json();
-
-        renderParameters(data.parameters);
-        renderCompartmentFlow(data.parameters);
+        currentParams = data.parameters || {};
+        
+        renderEditableParameters(currentParams);
+        renderCompartmentFlow(currentParams);
         renderColpaliPages(data.colpali_pages);
         renderRCode(data.r_code);
-    } catch (err) {
-        console.error('Failed to load results:', err);
-    }
+        renderReview(data.review || null);
+        
+        if (Object.keys(currentParams).length > 0) {
+            generateBtn.style.display = 'block';
+            generateBtn.disabled = false;
+        }
+    } catch (err) { console.error('Failed to load results:', err); }
 }
 
-// ── Render: Parameters ───────────────────────────────────────────────────
-function renderParameters(params) {
+// ── Editable Parameters UI ───────────────────────────────────────────────
+function createEditableTable(sectionTitle, sectionObj, isStringValue=false) {
+    if (!sectionObj) return '';
+    let html = `
+    <div class="param-section">
+        <div class="param-section-title" style="display:flex; justify-content:space-between;">
+            ${sectionTitle}
+            <button class="btn btn-secondary" style="padding:2px 8px; font-size:11px;" onclick="addParamRow(this, ${isStringValue})">+ Add</button>
+        </div>
+        <table class="param-table editable-table">
+            <thead><tr><th>Name/Organ</th><th>Value</th><th></th></tr></thead>
+            <tbody>`;
+            
+    for (const [key, val] of Object.entries(sectionObj)) {
+        html += `
+            <tr>
+                <td><input type="text" class="edit-key" value="${key}" /></td>
+                <td><input type="text" class="edit-val" value="${val}" /></td>
+                <td style="width:30px;"><button class="btn btn-secondary" style="padding:2px 6px; color:#ef4444;" onclick="this.closest('tr').remove(); saveUIToState();">✕</button></td>
+            </tr>`;
+    }
+    html += `</tbody></table></div>`;
+    return html;
+}
+
+window.addParamRow = (btn, isStringValue) => {
+    const tbody = btn.closest('.param-section').querySelector('tbody');
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+        <td><input type="text" class="edit-key" placeholder="New key" /></td>
+        <td><input type="text" class="edit-val" placeholder="Value" /></td>
+        <td style="width:30px;"><button class="btn btn-secondary" style="padding:2px 6px; color:#ef4444;" onclick="this.closest('tr').remove(); saveUIToState();">✕</button></td>
+    `;
+    tr.querySelectorAll('input').forEach(inp => {
+        inp.addEventListener('input', () => saveUIToState());
+    });
+    tbody.appendChild(tr);
+    saveUIToState();
+};
+
+window.saveUIToState = () => {
+    if (!currentParams) currentParams = {};
+    const sections = document.querySelectorAll('.param-section');
+    
+    sections.forEach(sec => {
+        const title = sec.querySelector('.param-section-title').innerText;
+        const rows = sec.querySelectorAll('tbody tr');
+        const newObj = {};
+        rows.forEach(r => {
+            const k = r.querySelector('.edit-key').value.trim();
+            let v = r.querySelector('.edit-val').value.trim();
+            if (!k) return;
+            if (!isNaN(v) && v !== '') v = Number(v);
+            newObj[k] = v;
+        });
+        
+        if (title.includes('Blood Flow')) currentParams.blood_flow_fraction = newObj;
+        else if (title.includes('Volume')) currentParams.volume_fraction = newObj;
+        else if (title.includes('Partition')) {
+            if (!currentParams.biochemical_parameters) currentParams.biochemical_parameters = {};
+            Object.keys(currentParams.biochemical_parameters).forEach(bk => {
+                if(bk.includes('plasma') || bk.startsWith('Kp')) delete currentParams.biochemical_parameters[bk];
+            });
+            Object.assign(currentParams.biochemical_parameters, newObj);
+        }
+        else if (title.includes('Biochemical')) {
+            if (!currentParams.biochemical_parameters) currentParams.biochemical_parameters = {};
+            Object.keys(currentParams.biochemical_parameters).forEach(bk => {
+                if(!(bk.includes('plasma') || bk.startsWith('Kp'))) delete currentParams.biochemical_parameters[bk];
+            });
+            Object.assign(currentParams.biochemical_parameters, newObj);
+        }
+        else if (title.includes('Equations')) currentParams.equations = newObj;
+    });
+    
+    renderCompartmentFlow(currentParams);
+};
+
+function renderEditableParameters(params) {
     const container = document.getElementById('params-content');
     const empty = document.getElementById('params-empty');
-    if (!params) return;
+    if (!params || Object.keys(params).length === 0) return;
+    empty.style.display = 'none'; container.style.display = 'block';
 
-    empty.style.display = 'none';
-    container.style.display = 'block';
+    let html = '<div class="param-grid">';
+    
+    if(!params.blood_flow_fraction) params.blood_flow_fraction = {};
+    if(!params.volume_fraction) params.volume_fraction = {};
+    
+    html += createEditableTable("�� Blood Flow Fractions", params.blood_flow_fraction);
+    html += createEditableTable("📐 Volume Fractions", params.volume_fraction);
+    html += '</div>';
 
-    let html = '';
-
-    // Blood Flow + Volume in a grid
-    html += '<div class="param-grid">';
-
-    // Blood Flow Fractions
-    if (params.blood_flow_fraction && Object.keys(params.blood_flow_fraction).length) {
-        html += `<div class="param-section">
-            <div class="param-section-title">🩸 Blood Flow Fractions</div>
-            <table class="param-table"><thead><tr>
-                <th>Organ</th><th>Fraction of Q<sub>c</sub></th>
-            </tr></thead><tbody>`;
-        for (const [organ, val] of Object.entries(params.blood_flow_fraction)) {
-            html += `<tr>
-                <td class="param-name">${organ}</td>
-                <td class="param-value">${val}</td>
-            </tr>`;
-        }
-        html += '</tbody></table></div>';
+    if (!params.biochemical_parameters) params.biochemical_parameters = {};
+    const partitions = {}; const others = {};
+    for (const [k, v] of Object.entries(params.biochemical_parameters)) {
+        if (k.includes('plasma') || k.includes('blood') || k.startsWith('Kp')) partitions[k] = v;
+        else others[k] = v;
     }
-
-    // Volume Fractions
-    if (params.volume_fraction && Object.keys(params.volume_fraction).length) {
-        html += `<div class="param-section">
-            <div class="param-section-title">📐 Volume Fractions</div>
-            <table class="param-table"><thead><tr>
-                <th>Organ</th><th>Fraction of BW</th>
-            </tr></thead><tbody>`;
-        for (const [organ, val] of Object.entries(params.volume_fraction)) {
-            html += `<tr>
-                <td class="param-name">${organ}</td>
-                <td class="param-value">${val}</td>
-            </tr>`;
-        }
-        html += '</tbody></table></div>';
-    }
-
-    html += '</div>';  // close param-grid
-
-    // Biochemical Parameters
-    if (params.biochemical_parameters && Object.keys(params.biochemical_parameters).length) {
-        // Separate partition coefficients from other params
-        const partitions = {};
-        const others = {};
-        for (const [k, v] of Object.entries(params.biochemical_parameters)) {
-            if (k.includes('plasma') || k.includes('blood') || k.startsWith('Kp')) {
-                partitions[k] = v;
-            } else {
-                others[k] = v;
-            }
-        }
-
-        if (Object.keys(partitions).length) {
-            html += `<div class="param-section">
-                <div class="param-section-title">⚗️ Partition Coefficients</div>
-                <table class="param-table"><thead><tr>
-                    <th>Parameter</th><th>Value</th>
-                </tr></thead><tbody>`;
-            for (const [k, v] of Object.entries(partitions)) {
-                html += `<tr>
-                    <td class="param-name">${k}</td>
-                    <td class="param-value">${v}</td>
-                </tr>`;
-            }
-            html += '</tbody></table></div>';
-        }
-
-        if (Object.keys(others).length) {
-            html += `<div class="param-section">
-                <div class="param-section-title">🧪 Biochemical Parameters</div>
-                <table class="param-table"><thead><tr>
-                    <th>Parameter</th><th>Value</th>
-                </tr></thead><tbody>`;
-            for (const [k, v] of Object.entries(others)) {
-                html += `<tr>
-                    <td class="param-name">${k}</td>
-                    <td class="param-value">${typeof v === 'number' ? v : `"${v}"`}</td>
-                </tr>`;
-            }
-            html += '</tbody></table></div>';
-        }
-    }
-
-    // Equations
-    if (params.equations && Object.keys(params.equations).length) {
-        html += `<div class="param-section">
-            <div class="param-section-title">📝 Model Equations</div>`;
-        for (const [name, formula] of Object.entries(params.equations)) {
-            html += `<div class="equation-card">
-                <div class="equation-name">${name}</div>
-                <div class="equation-formula">${formula}</div>
-            </div>`;
-        }
-        html += '</div>';
-    }
+    
+    html += createEditableTable("⚗️ Partition Coefficients", partitions);
+    html += createEditableTable("🧪 Biochemical Parameters", others, true);
+    html += createEditableTable("📝 Model Equations", params.equations || {}, true);
 
     container.innerHTML = html;
+    
+    container.querySelectorAll('input').forEach(inp => {
+        inp.addEventListener('input', () => saveUIToState());
+    });
 }
 
 // ── Render: Compartment Flow Diagram ─────────────────────────────────────
 async function renderCompartmentFlow(params) {
     const container = document.getElementById('compartment-diagram');
     const empty = document.getElementById('flow-empty');
-    if (!params || !params.blood_flow_fraction) return;
+    
+    if (!params) {
+        container.style.display = 'none'; empty.style.display = 'flex'; return;
+    }
+    
+    const bf = params.blood_flow_fraction || {};
+    const vf = params.volume_fraction || {};
+    const biochem = params.biochemical_parameters || {};
+    
+    let organSet = new Set();
+    Object.keys(bf).forEach(k => organSet.add(k));
+    Object.keys(vf).forEach(k => organSet.add(k));
+    
+    Object.keys(biochem).forEach(k => {
+        if(k.includes(':plasma')) organSet.add(k.split(':plasma')[0].trim());
+        if(k.includes('_plasma')) {
+            const parts = k.split('_');
+            if(parts.length > 1) {
+                const idx = parts.indexOf('plasma');
+                if(idx > 0) organSet.add(parts[idx-1]);
+            }
+        }
+    });
+    
+    const organs = Array.from(organSet).filter(k => !k.startsWith('Human_') && k.trim() !== '' && k.toLowerCase() !== 'plasma' && k.toLowerCase() !== 'blood');
+    
+    if (organs.length === 0) {
+        container.style.display = 'none'; empty.style.display = 'flex'; return;
+    }
+    
+    empty.style.display = 'none'; container.style.display = 'flex';
 
-    empty.style.display = 'none';
-    container.style.display = 'flex';
-
-    // Filter to unique organ names (remove Human_ prefixed duplicates for diagram)
-    const bf = params.blood_flow_fraction;
-    const organs = Object.keys(bf).filter(k => !k.startsWith('Human_'));
-
-    // Build Mermaid flowchart
     let mermaidCode = 'flowchart TD\n';
-
-    // Style definitions
     mermaidCode += '    classDef organ fill:#1a2744,stroke:#22d3ee,stroke-width:2px,color:#e2e8f0\n';
     mermaidCode += '    classDef blood fill:#1a1428,stroke:#a78bfa,stroke-width:2px,color:#e2e8f0\n';
     mermaidCode += '    classDef gut fill:#142820,stroke:#34d399,stroke-width:2px,color:#e2e8f0\n';
+    mermaidCode += '    BLOOD["🩸 Arterial Blood<br>Pool"]:::blood\n';
+    mermaidCode += '    VENOUS["🫀 Venous Blood<br>Pool"]:::blood\n';
 
-    // Central nodes
-    mermaidCode += '    BLOOD["🩸 Arterial Blood\\nPool"]:::blood\n';
-    mermaidCode += '    VENOUS["🫀 Venous Blood\\nPool"]:::blood\n';
-
-    // Determine if gut/GI exists
     const hasGut = organs.some(o => o.toLowerCase().includes('gut') || o.toLowerCase().includes('intestin'));
 
-    // Add organ nodes and connections
     organs.forEach(organ => {
-        const flow = bf[organ];
+        const flow = bf[organ] !== undefined ? bf[organ] : "?";
         const sanitized = organ.replace(/[^a-zA-Z0-9]/g, '_');
-        const kp = params.biochemical_parameters?.[`${organ}:plasma`] || '';
-        const kpLabel = kp ? `\\nKp=${kp}` : '';
+        
+        let kp = '';
+        for (const [k, v] of Object.entries(biochem)) {
+            if (k === `${organ}:plasma` || k.includes(`${organ}_plasma`)) {
+                kp = v; break;
+            }
+        }
+        // Use HTML <br> instead of \\n to avoid mermaid syntax errors!
+        const kpLabel = kp ? `<br>Kp=${kp}` : '';
 
-        if (organ.toLowerCase() === 'liver') {
+        if (organ.toLowerCase().includes('liver')) {
             mermaidCode += `    ${sanitized}["🫁 ${organ}${kpLabel}"]:::organ\n`;
             mermaidCode += `    BLOOD -->|"Q=${flow}"| ${sanitized}\n`;
-
-            if (hasGut) {
-                mermaidCode += `    ${sanitized} --> VENOUS\n`;
-            } else {
-                mermaidCode += `    ${sanitized} -->|"Portal + Hepatic"| VENOUS\n`;
-            }
+            if (hasGut) mermaidCode += `    ${sanitized} --> VENOUS\n`;
+            else mermaidCode += `    ${sanitized} -->|"Portal + Hepatic"| VENOUS\n`;
         } else if (organ.toLowerCase().includes('gut') || organ.toLowerCase().includes('intestin')) {
             mermaidCode += `    ${sanitized}["🟢 ${organ}${kpLabel}"]:::gut\n`;
             mermaidCode += `    BLOOD -->|"Q=${flow}"| ${sanitized}\n`;
             mermaidCode += `    ${sanitized} -->|"Portal Vein"| Liver\n`;
-        } else if (organ.toLowerCase() === 'lung') {
-            mermaidCode += `    ${sanitized}["��️ ${organ}${kpLabel}"]:::organ\n`;
+        } else if (organ.toLowerCase().includes('lung')) {
+            mermaidCode += `    ${sanitized}["🌬️ ${organ}${kpLabel}"]:::organ\n`;
             mermaidCode += `    VENOUS -->|"Q=${flow}"| ${sanitized}\n`;
             mermaidCode += `    ${sanitized} --> BLOOD\n`;
         } else {
@@ -413,95 +418,452 @@ async function renderCompartmentFlow(params) {
         }
     });
 
-    // Add dose compartment if Kabs exists
-    const biochem = params.biochemical_parameters || {};
     const hasKabs = Object.keys(biochem).some(k => k.toLowerCase().includes('kabs'));
     if (hasKabs) {
         mermaidCode += '    DOSE["💊 Oral Dose"]:::gut\n';
         const gutNode = organs.find(o => o.toLowerCase().includes('gut') || o.toLowerCase().includes('intestin'));
-        if (gutNode) {
-            mermaidCode += `    DOSE -->|"Kabs"| ${gutNode.replace(/[^a-zA-Z0-9]/g, '_')}\n`;
-        } else {
-            mermaidCode += '    DOSE -->|"Kabs"| Liver\n';
-        }
+        if (gutNode) mermaidCode += `    DOSE -->|"Kabs"| ${gutNode.replace(/[^a-zA-Z0-9]/g, '_')}\n`;
+        else mermaidCode += '    DOSE -->|"Kabs"| Liver\n';
     }
 
-    // Render with Mermaid
     container.innerHTML = `<div class="mermaid">${mermaidCode}</div>`;
-
     try {
+        container.removeAttribute('data-processed'); // force re-render
         await mermaid.run({ querySelector: '#compartment-diagram .mermaid' });
     } catch (e) {
-        console.error('Mermaid rendering error:', e);
-        container.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-text">Diagram rendering error. Check console.</div></div>`;
+        console.error("Mermaid error: ", e, "\\nGenerated Code:\\n", mermaidCode);
+        container.innerHTML = `<div class="empty-state"><div class="empty-text">Diagram parsing error for edited values</div></div>`;
     }
 }
 
-// ── Render: ColPali Pages ────────────────────────────────────────────────
+// ── Render: ColPali Pages & R Code ───────────────────────────────────────
 function renderColpaliPages(pages) {
     const gallery = document.getElementById('colpali-gallery');
     const empty = document.getElementById('colpali-empty');
     if (!pages || !pages.length) return;
-
-    empty.style.display = 'none';
-    gallery.style.display = 'grid';
-
+    empty.style.display = 'none'; gallery.style.display = 'grid';
     gallery.innerHTML = pages.map(filename => {
         const pageNum = filename.match(/(\d+)/)?.[1] || '?';
-        return `
-            <div class="gallery-item" onclick="openLightbox('/api/colpali-pages/${filename}')">
+        return `<div class="gallery-item" onclick="openLightbox('/api/colpali-pages/${filename}')">
                 <img src="/api/colpali-pages/${filename}" alt="Page ${pageNum}" loading="lazy">
-                <span class="page-label">Page ${parseInt(pageNum)}</span>
-            </div>
-        `;
+                <span class="page-label">Page ${parseInt(pageNum)}</span></div>`;
     }).join('');
 }
 
-// ── Render: R Code ───────────────────────────────────────────────────────
 function renderRCode(rCode) {
     const block = document.getElementById('rcode-block');
     const content = document.getElementById('rcode-content');
     const empty = document.getElementById('rcode-empty');
     if (!rCode) return;
-
-    empty.style.display = 'none';
-    block.style.display = 'block';
+    empty.style.display = 'none'; block.style.display = 'block';
     content.textContent = rCode;
 }
 
-// ── Lightbox ─────────────────────────────────────────────────────────────
-function openLightbox(src) {
-    lightboxImg.src = src;
-    lightbox.classList.add('active');
-}
+// ── Lightbox & Helpers ───────────────────────────────────────────────────
+function openLightbox(src) { lightboxImg.src = src; lightbox.classList.add('active'); }
 lightbox.addEventListener('click', () => lightbox.classList.remove('active'));
 
-// ── Helpers ──────────────────────────────────────────────────────────────
 function setStatus(text, state) {
-    statusText.textContent = text;
-    statusText.className = 'status-text' + (state ? ' ' + state : '');
-    if (state === 'running') {
-        spinner.classList.add('active');
-        progressBar.classList.add('active');
-    } else {
-        spinner.classList.remove('active');
-        progressBar.classList.remove('active');
+    statusText.textContent = text; statusText.className = 'status-text' + (state ? ' ' + state : '');
+    if (state === 'running') { spinner.classList.add('active'); progressBar.classList.add('active'); }
+    else { spinner.classList.remove('active'); progressBar.classList.remove('active'); }
+}
+function setProgress(pct) { progressBar.style.width = pct + '%'; progressPct.textContent = pct + '%'; }
+toggleLogBtn.addEventListener('click', () => logViewer.classList.toggle('visible'));
+document.getElementById('model-select').addEventListener('change', (e) => modelBadge.textContent = e.target.value);
+
+
+
+// ── Render: Model Review ──────────────────────────────────────────────────
+function renderReview(review) {
+    const container = document.getElementById('review-content');
+    const empty = document.getElementById('review-empty');
+    if (!review) { container.style.display = 'none'; empty.style.display = 'flex'; return; }
+
+    empty.style.display = 'none'; container.style.display = 'block';
+
+    const statusColors = { PASS: '#10b981', PASS_WITH_WARNINGS: '#f59e0b', FAIL: '#ef4444', ERROR: '#8b5cf6' };
+    const statusIcons  = { PASS: '✅', PASS_WITH_WARNINGS: '⚠️', FAIL: '❌', ERROR: '💥' };
+    const checkIcons   = { OK: '✅', WARNING: '⚠️', ERROR: '❌' };
+    const checkColors  = { OK: '#10b981', WARNING: '#f59e0b', ERROR: '#ef4444' };
+
+    const status = review.overall_status || 'UNKNOWN';
+    const color  = statusColors[status] || '#64748b';
+    const icon   = statusIcons[status] || '❓';
+
+    let html = `
+    <div class="review-panel">
+        <div class="review-header" style="border-left:4px solid ${color}; padding:12px 16px; margin-bottom:20px; background:rgba(255,255,255,0.03); border-radius:0 8px 8px 0;">
+            <div style="font-size:1.1rem; font-weight:700; color:${color};">${icon} ${status}</div>
+            <div style="color:var(--text-muted); margin-top:4px;">${review.summary || ''}</div>
+        </div>
+
+        <div class="review-checks" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap:12px; margin-bottom:20px;">`;
+
+    (review.checks || []).forEach(chk => {
+        const c = checkColors[chk.status] || '#64748b';
+        const ci = checkIcons[chk.status] || '❓';
+        html += `
+            <div class="review-check" style="background:var(--surface-2); border:1px solid ${c}33; border-radius:8px; padding:12px;">
+                <div style="font-weight:600; color:${c}; margin-bottom:6px; font-size:0.8rem; letter-spacing:0.05em;">${ci} ${chk.category || ''}</div>
+                <div style="font-size:0.85rem; color:var(--text-muted);">${chk.message || ''}</div>
+            </div>`;
+    });
+    html += '</div>';
+
+    if (review.critical_issues?.length) {
+        html += `<div style="background:rgba(239,68,68,0.1); border:1px solid #ef4444; border-radius:8px; padding:14px; margin-bottom:16px;">
+            <div style="font-weight:700; color:#ef4444; margin-bottom:8px;">🚨 Critical Issues</div>
+            <ul style="margin:0; padding-left:18px; color:var(--text-muted);">
+                ${review.critical_issues.map(i => `<li style="margin-bottom:4px;">${i}</li>`).join('')}
+            </ul></div>`;
     }
+
+    if (review.recommendations?.length) {
+        html += `<div style="background:rgba(16,185,129,0.08); border:1px solid #10b981; border-radius:8px; padding:14px;">
+            <div style="font-weight:700; color:#10b981; margin-bottom:8px;">💡 Recommendations</div>
+            <ul style="margin:0; padding-left:18px; color:var(--text-muted);">
+                ${review.recommendations.map(r => `<li style="margin-bottom:4px;">${r}</li>`).join('')}
+            </ul></div>`;
+    }
+
+    html += '</div>';
+    container.innerHTML = html;
 }
 
-function setProgress(pct) {
-    progressBar.style.width = pct + '%';
-    progressPct.textContent = pct + '%';
-}
+// ══════════════════════════════════════════════════════════════════════════════
+// Compartment Flow Builder (Cytoscape.js)
+// ══════════════════════════════════════════════════════════════════════════════
 
-toggleLogBtn.addEventListener('click', () => {
-    logViewer.classList.toggle('visible');
-});
+let flowMode = 'view'; // 'view' | 'edit'
 
-// ── Model badge sync ─────────────────────────────────────────────────────
-document.getElementById('model-select').addEventListener('change', (e) => {
-    modelBadge.textContent = e.target.value;
-});
+window.setFlowMode = function(mode) {
+    flowMode = mode;
+    document.getElementById('flow-view-pane').style.display = mode === 'view' ? 'block' : 'none';
+    document.getElementById('flow-edit-pane').style.display = mode === 'edit' ? 'block' : 'none';
+    document.getElementById('flow-view-btn').classList.toggle('active', mode === 'view');
+    document.getElementById('flow-edit-btn').classList.toggle('active', mode === 'edit');
+    if (mode === 'edit') {
+        cyBuilder.init();
+        cyBuilder.loadFromParams();
+    }
+};
 
-// ── Init ─────────────────────────────────────────────────────────────────
-loadPaperList();
+const cyBuilder = {
+    cy: null,
+    connectMode: false,
+    connectSource: null,
+    popover: null,
+
+    // ── Cytoscape style sheet ────────────────────────────────────────────────
+    _style: [
+        { selector: 'node[type="organ"]', style: {
+            'shape': 'round-rectangle', 'width': 'label', 'height': 'label',
+            'padding': '14px', 'background-color': '#1a2744',
+            'border-color': '#22d3ee', 'border-width': 2,
+            'color': '#e2e8f0', 'font-size': 11, 'font-family': 'Inter, sans-serif',
+            'text-valign': 'center', 'text-halign': 'center',
+            'label': 'data(label)', 'text-wrap': 'wrap', 'text-max-width': '120px',
+            'cursor': 'pointer',
+        }},
+        { selector: 'node[type="blood"]', style: {
+            'shape': 'ellipse', 'width': 'label', 'height': 'label', 'padding': '14px',
+            'background-color': '#1a1428', 'border-color': '#a78bfa', 'border-width': 2,
+            'color': '#e2e8f0', 'font-size': 11, 'label': 'data(label)',
+            'text-valign': 'center', 'text-halign': 'center', 'cursor': 'pointer',
+        }},
+        { selector: 'node:selected', style: { 'border-color': '#fbbf24', 'border-width': 3 }},
+        { selector: 'edge', style: {
+            'curve-style': 'bezier', 'target-arrow-shape': 'triangle',
+            'target-arrow-color': '#22d3ee', 'line-color': '#22d3ee',
+            'width': 1.5, 'label': 'data(label)',
+            'font-size': 9, 'color': '#94a3b8',
+            'text-background-color': '#0a0f1a', 'text-background-opacity': 1,
+            'text-background-padding': '3px', 'cursor': 'pointer',
+        }},
+        { selector: 'edge:selected', style: { 'line-color': '#fbbf24', 'target-arrow-color': '#fbbf24' }},
+    ],
+
+    // ── Init ─────────────────────────────────────────────────────────────────
+    init() {
+        if (this.cy) return;
+        this.cy = cytoscape({
+            container: document.getElementById('cy-canvas'),
+            style: this._style,
+            elements: [],
+            layout: { name: 'grid' },
+            userZoomingEnabled: true,
+            userPanningEnabled: true,
+            boxSelectionEnabled: true,
+        });
+        // Click on node → edit popover
+        this.cy.on('tap', 'node', (evt) => {
+            if (this.connectMode) {
+                this._handleConnectClick(evt.target);
+            } else {
+                this._showNodePopover(evt.target, evt.renderedPosition);
+            }
+        });
+        // Click on edge → edit label
+        this.cy.on('tap', 'edge', (evt) => {
+            if (!this.connectMode) this._showEdgePopover(evt.target, evt.renderedPosition);
+        });
+        // Click canvas → close popover
+        this.cy.on('tap', (evt) => {
+            if (evt.target === this.cy) this._closePopover();
+        });
+    },
+
+    // ── Load from currentParams ───────────────────────────────────────────────
+    loadFromParams() {
+        if (!this.cy) this.init();
+        this.cy.elements().remove();
+        const bf = (currentParams && currentParams.blood_flow_fraction) ? currentParams.blood_flow_fraction : {};
+        const vf = (currentParams && currentParams.volume_fraction)     ? currentParams.volume_fraction     : {};
+        const biochem = (currentParams && currentParams.biochemical_parameters) ? currentParams.biochemical_parameters : {};
+
+        // Always add blood nodes
+        this.cy.add([
+            { data: { id: 'ARTERIAL', label: '🩸 Arterial Blood', type: 'blood' } },
+            { data: { id: 'VENOUS',   label: '🫀 Venous Blood',   type: 'blood' } },
+        ]);
+
+        const organs = Object.keys(bf).filter(k => !k.startsWith('Human_'));
+        if (organs.length === 0 && Object.keys(vf).length > 0) {
+            Object.keys(vf).filter(k => !k.startsWith('Human_') && k.toLowerCase() !== 'plasma').forEach(o => organs.includes(o) || organs.push(o));
+        }
+
+        organs.forEach(organ => {
+            const q = bf[organ] !== undefined ? bf[organ] : '?';
+            const v = vf[organ] !== undefined ? vf[organ] : '?';
+            let kp = '';
+            for (const [k, val] of Object.entries(biochem)) {
+                if (k === `${organ}:plasma` || k.includes(`${organ}_plasma`)) { kp = val; break; }
+            }
+            const label = `${organ}\nQ=${q} V=${v}${kp ? '\nKp=' + kp : ''}`;
+            this.cy.add({ data: { id: organ, label, organName: organ, q, v, kp, type: 'organ' } });
+        });
+
+        organs.forEach(organ => {
+            const q = bf[organ] !== undefined ? bf[organ] : '?';
+            if (organ.toLowerCase().includes('lung')) {
+                this._addEdge('VENOUS', organ, `Q=${q}`);
+                this._addEdge(organ, 'ARTERIAL', '');
+            } else if (organ.toLowerCase().includes('gut') || organ.toLowerCase().includes('intestin')) {
+                this._addEdge('ARTERIAL', organ, `Q=${q}`);
+                const liver = organs.find(o => o.toLowerCase().includes('liver'));
+                this._addEdge(organ, liver || 'VENOUS', 'Portal');
+            } else if (organ.toLowerCase().includes('liver')) {
+                this._addEdge('ARTERIAL', organ, `Q=${q}`);
+                this._addEdge(organ, 'VENOUS', 'Hepatic');
+            } else {
+                this._addEdge('ARTERIAL', organ, `Q=${q}`);
+                this._addEdge(organ, 'VENOUS', '');
+            }
+        });
+
+        this.autoLayout();
+    },
+
+    _addEdge(src, tgt, label) {
+        if (!this.cy.getElementById(src).length || !this.cy.getElementById(tgt).length) return;
+        const id = `e_${src}_${tgt}`;
+        if (!this.cy.getElementById(id).length) {
+            this.cy.add({ data: { id, source: src, target: tgt, label } });
+        }
+    },
+
+    // ── Add Nodes ────────────────────────────────────────────────────────────
+    addOrganNode() {
+        const name = prompt('Organ name (e.g. Liver, Kidney, Fat):');
+        if (!name || !name.trim()) return;
+        const id = name.trim().replace(/[^a-zA-Z0-9]/g, '_');
+        const q  = prompt('Blood flow fraction Q (e.g. 0.174):', '0.0') || '0.0';
+        const v  = prompt('Volume fraction V (e.g. 0.036):', '0.0') || '0.0';
+        const kp = prompt('Partition coefficient Kp (leave blank if unknown):', '') || '';
+        const label = `${name.trim()}\nQ=${q} V=${v}${kp ? '\nKp=' + kp : ''}`;
+        this.cy.add({ data: { id, label, organName: name.trim(), q, v, kp, type: 'organ' } });
+        this.cy.getElementById(id).position({ x: 200 + Math.random() * 300, y: 200 + Math.random() * 200 });
+    },
+
+    addBloodNodes() {
+        if (!this.cy.getElementById('ARTERIAL').length)
+            this.cy.add({ data: { id: 'ARTERIAL', label: '🩸 Arterial Blood', type: 'blood' } });
+        if (!this.cy.getElementById('VENOUS').length)
+            this.cy.add({ data: { id: 'VENOUS', label: '🫀 Venous Blood', type: 'blood' } });
+        this.autoLayout();
+    },
+
+    // ── Connect Mode ─────────────────────────────────────────────────────────
+    toggleConnectMode() {
+        this.connectMode = !this.connectMode;
+        this.connectSource = null;
+        const btn = document.getElementById('connect-btn');
+        const hint = document.getElementById('flow-connect-hint');
+        if (this.connectMode) {
+            btn.classList.add('active');
+            hint.textContent = '← Click source node, then target node to draw an arrow';
+        } else {
+            btn.classList.remove('active');
+            hint.textContent = '';
+        }
+    },
+
+    _handleConnectClick(node) {
+        if (!this.connectSource) {
+            this.connectSource = node;
+            node.style('border-color', '#fbbf24');
+            document.getElementById('flow-connect-hint').textContent = '✓ Source selected — now click the target node';
+        } else {
+            const label = prompt('Edge label (e.g. Q=0.17, Portal Vein — or leave blank):', '') || '';
+            this._addEdge(this.connectSource.id(), node.id(), label);
+            this.connectSource.style('border-color', this.connectSource.data('type') === 'blood' ? '#a78bfa' : '#22d3ee');
+            this.connectSource = null;
+            this.toggleConnectMode();
+        }
+    },
+
+    // ── Delete Selected ──────────────────────────────────────────────────────
+    deleteSelected() {
+        const selected = this.cy.$(':selected');
+        if (!selected.length) { alert('Select a node or edge first (click to select)'); return; }
+        if (confirm(`Delete ${selected.length} selected element(s)?`)) selected.remove();
+    },
+
+    // ── Auto Layout ──────────────────────────────────────────────────────────
+    autoLayout() {
+        if (!this.cy) return;
+        // Manual hierarchical: ARTERIAL top, organs middle, VENOUS bottom
+        const w = document.getElementById('cy-canvas').offsetWidth || 800;
+        const organs = this.cy.nodes('[type="organ"]');
+        const spacing = Math.max(130, Math.min(200, (w - 100) / Math.max(organs.length, 1)));
+        const startX = (w - spacing * (organs.length - 1)) / 2;
+
+        this.cy.getElementById('ARTERIAL').position({ x: w / 2, y: 60 });
+        organs.forEach((n, i) => n.position({ x: startX + i * spacing, y: 250 }));
+        this.cy.getElementById('VENOUS').position({ x: w / 2, y: 440 });
+        this.cy.fit(this.cy.elements(), 30);
+    },
+
+    // ── Apply to Parameters ──────────────────────────────────────────────────
+    async applyToParams() {
+        if (!this.cy) return;
+        if (!currentParams) currentParams = {};
+        if (!currentParams.blood_flow_fraction) currentParams.blood_flow_fraction = {};
+        if (!currentParams.volume_fraction) currentParams.volume_fraction = {};
+        if (!currentParams.biochemical_parameters) currentParams.biochemical_parameters = {};
+
+        // Clear existing (non-Human_) organ entries
+        ['blood_flow_fraction', 'volume_fraction'].forEach(key => {
+            Object.keys(currentParams[key]).forEach(k => { if (!k.startsWith('Human_')) delete currentParams[key][k]; });
+        });
+
+        this.cy.nodes('[type="organ"]').forEach(node => {
+            const d = node.data();
+            const organ = d.organName || d.id;
+            const q = parseFloat(d.q);
+            const v = parseFloat(d.v);
+            const kp = parseFloat(d.kp);
+            if (!isNaN(q)) currentParams.blood_flow_fraction[organ] = q;
+            if (!isNaN(v)) currentParams.volume_fraction[organ]     = v;
+            if (!isNaN(kp) && kp > 0) currentParams.biochemical_parameters[`${organ}:plasma`] = kp;
+        });
+
+        // Rebuild param tables to reflect changes
+        renderEditableParameters(currentParams);
+        renderCompartmentFlow(currentParams);
+
+        // Save to server
+        try {
+            const resp = await fetch('/api/save-params', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ paper_name: currentPaperName, parameters: currentParams })
+            });
+            if (resp.ok) {
+                const hint = document.getElementById('flow-connect-hint');
+                hint.textContent = '✅ Parameters saved!';
+                hint.style.color = '#10b981';
+                setTimeout(() => { hint.textContent = ''; hint.style.color = ''; }, 3000);
+            }
+        } catch(e) { console.error('Save failed:', e); }
+    },
+
+    // ── Node Popover ─────────────────────────────────────────────────────────
+    _showNodePopover(node, pos) {
+        this._closePopover();
+        const d = node.data();
+        const isBlood = d.type === 'blood';
+        const div = document.createElement('div');
+        div.className = 'node-popover';
+        div.style.left = (pos.x + 20) + 'px';
+        div.style.top  = (pos.y + 20) + 'px';
+        div.innerHTML = `
+            <h4>${isBlood ? d.label : '✏️ Edit ' + (d.organName || d.id)}</h4>
+            ${!isBlood ? `
+            <label>Organ Name</label><input id="pop-name" value="${d.organName || d.id}">
+            <label>Blood Flow Fraction (Q)</label><input id="pop-q" type="number" step="0.001" value="${d.q || 0}">
+            <label>Volume Fraction (V)</label><input id="pop-v" type="number" step="0.001" value="${d.v || 0}">
+            <label>Partition Coef. Kp (0 = none)</label><input id="pop-kp" type="number" step="0.01" value="${d.kp || 0}">
+            <div class="pop-btns">
+                <button class="pop-btn pop-save" onclick="cyBuilder._saveNodeEdit('${node.id()}')">💾 Save</button>
+                <button class="pop-btn pop-del" onclick="cyBuilder._deleteNode('${node.id()}')">🗑️ Delete</button>
+                <button class="pop-btn pop-cancel" onclick="cyBuilder._closePopover()">✕</button>
+            </div>` : `<div class="pop-btns"><button class="pop-btn pop-cancel" onclick="cyBuilder._closePopover()">✕ Close</button></div>`}
+        `;
+        document.body.appendChild(div);
+        this.popover = div;
+    },
+
+    _showEdgePopover(edge, pos) {
+        this._closePopover();
+        const div = document.createElement('div');
+        div.className = 'node-popover';
+        div.style.left = (pos.x + 20) + 'px';
+        div.style.top  = (pos.y + 20) + 'px';
+        div.innerHTML = `
+            <h4>✏️ Edit Connection</h4>
+            <label>Label (e.g. Q=0.17)</label>
+            <input id="pop-edge-label" value="${edge.data('label') || ''}">
+            <div class="pop-btns">
+                <button class="pop-btn pop-save" onclick="cyBuilder._saveEdgeEdit('${edge.id()}')">💾 Save</button>
+                <button class="pop-btn pop-del" onclick="cyBuilder._deleteEdge('${edge.id()}')">🗑️ Delete</button>
+                <button class="pop-btn pop-cancel" onclick="cyBuilder._closePopover()">✕</button>
+            </div>
+        `;
+        document.body.appendChild(div);
+        this.popover = div;
+    },
+
+    _saveNodeEdit(nodeId) {
+        const node = this.cy.getElementById(nodeId);
+        const name = document.getElementById('pop-name')?.value.trim() || node.data('organName');
+        const q    = document.getElementById('pop-q')?.value  || '0';
+        const v    = document.getElementById('pop-v')?.value  || '0';
+        const kp   = document.getElementById('pop-kp')?.value || '0';
+        const label = `${name}\nQ=${q} V=${v}${parseFloat(kp) > 0 ? '\nKp=' + kp : ''}`;
+        node.data({ organName: name, q, v, kp, label });
+        this._closePopover();
+    },
+
+    _deleteNode(nodeId) {
+        if (confirm('Delete this node and all its connections?')) {
+            this.cy.getElementById(nodeId).remove();
+            this._closePopover();
+        }
+    },
+
+    _saveEdgeEdit(edgeId) {
+        const label = document.getElementById('pop-edge-label')?.value || '';
+        this.cy.getElementById(edgeId).data('label', label);
+        this._closePopover();
+    },
+
+    _deleteEdge(edgeId) {
+        this.cy.getElementById(edgeId).remove();
+        this._closePopover();
+    },
+
+    _closePopover() {
+        if (this.popover) { this.popover.remove(); this.popover = null; }
+    },
+};

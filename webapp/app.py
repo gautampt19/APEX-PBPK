@@ -14,6 +14,7 @@ Routes:
 import os
 import sys
 import json
+import sqlite3
 import uuid
 import subprocess
 import threading
@@ -42,7 +43,7 @@ jobs = {}  # job_id -> { status, progress, log_lines, paper_name, result }
 
 
 def _run_pipeline(job_id: str, pdf_path: str, use_colpali: bool,
-                  model: str, top_k: int, backend: str):
+                  model: str, top_k: int, backend: str, run_step: str = "all"):
     """Run the pipeline in a background thread, streaming output to the job."""
     paper_name = Path(pdf_path).stem
     jobs[job_id]["paper_name"] = paper_name
@@ -55,6 +56,8 @@ def _run_pipeline(job_id: str, pdf_path: str, use_colpali: bool,
         "--model-extract", model,
         "--model-generate", model,
         "--output-dir", str(PIPELINE_OUTPUT),
+        "--run-step", run_step,
+        "--non-interactive"
     ]
     if use_colpali:
         cmd.extend(["--use-colpali", "--colpali-top-k", str(top_k)])
@@ -121,10 +124,18 @@ def upload_pdf():
 
     save_path = PAPERS_DIR / f.filename
     f.save(str(save_path))
+    
+    # Delete old results if this file was processed previously
+    paper_name = Path(f.filename).stem
+    for ext in ["_params.json", "_cleaned.md", "_pbpk_model.R", "_review.json", "_pbpk_model_fallback.R", "_pbpk_model_retry1.R", "_pbpk_model_retry2.R"]:
+        old_file = PIPELINE_OUTPUT / f"{paper_name}{ext}"
+        if old_file.exists():
+            old_file.unlink()
+            
     return jsonify({
         "message": f"Uploaded {f.filename}",
         "filename": f.filename,
-        "paper_name": Path(f.filename).stem,
+        "paper_name": paper_name,
     })
 
 
@@ -154,16 +165,37 @@ def run_pipeline():
     model = data.get("model", "qwen3.8:latest")
     top_k = data.get("top_k", 5)
     backend = data.get("backend", "ollama")
+    run_step = data.get("run_step", "all")
 
     t = threading.Thread(
         target=_run_pipeline,
-        args=(job_id, pdf_path, use_colpali, model, top_k, backend),
+        args=(job_id, pdf_path, use_colpali, model, top_k, backend, run_step),
         daemon=True,
     )
     t.start()
 
     return jsonify({"job_id": job_id, "message": "Pipeline started"})
 
+
+
+@app.route("/api/save-params", methods=["POST"])
+def save_params():
+    """Save edited parameters from UI."""
+    data = request.get_json(force=True)
+    paper_name = data.get("paper_name")
+    params = data.get("parameters")
+    
+    if not paper_name or not params:
+        return jsonify({"error": "Missing paper_name or parameters"}), 400
+        
+    params_file = PIPELINE_OUTPUT / f"{paper_name}_params.json"
+    
+    try:
+        with open(params_file, "w") as f:
+            json.dump(params, f, indent=4)
+        return jsonify({"message": "Parameters saved successfully"})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @app.route("/api/status/<job_id>")
 def job_status(job_id):
@@ -219,6 +251,14 @@ def get_results(paper_name):
     if r_script.exists():
         with open(r_script, "r") as f:
             r_code = f.read()
+    # Also check for fallback / retry R scripts
+    if not r_code:
+        for suffix in ["_pbpk_model_fallback.R", "_pbpk_model_retry1.R", "_pbpk_model_retry2.R"]:
+            alt = PIPELINE_OUTPUT / f"{paper_name}{suffix}"
+            if alt.exists():
+                with open(alt, "r") as f:
+                    r_code = f.read()
+                break
 
     colpali_images = []
     if colpali_dir.exists():
@@ -226,11 +266,19 @@ def get_results(paper_name):
             f.name for f in colpali_dir.glob("*.png")
         ])
 
+    # Load LLM review if available
+    review = None
+    review_file = PIPELINE_OUTPUT / f"{paper_name}_review.json"
+    if review_file.exists():
+        with open(review_file, "r") as f:
+            review = json.load(f)
+
     return jsonify({
         "paper_name": paper_name,
         "parameters": params,
         "r_code": r_code,
         "colpali_pages": colpali_images,
+        "review": review,
     })
 
 
@@ -241,6 +289,44 @@ def serve_colpali_page(filename):
 
 
 # ── Main ─────────────────────────────────────────────────────────────────────
+
+
+# ── Database Viewer Routes ──────────────────────────────────────────────────
+
+def get_db_connection():
+    db_path = PROJECT_ROOT / "pk_parameters.db"
+    conn = sqlite3.connect(db_path)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+@app.route("/database")
+def database_viewer():
+    return render_template("database.html")
+
+@app.route("/api/db/papers", methods=["GET"])
+def db_list_papers():
+    try:
+        conn = get_db_connection()
+        papers = conn.execute("SELECT paper_id, title, created_at FROM documents ORDER BY created_at DESC").fetchall()
+        conn.close()
+        return jsonify({"papers": [dict(p) for p in papers]})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/api/db/parameters/<path:paper_id>", methods=["GET"])
+def db_get_parameters(paper_id):
+    try:
+        conn = get_db_connection()
+        params = conn.execute("SELECT * FROM pk_parameters WHERE paper_id = ? ORDER BY table_id, id", (paper_id,)).fetchall()
+        doc = conn.execute("SELECT * FROM documents WHERE paper_id = ?", (paper_id,)).fetchone()
+        conn.close()
+        return jsonify({
+            "document": dict(doc) if doc else None,
+            "parameters": [dict(p) for p in params]
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 if __name__ == "__main__":
     print("\n" + "=" * 60)

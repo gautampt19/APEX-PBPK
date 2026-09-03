@@ -16,6 +16,68 @@ from typing import List, Optional
 from collections import Counter
 
 
+# ── Table Region Protection ──────────────────────────────────────────────────
+# Sentinel used to mark lines that must survive header/footer stripping.
+# Protects: table rows, the caption line directly above, and up to 3 footnote
+# lines below each table (where units and statistical notes typically live).
+_TABLE_SENTINEL = "\x00TABLE\x00"
+_TABLE_ROW_RE = re.compile(r"^\s*\|")
+
+
+# Footnote markers: lines starting with superscript letters, *, †, a–z, numbers
+# followed by a space/text — typical table footnote patterns in papers.
+_FOOTNOTE_RE = re.compile(
+    r"^\s*(?:[a-z]|\d|\*|†|‡|§|\^[a-z0-9]+)\s+\S",  # e.g. "a Values", "* p < 0.05"
+    re.IGNORECASE,
+)
+# "Table X." or "Figure X." captions
+_CAPTION_RE = re.compile(r"^\s*(Table|Figure|Fig\.?)\s+[\dIVX]+", re.IGNORECASE)
+
+
+def protect_table_regions(text: str) -> str:
+    """Mark table rows, their captions (1 line above) and genuine footnotes
+    (up to 3 lines below matching _FOOTNOTE_RE) with a sentinel prefix, so
+    suppress_headers_footers() never removes them.
+
+    Only *footnote-looking* lines are sentinelled after the table, preventing
+    repeating journal headers that happen to follow a table from being shielded.
+    """
+    lines = text.split("\n")
+    protected = list(lines)
+    n = len(lines)
+    in_table = False
+
+    for i, line in enumerate(lines):
+        is_row = bool(_TABLE_ROW_RE.match(line))
+        if is_row:
+            protected[i] = _TABLE_SENTINEL + lines[i]
+            # Protect the line immediately above if it looks like a table caption
+            if i > 0 and not protected[i - 1].startswith(_TABLE_SENTINEL):
+                prev = lines[i - 1].strip()
+                if _CAPTION_RE.match(prev) or prev.lower().startswith("table"):
+                    protected[i - 1] = _TABLE_SENTINEL + lines[i - 1]
+            in_table = True
+        elif in_table and not is_row:
+            in_table = False
+            # Protect up to 3 lines after table end, but ONLY if they look like
+            # footnotes (superscript markers, *, †) or are blank spacer lines.
+            for j in range(i, min(i + 3, n)):
+                candidate = lines[j].strip()
+                is_footnote = bool(_FOOTNOTE_RE.match(candidate))
+                is_blank = (candidate == "")
+                if (is_footnote or is_blank) and not protected[j].startswith(_TABLE_SENTINEL):
+                    protected[j] = _TABLE_SENTINEL + lines[j]
+                elif not is_blank and not is_footnote:
+                    break  # stop at first non-footnote, non-blank line
+
+    return "\n".join(protected)
+
+
+def unprotect_table_regions(text: str) -> str:
+    """Remove the sentinel prefix after cleaning is complete."""
+    return text.replace(_TABLE_SENTINEL, "")
+
+
 # ── Header / Footer Suppression ──────────────────────────────────────────────
 
 # Patterns commonly emitted by the Unlimited-OCR model
@@ -38,25 +100,43 @@ def _detect_repeating_lines(text: str, min_occurrences: int = 3) -> set:
 
 
 def suppress_headers_footers(text: str) -> str:
-    """Remove repeating headers, footers, page markers, and publisher stamps."""
+    """Remove repeating headers, footers, page markers, and publisher stamps.
+
+    NOTE: Lines prefixed with _TABLE_SENTINEL are always preserved — call
+    protect_table_regions() before this function and unprotect_table_regions()
+    afterwards to shield table captions and footnotes.
+    """
     # 1. Remove <PAGE> markers
     text = _PAGE_MARKER_RE.sub("", text)
 
     # 2. Remove "Page X of Y ..." lines
     text = _PAGE_X_OF_Y_RE.sub("", text)
 
-    # 3. Detect and remove repeating lines (journal name, publisher, etc.)
-    repeating = _detect_repeating_lines(text)
+    # 3. Detect repeating lines across ALL lines (including sentinelled).
+    #    Strip only non-sentinelled repeats; sentinelled table lines always survive.
+    repeating = _detect_repeating_lines(
+        "\n".join(
+            line.replace(_TABLE_SENTINEL, "")  # strip sentinel for counting
+            for line in text.split("\n")
+        )
+    )
     if repeating:
         cleaned_lines = []
         for line in text.split("\n"):
-            normalised = re.sub(r"\s+", " ", line).strip()
-            if normalised not in repeating:
-                cleaned_lines.append(line)
+            if line.startswith(_TABLE_SENTINEL):
+                cleaned_lines.append(line)  # always keep (table row/caption/footnote)
+            else:
+                normalised = re.sub(r"\s+", " ", line).strip()
+                if normalised not in repeating:
+                    cleaned_lines.append(line)
         text = "\n".join(cleaned_lines)
 
-    # 4. Remove standalone page numbers (lines that are just a number)
-    text = _STANDALONE_PAGE_NUM_RE.sub("", text)
+    # 4. Remove standalone page numbers — skip sentinelled lines
+    lines = text.split("\n")
+    text = "\n".join(
+        line for line in lines
+        if line.startswith(_TABLE_SENTINEL) or not _STANDALONE_PAGE_NUM_RE.match(line)
+    )
 
     # 5. Collapse excessive blank lines (3+ → 2)
     text = re.sub(r"\n{3,}", "\n\n", text)
@@ -65,6 +145,38 @@ def suppress_headers_footers(text: str) -> str:
 
 
 # ── Smart Chunking ───────────────────────────────────────────────────────────
+
+
+def remove_references_section(text: str) -> str:
+    """
+    Finds the References section and removes it, preserving anything after it
+    (like Appendices, Supplementary Data, etc.) that starts with a heading.
+    """
+    import re
+    # Find the References heading (case-insensitive, allows whitespace)
+    ref_heading_re = re.compile(r"^#{1,4}\s*(?:References?|Bibliography)\s*$", re.IGNORECASE | re.MULTILINE)
+    
+    match = ref_heading_re.search(text)
+    if not match:
+        return text
+    
+    start_idx = match.start()
+    
+    # Look for the NEXT heading to determine where references end
+    next_heading_re = re.compile(r"^#{1,4}\s+(?!References?|Bibliography)", re.IGNORECASE | re.MULTILINE)
+    next_match = next_heading_re.search(text, match.end())
+    
+    if next_match:
+        end_idx = next_match.start()
+    else:
+        end_idx = len(text)
+        
+    # Replace the reference block with a placeholder
+    before = text[:start_idx]
+    after = text[end_idx:]
+    
+    return before + "\n\n> [!NOTE]\n> References section removed for context efficiency.\n\n" + after
+
 
 def chunk_text(
     text: str,
@@ -130,7 +242,13 @@ def clean_markdown(
     chunk_size: int = 8000,
 ) -> str:
     """Full cleaning pipeline.  Returns the cleaned text (single string)."""
-    cleaned = suppress_headers_footers(md_text)
+    # Protect table regions before stripping, restore afterwards
+    # Remove references before any protection/stripping
+    no_refs   = remove_references_section(md_text)
+    protected = protect_table_regions(no_refs)
+    stripped  = suppress_headers_footers(protected)
+    cleaned   = unprotect_table_regions(stripped)
+
     word_count = len(cleaned.split())
     if word_count > max_words_before_chunking:
         chunks = chunk_text(cleaned, chunk_size=chunk_size)

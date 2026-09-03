@@ -7,6 +7,46 @@
     <meta name="description" content="Upload a scientific paper PDF and extract PBPK parameters with AI-powered visual document retrieval.">
     <link rel="stylesheet" href="/static/style.css">
     <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.29.2/cytoscape.min.js"></script>
+    <style>
+        /* ── Compartment Builder Styles ───────────────────── */
+        .flow-toolbar {
+            display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+            padding: 10px 14px; background: var(--surface-2);
+            border-bottom: 1px solid var(--border); border-radius: 10px 10px 0 0;
+        }
+        .flow-toolbar .tool-btn {
+            padding: 5px 12px; font-size: 0.78rem; border-radius: 6px;
+            border: 1px solid var(--border); background: var(--surface-3);
+            color: var(--text-primary); cursor: pointer; transition: all 0.15s;
+        }
+        .flow-toolbar .tool-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+        .flow-toolbar .tool-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+        .flow-toolbar .tool-btn.danger:hover { background: #ef4444; border-color: #ef4444; }
+        .flow-toolbar .tool-btn.success:hover { background: #10b981; border-color: #10b981; }
+        .flow-toolbar .sep { width: 1px; height: 24px; background: var(--border); margin: 0 4px; }
+        .flow-toolbar .tool-label { font-size: 0.75rem; color: var(--text-muted); }
+        #cy-canvas { width: 100%; height: 520px; background: #0a0f1a; border-radius: 0 0 10px 10px; border: 1px solid var(--border); border-top: none; }
+        .node-popover {
+            position: fixed; background: var(--surface-3); border: 1px solid var(--accent);
+            border-radius: 10px; padding: 14px; z-index: 1000; min-width: 220px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+        }
+        .node-popover h4 { margin: 0 0 10px; color: var(--accent); font-size: 0.9rem; }
+        .node-popover label { font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 3px; margin-top: 8px; }
+        .node-popover input, .node-popover select {
+            width: 100%; padding: 5px 8px; background: var(--surface-2);
+            border: 1px solid var(--border); border-radius: 6px; color: var(--text-primary); font-size: 0.8rem;
+        }
+        .node-popover .pop-btns { display: flex; gap: 8px; margin-top: 12px; }
+        .node-popover .pop-btn { flex: 1; padding: 5px; font-size: 0.78rem; border-radius: 6px; border: none; cursor: pointer; }
+        .node-popover .pop-save { background: var(--accent); color: #fff; }
+        .node-popover .pop-del { background: #ef4444; color: #fff; }
+        .node-popover .pop-cancel { background: var(--surface-2); color: var(--text-muted); border: 1px solid var(--border); }
+        .flow-mode-bar { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
+        .flow-mode-bar button { padding: 5px 14px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text-muted); cursor: pointer; font-size: 0.82rem; }
+        .flow-mode-bar button.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    </style>
 </head>
 <body>
 <div class="app-container">
@@ -43,11 +83,7 @@
                 </div>
                 <div id="uploaded-info"></div>
 
-                <!-- Previously uploaded papers -->
-                <div style="margin-top: 16px;">
-                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 6px;">Previous Papers</div>
-                    <ul class="paper-list" id="paper-list"></ul>
-                </div>
+                
             </div>
 
             <!-- Pipeline Controls Card -->
@@ -80,8 +116,11 @@
                         </select>
                     </div>
                 </div>
-                <button class="btn btn-primary" id="run-btn" disabled style="margin-top: 16px; width: 100%;">
-                    <span>▶</span> Run Pipeline
+                <button class="btn btn-primary" id="extract-btn" disabled style="margin-top: 16px; width: 100%;">
+                    <span>🧬</span> Extract Parameters
+                </button>
+                <button class="btn btn-success" id="generate-btn" disabled style="margin-top: 8px; width: 100%; display: none; background-color: #10b981; color: white;">
+                    <span>💻</span> Generate Model
                 </button>
                 <button class="btn btn-secondary" id="toggle-log-btn" style="margin-top: 8px; width: 100%;">
                     <span>📋</span> Toggle Log
@@ -106,6 +145,9 @@
                 <button class="tab-btn" data-tab="rcode">
                     <span>💻</span> R Model Code
                 </button>
+                <button class="tab-btn" data-tab="review">
+                    <span>🔬</span> Model Review
+                </button>
             </div>
 
             <div class="tab-content">
@@ -120,11 +162,38 @@
 
                 <!-- Compartment Flow Tab -->
                 <div class="tab-panel" id="tab-flow">
-                    <div class="empty-state" id="flow-empty">
-                        <div class="empty-icon">🔀</div>
-                        <div class="empty-text">Compartment flow diagram will be generated from extracted parameters</div>
+                    <!-- Mode toggle -->
+                    <div class="flow-mode-bar">
+                        <button id="flow-view-btn" class="active" onclick="setFlowMode('view')">🔀 View Diagram</button>
+                        <button id="flow-edit-btn" onclick="setFlowMode('edit')">✏️ Edit Layout</button>
+                        <span style="font-size:0.75rem; color:var(--text-muted); margin-left:4px;" id="flow-connect-hint"></span>
                     </div>
-                    <div id="compartment-diagram" style="display:none;"></div>
+                    <!-- View Mode -->
+                    <div id="flow-view-pane">
+                        <div class="empty-state" id="flow-empty">
+                            <div class="empty-icon">🔀</div>
+                            <div class="empty-text">Compartment flow diagram will be generated from extracted parameters<br><small style="color:var(--accent);">Or switch to Edit Layout to build manually</small></div>
+                        </div>
+                        <div id="compartment-diagram" style="display:none;"></div>
+                    </div>
+                    <!-- Edit Mode (Cytoscape canvas) -->
+                    <div id="flow-edit-pane" style="display:none;">
+                        <div class="flow-toolbar">
+                            <span class="tool-label">ADD:</span>
+                            <button class="tool-btn" onclick="cyBuilder.addOrganNode()">➕ Organ</button>
+                            <button class="tool-btn" onclick="cyBuilder.addBloodNodes()">🩸 Blood Nodes</button>
+                            <div class="sep"></div>
+                            <span class="tool-label">EDIT:</span>
+                            <button class="tool-btn" id="connect-btn" onclick="cyBuilder.toggleConnectMode()">🔗 Connect</button>
+                            <button class="tool-btn danger" onclick="cyBuilder.deleteSelected()">🗑️ Delete</button>
+                            <div class="sep"></div>
+                            <button class="tool-btn" onclick="cyBuilder.autoLayout()">⬆️ Auto Layout</button>
+                            <button class="tool-btn" onclick="cyBuilder.loadFromParams()">↩️ Reset</button>
+                            <div class="sep"></div>
+                            <button class="tool-btn success" onclick="cyBuilder.applyToParams()">📤 Apply to Parameters</button>
+                        </div>
+                        <div id="cy-canvas"></div>
+                    </div>
                 </div>
 
                 <!-- ColPali Pages Tab -->
@@ -146,6 +215,15 @@
                         <pre id="rcode-content"></pre>
                     </div>
                 </div>
+
+                <!-- Model Review Tab -->
+                <div class="tab-panel" id="tab-review">
+                    <div class="empty-state" id="review-empty">
+                        <div class="empty-icon">🔬</div>
+                        <div class="empty-text">LLM model review will appear here after R code generation</div>
+                    </div>
+                    <div id="review-content" style="display:none;"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -166,6 +244,6 @@
     </div>
 </div>
 
-<script src="/static/app.js"></script>
+<script src="/static/app.js?v=1.4"></script>
 </body>
 </html>

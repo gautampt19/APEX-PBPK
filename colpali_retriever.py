@@ -25,12 +25,34 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 
 # ── Default PBPK retrieval queries ───────────────────────────────────────────
 
+# Kept for backward-compat / single-query fallback
 DEFAULT_PBPK_QUERIES = [
     "Table of physiological parameters: organ blood flows, organ volumes, partition coefficients",
     "PBPK model compartment diagram showing tissue connections and blood flow",
     "Differential equations for mass balance, ODE system, dA/dt",
     "Pharmacokinetic parameters: Vmax, Km, clearance, absorption rate, fraction unbound",
     "Drug dose, body weight, cardiac output, species information",
+]
+
+# ── Multi-query ensemble groups (Upgrade: 3-group, Top-2 union) ─────────────
+# Running 3 focused retrieval groups ensures split tables (e.g., Table 1 on
+# page 4, Table 2 on page 6) are never outranked by a single dense page.
+ENSEMBLE_QUERY_GROUPS = [
+    # Group A — Physiological / structural parameters
+    [
+        "Table of physiological parameters, organ blood flows and tissue volumes",
+        "Organ blood flow fractions, cardiac output fraction, tissue volume fraction of body weight",
+    ],
+    # Group B — PK/PD biochemical parameters
+    [
+        "Pharmacokinetic parameters: clearance, AUC, Cmax, bioavailability, half-life",
+        "Vmax, Km, Michaelis-Menten kinetics, partition coefficients Kp, fraction unbound fu, hematocrit",
+    ],
+    # Group C — Model equations and experimental context
+    [
+        "Differential equations, ODE system, mass balance, dA/dt, deSolve, PBPK model structure",
+        "Species comparison table, rat human mouse, formulation, dose, route of administration",
+    ],
 ]
 
 
@@ -165,45 +187,88 @@ class ColPaliRetriever:
         queries: List[str] = None,
         top_k: int = 5,
         dpi: int = 200,
+        use_ensemble: bool = True,
     ) -> List[Tuple[int, float, Image.Image]]:
         """
         Retrieve the top-K most relevant pages from a PDF.
 
         Args:
             pdf_path: Path to the PDF file.
-            queries: List of text queries. Defaults to PBPK-specific queries.
+            queries: Override query list. Ignored when use_ensemble=True.
             top_k: Number of pages to return.
             dpi: Resolution for PDF-to-image conversion.
+            use_ensemble: If True (default), run multi-query ensemble retrieval
+                          using ENSEMBLE_QUERY_GROUPS.  Each group contributes
+                          its Top-2 pages to a union set, guaranteeing split
+                          tables across different pages are always captured.
+                          Falls back to single-pool scoring if False.
 
         Returns:
-            List of (page_number, score, pil_image) tuples, sorted by relevance.
+            List of (page_number, score, pil_image) tuples.
         """
         self._load_model()
 
-        if queries is None:
-            queries = DEFAULT_PBPK_QUERIES
-
-        # Convert PDF to images
+        # Convert PDF to images once (shared across all queries)
         page_images = pdf_to_images(pdf_path, dpi=dpi)
         logging.info(f"Encoding {len(page_images)} page images with ColPali...")
-
-        # Encode
         image_embeddings = self._encode_images(page_images)
-        query_embeddings = self._encode_queries(queries)
 
-        # Score
-        page_scores = self._score_pages(query_embeddings, image_embeddings)
+        if use_ensemble:
+            # ── Multi-query ensemble: Top-2 per group → union ──────────────
+            selected_indices: set = set()
+            for group_idx, group_queries in enumerate(ENSEMBLE_QUERY_GROUPS):
+                q_embeddings = self._encode_queries(group_queries)
+                scores = self._score_pages(q_embeddings, image_embeddings)
+                top2_for_group = sorted(
+                    enumerate(scores), key=lambda x: x[1], reverse=True
+                )[:2]
+                for idx, score in top2_for_group:
+                    selected_indices.add(idx)
+                logging.info(
+                    f"  Ensemble group {group_idx + 1}: "
+                    f"pages {[i + 1 for i, _ in top2_for_group]}"
+                )
 
-        # Rank and select top-K
-        scored_pages = [
-            (idx + 1, score, page_images[idx])
-            for idx, score in enumerate(page_scores)
-        ]
-        scored_pages.sort(key=lambda x: x[1], reverse=True)
-        top_pages = scored_pages[:top_k]
+            # If union < top_k, fill remaining slots from a global ranking
+            if len(selected_indices) < top_k:
+                all_flat = [q for grp in ENSEMBLE_QUERY_GROUPS for q in grp]
+                global_embeddings = self._encode_queries(all_flat)
+                global_scores = self._score_pages(global_embeddings, image_embeddings)
+                for idx, _ in sorted(
+                    enumerate(global_scores), key=lambda x: x[1], reverse=True
+                ):
+                    if idx not in selected_indices:
+                        selected_indices.add(idx)
+                    if len(selected_indices) >= top_k:
+                        break
 
-        logging.info(f"ColPali top-{top_k} pages: {[(p[0], f'{p[1]:.1f}') for p in top_pages]}")
-        return top_pages
+            results = [
+                (idx + 1, 0.0, page_images[idx])
+                for idx in sorted(selected_indices)
+            ]
+            logging.info(
+                f"ColPali ensemble top-{top_k} pages selected: "
+                f"{[r[0] for r in results]}"
+            )
+            return results[:top_k]
+
+        else:
+            # ── Original single-pool scoring ────────────────────────────────
+            if queries is None:
+                queries = DEFAULT_PBPK_QUERIES
+            query_embeddings = self._encode_queries(queries)
+            page_scores = self._score_pages(query_embeddings, image_embeddings)
+            scored_pages = [
+                (idx + 1, score, page_images[idx])
+                for idx, score in enumerate(page_scores)
+            ]
+            scored_pages.sort(key=lambda x: x[1], reverse=True)
+            top_pages = scored_pages[:top_k]
+            logging.info(
+                f"ColPali top-{top_k} pages: "
+                f"{[(p[0], f'{p[1]:.1f}') for p in top_pages]}"
+            )
+            return top_pages
 
 
 # ── Convenience function ─────────────────────────────────────────────────────

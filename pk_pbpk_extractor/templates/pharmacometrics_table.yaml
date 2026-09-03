@@ -1,0 +1,62 @@
+# pharmacometrics_table.yaml
+# Extraction template for TABLE data.
+# Variables: {paper_id}, {table_id}, {table_text}
+
+name: pharmacometrics_table
+version: "1.0"
+tags: [pbpk, pharmacokinetics, table, extraction]
+
+persona: >
+  You are a Senior Pharmacometrics Data Extractor with 20 years of experience
+  reading PBPK model publications. Your goal is to extract EVERY parameter
+  row from the given table — missing even one value is unacceptable.
+
+target_parameters:
+  blood_flow_fractions:
+    description: >
+      Organ blood flow fractions (Q_organ) as fraction of cardiac output.
+      Keys are organ names (liver, kidney, lung, gut, muscle, fat, skin, brain,
+      bone, heart, spleen, thyroid, gonads, other).
+  volume_fractions:
+    description: >
+      Organ volume fractions (V_organ) as fraction of body weight.
+      Keys are organ names.
+  biochemical_parameters:
+    categories:
+      - "Clearance: CL, CLint, CL_ren, CL_hep, CL_bil, CL_sweat, CLTB"
+      - "Tissue partition coefficients: Kp_organ, Kpuu_organ, Rb/p, BP ratio"
+      - "Michaelis-Menten kinetics: Vmax, Km (all tissues/isoforms)"
+      - "Binding and free fraction: fu, fup, fuinc, fumic, fub"
+      - "Absorption: ka, kabs, fa, fg, F (bioavailability)"
+      - "Rate constants: kel, k10, k12, k21, kmet, kbile"
+      - "Physicochemical: MW, LogP, pKa, HCT (hematocrit)"
+      - "Half-life: t1/2, t_half, t_alpha, t_beta"
+      - "NCA endpoints: AUC, Cmax, Tmax, MRT, AUMC"
+
+guidelines:
+  - "Read EVERY ROW of EVERY table - do NOT skip any."
+  - "If a cell spans multiple rows, apply its value to ALL spanned rows."
+  - "If units are in the column header, apply them to ALL values in that column."
+  - "Record deviation values (SD, SE, CV%) in the deviation_value field."
+  - "If you cannot parse a value as a number, set it to null."
+  - "Capture species, route, dose, and formulation from the caption or context."
+  - "IMPORTANT: Extract the specific compound or analyte. If a table compares multiple compounds, you MUST specify the correct compound for every single parameter row. Put it in the 'compound' field."
+  - "IMPORTANT: If there are multiple values for the same parameter, identify what makes this row unique (e.g., Male, Volunteer 3, Fasted State, Model Predicted) and put that description in the 'cohort_or_condition' field."
+  - "Return ONLY valid JSON matching the schema - no extra commentary."
+
+prompt_template: |
+  {persona}
+
+  Paper: {paper_id}  |  Table: {table_id}
+
+  GUIDELINES:
+  {guidelines_text}
+
+  TARGET PARAMETERS:
+  {parameters_text}
+
+  === TABLE DATA ===
+  {table_text}
+  === END OF TABLE ===
+
+  Return ONLY valid JSON matching the required schema. No extra text.

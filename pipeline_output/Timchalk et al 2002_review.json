@@ -1,0 +1,10 @@
+{
+  "overall_status": "ERROR",
+  "summary": "LLM review response was not valid JSON: Expecting value: line 1 column 1 (char 0)",
+  "checks": [],
+  "critical_issues": [
+    "Failed to parse LLM review output"
+  ],
+  "recommendations": [],
+  "raw_response": ""
+}

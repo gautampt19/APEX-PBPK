@@ -1,0 +1,153 @@
+{
+    "blood_flow_fraction": {},
+    "volume_fraction": {
+        "Glucuronides/Sulfates (serum)": 0.0435
+    },
+    "biochemical_parameters": {
+        "tissue_serum_partition_coefficients": {
+            "Liver": {
+                "BPA": 0.73,
+                "BPS": 0.846,
+                "BPF": 0.872,
+                "BPAF": 2.44
+            },
+            "Slowly_perfused_tissue": {
+                "BPA": 2.7,
+                "BPS": 0.881,
+                "BPF": 0.853,
+                "BPAF": 2.11
+            },
+            "Brain": {
+                "BPA": 2.8,
+                "BPS": 0.81,
+                "BPF": 0.745,
+                "BPAF": 2.04
+            },
+            "Richly_perfused_tissue": {
+                "BPA": 2.8,
+                "BPS": 0.81,
+                "BPF": 0.745,
+                "BPAF": 2.04
+            },
+            "Fat": {
+                "BPA": 5.0,
+                "BPS": 0.435,
+                "BPF": 0.884,
+                "BPAF": 5.73
+            },
+            "Skin": {
+                "BPA": 2.15,
+                "BPS": 0.915,
+                "BPF": 1.09,
+                "BPAF": 3.26
+            },
+            "Gonads": {
+                "BPA": 2.6,
+                "BPS": 0.843,
+                "BPF": 0.778,
+                "BPAF": 1.86
+            }
+        },
+        "hepatic_glucuronidation": {
+            "BPA": {
+                "Km_nM": 45800,
+                "Ksi_nM": 219000,
+                "vmax_nmol_per_h_per_g_liver": 9040
+            },
+            "BPS": {
+                "Km_nM": 446000,
+                "vmax_nmol_per_h_per_g_liver": 7810
+            },
+            "BPF": {
+                "Km_nM": 17900,
+                "vmax_nmol_per_h_per_g_liver": 3600
+            },
+            "BPAF": {
+                "Km_nM": 4210,
+                "vmax_nmol_per_h_per_g_liver": 5660
+            },
+            "microsomal_protein_liver_mg_per_g": 32.0
+        },
+        "intestinal_glucuronidation": {
+            "BPA": {
+                "Km_nM": 58400,
+                "vmax_nmol_per_h_per_g_bw": 361
+            },
+            "BPS": {
+                "Km_nM": 555000,
+                "Ksi_nM": 711000
+            },
+            "BPF": {
+                "Ksi_nM": 605000
+            },
+            "BPAF": {
+                "Km_nM": 1830,
+                "Ksi_nM": 82200
+            },
+            "microsomal_protein_small_intestine_mg_per_kg_bw": 4.29
+        },
+        "hepatic_sulfation": {
+            "BPA": {
+                "Km_nM": 10100,
+                "vmax_nmol_per_h_per_g_liver": 149
+            },
+            "BPS": "approximated from BPA",
+            "BPF": "approximated from BPA",
+            "BPAF": "approximated from BPA"
+        },
+        "gastric_emptying_1_per_h_per_kgBW_m0.25": 3.5,
+        "volume_of_distribution_small_intestine_mL": 122,
+        "oral_uptake_small_intestine_to_liver_1_per_h_per_kgBW_m0.25": {
+            "BPA": 2.1,
+            "BPS": 5.0,
+            "BPF": 2.1,
+            "BPAF": 5.0
+        },
+        "urinary_excretion_1_per_h_per_kgBW_0.75": {
+            "BPA": 0.06,
+            "BPS": 0.3,
+            "BPF": 0.06,
+            "BPAF": 0.3
+        },
+        "fraction_glucuronide_liver_to_serum_no_EHR": {
+            "BPA": 0.9,
+            "BPS": 0.33,
+            "BPF": 1.0,
+            "BPAF": 0.3
+        },
+        "EHR_unconjugated_1_per_h_per_kgBW_m0.25": {
+            "BPA": 0.2,
+            "BPS": 0.35,
+            "BPF": 0.2,
+            "BPAF": 0.35
+        },
+        "EHR_as_glucuronide_1_per_h_per_kgBW_m0.25": {
+            "BPA": 0.2,
+            "BPS": 2.0,
+            "BPF": 0.2,
+            "BPAF": 2.0
+        },
+        "uptake_enterocytes_to_liver_gluc_sulf_1_per_h_per_kgBW_m0.25": 50.0,
+        "urinary_excretion_glucuronide_1_per_h_per_kgBW_0.75": {
+            "BPA": 0.35,
+            "BPS": 1.2,
+            "BPF": 0.35,
+            "BPAF": 1.2
+        },
+        "urinary_excretion_sulfate_1_per_h_per_kgBW_0.75": 0.03,
+        "peroral_absorption_fraction": 1.0,
+        "peroral_uptake_period_h": 0.25,
+        "dermal_thermal_paper_absorption_fraction": 0.2,
+        "dermal_thermal_paper_absorption_half_life_h": 6.0,
+        "dermal_thermal_paper_uptake_period_h": 24.0,
+        "dermal_PCPs_absorption_fraction": 0.6,
+        "dermal_PCPs_absorption_half_life_h": 0.167,
+        "dermal_PCPs_uptake_period_h": 24.0
+    },
+    "equations": {
+        "Michaelis_Menten": "v = (vmax * [S]) / (Km + [S])",
+        "Substrate_inhibition": "v = (vmax * [S]) / (Km + [S]) * (1 + [S]/Ksi)",
+        "MRD": "MRD = 10 * sqrt( sum(log10(predicted) - log10(observed))^2 / n )",
+        "AFE": "AFE = 10 * ( sum(log10(predicted) - log10(observed)) / n )"
+    }
+}

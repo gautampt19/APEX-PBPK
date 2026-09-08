@@ -166,20 +166,12 @@ def try_pmc(doi: str = None, title: str = None) -> str | None:
         return None
     
     found_pmcid = None
-    if doi and title:
-        # Parallel search
-        with ThreadPoolExecutor(max_workers=2) as ex:
-            futures = {}
-            if doi:   futures[ex.submit(doi_to_pmcid, doi)]   = "doi"
-            if title: futures[ex.submit(title_to_pmcid, title)] = "title"
-            for future in as_completed(futures):
-                result = future.result()
-                if result and not found_pmcid:
-                    found_pmcid = result
-                    print(f"  [PMC] First hit from {futures[future]}: {found_pmcid}")
-    elif doi:
+    
+    # Strictly prioritize DOI if available.
+    if doi:
         found_pmcid = doi_to_pmcid(doi)
-    elif title:
+    elif title and len(title) > 10 and any(c.isalpha() for c in title):
+        # ONLY search by title if no DOI was extracted from the PDF at all.
         found_pmcid = title_to_pmcid(title)
 
     if found_pmcid:
@@ -290,6 +282,31 @@ def _download_pdf(url: str, file_stem: str, source: str = "web") -> str | None:
         print(f"  Cached PDF: {pdf_path}")
         return pdf_path
 
+    if source == "pmc_supp" or "pmc.ncbi" in url:
+        try:
+            from playwright.sync_api import sync_playwright
+            print(f"  [PMC] Downloading via playwright to bypass PoW: {url}")
+            with sync_playwright() as p:
+                browser = p.chromium.launch(headless=True)
+                context = browser.new_context(user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36")
+                page = context.new_page()
+                try:
+                    with page.expect_download(timeout=30000) as download_info:
+                        page.goto(url)
+                    download = download_info.value
+                    download.save_as(pdf_path)
+                    size_kb = os.path.getsize(pdf_path) / 1024
+                    print(f"  Downloaded PDF ({size_kb:.1f} KB): {pdf_path}")
+                    return pdf_path
+                except Exception as e:
+                    print(f"  Playwright download failed: {e}")
+                    return None
+                finally:
+                    browser.close()
+        except Exception as e:
+            print(f"  Failed to use playwright: {e}")
+            return None
+
     try:
         headers = {"User-Agent": "Mozilla/5.0 (compatible; PBPK-Extractor/1.0; research use)"}
         r = requests.get(url, headers=headers, timeout=60, stream=True)
@@ -311,6 +328,52 @@ def _download_pdf(url: str, file_stem: str, source: str = "web") -> str | None:
 # ─────────────────────────────────────────────────────────────
 # Main public resolver
 # ─────────────────────────────────────────────────────────────
+
+
+def fetch_supplementary_pdfs(pmcid: str) -> list[str]:
+    import requests
+    from bs4 import BeautifulSoup
+    from urllib.parse import urljoin
+    import os
+    print(f"\n  [PMC Scraper] Searching for supplementary files for {pmcid}...")
+    
+    if not pmcid.startswith("PMC"):
+        pmcid = f"PMC{pmcid}"
+        
+    url = f"https://www.ncbi.nlm.nih.gov/pmc/articles/{pmcid}/"
+    headers = {"User-Agent": "Mozilla/5.0"}
+    try:
+        r = requests.get(url, headers=headers, timeout=30)
+        r.raise_for_status()
+    except Exception as e:
+        print(f"  [PMC Scraper] Failed to fetch PMC page: {e}")
+        return []
+        
+    soup = BeautifulSoup(r.text, 'html.parser')
+    downloaded_pdfs = []
+    
+    for a in soup.find_all('a', href=True):
+        href = a.get('href', '')
+        if '/bin/' in href or 'supp' in href.lower() or href.lower().endswith('.pdf'):
+            if not (href.lower().endswith('.pdf') or '/bin/' in href):
+                continue
+                
+            full_url = urljoin(r.url, href)
+            file_name = href.split('/')[-1]
+            if not file_name.endswith('.pdf'):
+                file_name += '.pdf'
+                
+            if 'pdf' in file_name.lower() and pmcid.lower() not in file_name.lower() and 'supp' in file_name.lower():
+                pass
+            elif 'supp' not in href.lower() and 'bin' not in href:
+                continue
+                
+            print(f"  [PMC Scraper] Found supplementary file: {full_url}")
+            out_path = _download_pdf(full_url, f"{pmcid}_{file_name.replace('.pdf', '')}", source="pmc_supp")
+            if out_path and out_path not in downloaded_pdfs:
+                downloaded_pdfs.append(out_path)
+                
+    return downloaded_pdfs
 
 def resolve_paper(doi: str = None, title: str = None, pmcid: str = None) -> dict:
     """

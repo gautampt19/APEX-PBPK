@@ -11,6 +11,7 @@ Routing chain (auto-detected from PDF when only --pdf is given):
 import argparse
 import os
 import json
+import math
 import ollama
 
 from .ingestion.xml_parser import parse_xml_tables
@@ -20,6 +21,7 @@ from .ingestion.pmc_fetcher import (
     resolve_paper,
     extract_doi_from_pdf,
     extract_title_from_pdf,
+    fetch_supplementary_pdfs
 )
 import sys, importlib.util as _ilu, os as _os
 _cm_path = _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.dirname(__file__))), "clean_markdown.py")
@@ -37,6 +39,7 @@ from .normalization.unit_normalizer import normalize_unit
 from .normalization.entity_linker import link_pk_entity
 from .normalization.harmonizer import harmonize
 from .enrichment.pbpk_compound_enricher import enrich_pbpk_properties, resolve_compound_name
+from .enrichment.deduplicator import deduplicate_extracted_parameters
 from .templates.template_loader import build_prompt
 from .schemas.pbpk_schema import ExtractedTablePayload
 
@@ -183,7 +186,7 @@ def process_pdf(pdf_path: str, worker: OllamaWorker, paper_id: str = None):
     output_dir = "/tmp/mineru_output"
     os.makedirs(output_dir, exist_ok=True)
 
-    md_content, _ = run_mineru(pdf_path, output_dir)
+    md_content, layout_data = run_mineru(pdf_path, output_dir)
 
     if not paper_id:
         paper_id = os.path.splitext(os.path.basename(pdf_path))[0]
@@ -193,6 +196,52 @@ def process_pdf(pdf_path: str, worker: OllamaWorker, paper_id: str = None):
 
     # ── Pass 1: Text-only extraction from full cleaned markdown ──────────
     process_md_text_pass(md_content, worker, paper_id, output_dir)
+
+    # ── Pass 1.5: AutoPK Structured Table Pass ─────────────────────────────
+    structured_tables = layout_data.get("structured_tables", [])
+    if structured_tables:
+        try:
+            from pk_pbpk_extractor.inference.autopk_filter import autopk_filter_and_flatten
+            from pk_pbpk_extractor.schemas.pbpk_schema import ExtractedTablePayload
+            import json
+            
+            print(f"\n[AutoPK Table Pass] Processing {len(structured_tables)} extracted tables...")
+            for table_data in structured_tables:
+                table_idx = table_data.get("table_index", 1)
+                raw_table = table_data.get("data", [])
+                
+                kv_flattened_text = autopk_filter_and_flatten(raw_table, sim_threshold=0.60)
+                if not kv_flattened_text:
+                    continue
+                    
+                print(f"  [AutoPK] Filtered Table {table_idx} to key-value format (len={len(kv_flattened_text)})")
+                
+                prompt = (
+                    "You are a Senior Pharmacometrics Data Extractor.\n"
+                    "The following are highly condensed Key-Value formatted rows extracted from a PK table.\n"
+                    "Extract ALL parameters and map them precisely. The format is <Value@ColumnHeader>.\n"
+                    "Return ONLY valid JSON matching the schema.\n\n"
+                    f"Paper: {paper_id} | Table: {table_idx}\n"
+                    "=== CONDENSED TABLE ===\n"
+                    f"{kv_flattened_text}\n"
+                    "=======================\n"
+                )
+                
+                response = worker.client.chat(
+                    model=worker.model,
+                    messages=[{"role": "user", "content": prompt}],
+                    format=worker.json_schema,
+                    options={"temperature": 0.0}
+                )
+                
+                try:
+                    res_dict = ExtractedTablePayload.model_validate_json(response["message"]["content"]).model_dump()
+                    _save_payload(res_dict, paper_id, source_pass="autopk_table")
+                except Exception as e:
+                    print(f"  [AutoPK] Extraction warning: {e}")
+        except Exception as e:
+            print(f"  [AutoPK] Error during AutoPK pass: {e}")
+
 
     # ── Pass 2: Multimodal image extraction via ColPali ───────────────────
     # Split the full markdown into per-page sections for targeted context
@@ -430,12 +479,29 @@ def _save_payload(payload: dict, paper_id: str, source_pass: str = "xml_table"):
         })
 
     if params_to_insert:
+        import pandas as pd
+        df = pd.DataFrame(params_to_insert)
+        df_dedup = deduplicate_extracted_parameters(df)
+        # Replace NaN with None so JSON serialization doesn't break
+        df_dedup = df_dedup.where(df_dedup.notna(), None)
+        params_to_insert = df_dedup.to_dict("records")
+        # Safety: scrub any remaining float('nan') from nested structures
+        def _scrub_nan(obj):
+            if isinstance(obj, float) and math.isnan(obj):
+                return None
+            if isinstance(obj, dict):
+                return {k: _scrub_nan(v) for k, v in obj.items()}
+            if isinstance(obj, list):
+                return [_scrub_nan(v) for v in obj]
+            return obj
+        params_to_insert = [_scrub_nan(r) for r in params_to_insert]
         insert_pk_parameters(params_to_insert)
-        print(f"  Saved {len(params_to_insert)} parameter records to the database.")
+        print(f"  Saved {len(params_to_insert)} parameter records to the database (after semantic deduplication).")
 
     print("\n  ── Extracted Parameters ──────────────────────────")
     for row in params_to_insert:
-        print(f"    {row['parameter_name']:30s} = {row['value']:.4f} {row['unit']}")
+        val_str = f"{row['value']:.4f}" if row.get('value') is not None else f"[{row.get('start_value')} - {row.get('end_value')}]"
+        print(f"    {row['parameter_name']:30s} = {val_str} {row['unit']}")
 
 
 # ─────────────────────────────────────────────────────────────
@@ -509,6 +575,14 @@ Examples:
         if resolved["xml_path"]:
             print(f"\n[Auto-Routing] ✓ Got XML via {resolved['source']}. Using fast-path.")
             process_xml(resolved["xml_path"], worker, paper_id=paper_id)
+            
+            # Extract pmcid and fetch supplementary files
+            pmcid = resolved["xml_path"].split("/")[-1].split(".")[0]
+            print(f"\n[PMC Scraper] Searching for supplementary files for {pmcid}...")
+            supp_pdfs = fetch_supplementary_pdfs(pmcid)
+            for supp_pdf in supp_pdfs:
+                print(f"\n[Auto-Routing] Processing supplementary file: {supp_pdf}")
+                process_pdf(supp_pdf, worker, paper_id=paper_id)
             return
 
         if resolved["pdf_path"]:

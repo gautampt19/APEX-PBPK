@@ -86,6 +86,8 @@ def setup_database():
             parameter_name TEXT,
             canonical_name TEXT,
             value DOUBLE PRECISION,
+            start_value DOUBLE PRECISION,
+            end_value DOUBLE PRECISION,
             deviation_value DOUBLE PRECISION,
             measure_type TEXT,
             unit TEXT,
@@ -125,6 +127,8 @@ def setup_database():
                     parameter_name TEXT,
                     canonical_name TEXT,
                     value REAL,
+                    start_value REAL,
+                    end_value REAL,
                     deviation_value REAL,
                     measure_type TEXT,
                     unit TEXT,
@@ -208,16 +212,16 @@ def insert_pk_parameters(params_list: list):
                     tuples.append((
                         p.get("paper_id"), p.get("table_id"), p.get("species"), p.get("formulation"), 
                         p.get("route"), p.get("dose"), p.get("parameter_name"), p.get("canonical_name"), 
-                        p.get("value"), p.get("deviation_value"), p.get("measure_type"), p.get("unit"), 
+                        p.get("value"), p.get("start_value"), p.get("end_value"), p.get("deviation_value"), p.get("measure_type"), p.get("unit"), 
                         p.get("source_pass", "xml_table"), p.get("compound"), p.get("cohort_or_condition")
                     ))
             if tuples:
                 conn.executemany("""
                     INSERT INTO pk_parameters (
                         paper_id, table_id, species, formulation, route, dose,
-                        parameter_name, canonical_name, value, deviation_value,
+                        parameter_name, canonical_name, value, start_value, end_value, deviation_value,
                         measure_type, unit, source_pass, compound, cohort_or_condition
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """, tuples)
         print(f"  [DB] Inserted {len(params_list)} rows into SQLite.")
 

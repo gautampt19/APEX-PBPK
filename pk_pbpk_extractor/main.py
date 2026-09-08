@@ -402,90 +402,84 @@ def _compound_enrichment_pass(paper_id: str, paper_title: str = "", text_context
 # ─────────────────────────────────────────────────────────────
 
 def _save_payload(payload: dict, paper_id: str, source_pass: str = "xml_table"):
-    def _has_leak(*vals):
-        return any(isinstance(v, str) and (">>" in v or "<<" in v) for v in vals)
-
     params_to_insert = []
-    study = payload.get("study_context", {})
-    global_compound = study.get("compound")
-    global_cohort = study.get("cohort_or_condition")
-
-    for pk in payload.get("biochemical_parameters", []):
-        p_name = pk.get("parameter_name", "")
-        if _has_leak(p_name, study.get("species"), study.get("route")):
-            continue
-            
-        c_compound = pk.get("compound") or global_compound
-        c_cohort = pk.get("cohort_or_condition") or global_cohort
+    
+    # Extract global context if available
+    ctx = payload.get("table_context", {})
+    global_compound = ctx.get("compound")
+    global_species = ctx.get("species")
+    global_route = ctx.get("route")
+    global_dose_val = ctx.get("dose_value")
+    global_dose_unit = ctx.get("dose_unit")
+    global_formulation = ctx.get("formulation")
+    
+    records = payload.get("records", [])
+    if not records:
+        print("  [DB] No records found in payload to save.")
+        return
         
-        params_to_insert.append({
+    for rec in records:
+        # Fallback to global table context if specific record lacks it
+        compound = rec.get("compound") or global_compound
+        species = rec.get("species") or global_species
+        route = rec.get("route") or global_route
+        dose = rec.get("dose_value")
+        if dose is None:
+            dose = global_dose_val
+        dose_unit = rec.get("dose_unit") or global_dose_unit
+        formulation = rec.get("formulation") or global_formulation
+        
+        # Prepare row for DB
+        row = {
             "paper_id": paper_id,
             "table_id": payload.get("table_id", "Unknown"),
-            "species": study.get("species", ""),
-            "formulation": study.get("formulation", ""),
-            "route": study.get("route", ""),
-            "dose": study.get("dose", 0.0),
-            "parameter_name": p_name,
-            "canonical_name": link_pk_entity(p_name),
-            "value": pk.get("value", 0.0),
-            "deviation_value": pk.get("deviation_value"),
-            "measure_type": pk.get("measure_type", "mean"),
-            "unit": normalize_unit(pk.get("unit", "")),
-            "source_pass": source_pass,
-            "compound": c_compound,
-            "cohort_or_condition": c_cohort
-        })
-
-    for organ, val in payload.get("blood_flow_fractions", {}).items():
-        if val == 0.0: continue
-        if _has_leak(study.get("species"), study.get("route")): continue
-        params_to_insert.append({
-            "paper_id": paper_id,
-            "table_id": payload.get("table_id", "Unknown"),
-            "species": study.get("species", ""),
-            "formulation": study.get("formulation", ""),
-            "route": study.get("route", ""),
-            "dose": study.get("dose", 0.0),
-            "parameter_name": f"Q_{organ}",
-            "canonical_name": "Blood Flow Fraction",
-            "value": val,
-            "deviation_value": None,
-            "measure_type": "mean",
-            "unit": "fraction",
-            "source_pass": source_pass,
-            "compound": global_compound,
-            "cohort_or_condition": global_cohort
-        })
-
-    for organ, val in payload.get("volume_fractions", {}).items():
-        if val == 0.0: continue
-        if _has_leak(study.get("species"), study.get("route")): continue
-        params_to_insert.append({
-            "paper_id": paper_id,
-            "table_id": payload.get("table_id", "Unknown"),
-            "species": study.get("species", ""),
-            "formulation": study.get("formulation", ""),
-            "route": study.get("route", ""),
-            "dose": study.get("dose", 0.0),
-            "parameter_name": f"V_{organ}",
-            "canonical_name": "Volume Fraction",
-            "value": val,
-            "deviation_value": None,
-            "measure_type": "mean",
-            "unit": "fraction",
-            "source_pass": source_pass,
-            "compound": global_compound,
-            "cohort_or_condition": global_cohort
-        })
+            "record_id": rec.get("record_id"),
+            "source_row_index": rec.get("source_row_index"),
+            "source_column_index": rec.get("source_column_index"),
+            "source_row_label": rec.get("source_row_label"),
+            "source_column_header": rec.get("source_column_header"),
+            
+            "parameter_raw": rec.get("parameter_raw"),
+            "parameter_normalized": rec.get("parameter_normalized"),
+            "parameter_category": rec.get("parameter_category"),
+            "is_target_parameter": rec.get("is_target_parameter", False),
+            "organ_or_tissue": rec.get("organ_or_tissue"),
+            
+            "compound": compound,
+            "species": species,
+            "sex": rec.get("sex"),
+            "route": route,
+            "dose_value": dose,
+            "dose_unit": dose_unit,
+            "dose_raw": rec.get("dose_raw") or ctx.get("dose_raw"),
+            "formulation": formulation,
+            
+            "cohort_or_condition": rec.get("cohort_or_condition"),
+            "replicate_or_subject": rec.get("replicate_or_subject"),
+            "value_index": rec.get("value_index", 1),
+            
+            "value": rec.get("value"),
+            "unit": rec.get("unit"),
+            "qualifier": rec.get("qualifier"),
+            
+            "deviation_value": rec.get("deviation_value"),
+            "deviation_unit": rec.get("deviation_unit"),
+            "deviation_type": rec.get("deviation_type"),
+            
+            "interval_lower": rec.get("interval_lower"),
+            "interval_upper": rec.get("interval_upper"),
+            "interval_unit": rec.get("interval_unit"),
+            "interval_type": rec.get("interval_type"),
+            
+            "raw_value": rec.get("raw_value"),
+            "notes": rec.get("notes"),
+            "source_pass": source_pass
+        }
+        params_to_insert.append(row)
 
     if params_to_insert:
-        import pandas as pd
-        df = pd.DataFrame(params_to_insert)
-        df_dedup = deduplicate_extracted_parameters(df)
-        # Replace NaN with None so JSON serialization doesn't break
-        df_dedup = df_dedup.where(df_dedup.notna(), None)
-        params_to_insert = df_dedup.to_dict("records")
-        # Safety: scrub any remaining float('nan') from nested structures
+        # Scrub None/NaN safety
+        import math
         def _scrub_nan(obj):
             if isinstance(obj, float) and math.isnan(obj):
                 return None
@@ -494,19 +488,19 @@ def _save_payload(payload: dict, paper_id: str, source_pass: str = "xml_table"):
             if isinstance(obj, list):
                 return [_scrub_nan(v) for v in obj]
             return obj
+            
         params_to_insert = [_scrub_nan(r) for r in params_to_insert]
         insert_pk_parameters(params_to_insert)
-        print(f"  Saved {len(params_to_insert)} parameter records to the database (after semantic deduplication).")
+        print(f"  Saved {len(params_to_insert)} parameter records to the database.")
 
     print("\n  ── Extracted Parameters ──────────────────────────")
     for row in params_to_insert:
-        val_str = f"{row['value']:.4f}" if row.get('value') is not None else f"[{row.get('start_value')} - {row.get('end_value')}]"
-        print(f"    {row['parameter_name']:30s} = {val_str} {row['unit']}")
+        # Display logic for terminal
+        val_str = f"{row['value']:.4f}" if row.get('value') is not None else f"[{row.get('interval_lower')} - {row.get('interval_upper')}]"
+        name = row.get('parameter_raw') or "Unknown Parameter"
+        unit = row.get('unit') or ""
+        print(f"    {name:30s} = {val_str} {unit}")
 
-
-# ─────────────────────────────────────────────────────────────
-# Main
-# ─────────────────────────────────────────────────────────────
 
 def main():
     parser = argparse.ArgumentParser(

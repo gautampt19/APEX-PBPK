@@ -75,22 +75,44 @@ def setup_database():
             metadata_json TEXT,
             created_at TIMESTAMPTZ DEFAULT NOW()
         );
-        CREATE TABLE IF NOT EXISTS pk_parameters (
+        CREATE TABLE IF NOT EXISTS pk_records (
             id BIGSERIAL PRIMARY KEY,
             paper_id TEXT REFERENCES documents(paper_id),
             table_id TEXT,
+            record_id TEXT,
+            source_row_index INTEGER,
+            source_column_index INTEGER,
+            source_row_label TEXT,
+            source_column_header TEXT,
+            parameter_raw TEXT,
+            parameter_normalized TEXT,
+            parameter_category TEXT,
+            is_target_parameter BOOLEAN,
+            organ_or_tissue TEXT,
+            compound TEXT,
             species TEXT,
-            formulation TEXT,
+            sex TEXT,
             route TEXT,
-            dose DOUBLE PRECISION,
-            parameter_name TEXT,
-            canonical_name TEXT,
+            dose_value DOUBLE PRECISION,
+            dose_unit TEXT,
+            dose_raw TEXT,
+            formulation TEXT,
+            cohort_or_condition TEXT,
+            replicate_or_subject TEXT,
+            value_index INTEGER,
             value DOUBLE PRECISION,
-            start_value DOUBLE PRECISION,
-            end_value DOUBLE PRECISION,
-            deviation_value DOUBLE PRECISION,
-            measure_type TEXT,
             unit TEXT,
+            qualifier TEXT,
+            deviation_value DOUBLE PRECISION,
+            deviation_unit TEXT,
+            deviation_type TEXT,
+            interval_lower DOUBLE PRECISION,
+            interval_upper DOUBLE PRECISION,
+            interval_unit TEXT,
+            interval_type TEXT,
+            raw_value TEXT,
+            notes TEXT,
+            source_pass TEXT DEFAULT 'xml_table',
             extracted_at TIMESTAMPTZ DEFAULT NOW()
         );
         """
@@ -116,28 +138,49 @@ def setup_database():
                     created_at TIMESTAMP
                 )""")
             cur.execute("""
-                CREATE TABLE IF NOT EXISTS pk_parameters (
+                CREATE TABLE IF NOT EXISTS pk_records (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     paper_id TEXT,
                     table_id TEXT,
+                    record_id TEXT,
+                    source_row_index INTEGER,
+                    source_column_index INTEGER,
+                    source_row_label TEXT,
+                    source_column_header TEXT,
+                    parameter_raw TEXT,
+                    parameter_normalized TEXT,
+                    parameter_category TEXT,
+                    is_target_parameter BOOLEAN,
+                    organ_or_tissue TEXT,
+                    compound TEXT,
                     species TEXT,
-                    formulation TEXT,
+                    sex TEXT,
                     route TEXT,
-                    dose REAL,
-                    parameter_name TEXT,
-                    canonical_name TEXT,
+                    dose_value REAL,
+                    dose_unit TEXT,
+                    dose_raw TEXT,
+                    formulation TEXT,
+                    cohort_or_condition TEXT,
+                    replicate_or_subject TEXT,
+                    value_index INTEGER,
                     value REAL,
-                    start_value REAL,
-                    end_value REAL,
-                    deviation_value REAL,
-                    measure_type TEXT,
                     unit TEXT,
+                    qualifier TEXT,
+                    deviation_value REAL,
+                    deviation_unit TEXT,
+                    deviation_type TEXT,
+                    interval_lower REAL,
+                    interval_upper REAL,
+                    interval_unit TEXT,
+                    interval_type TEXT,
+                    raw_value TEXT,
+                    notes TEXT,
                     source_pass TEXT DEFAULT 'xml_table',
                     FOREIGN KEY(paper_id) REFERENCES documents(paper_id)
                 )""")
             # Migrate: add source_pass column if it doesn't exist yet
             try:
-                cur.execute("ALTER TABLE pk_parameters ADD COLUMN source_pass TEXT DEFAULT 'xml_table'")
+                cur.execute("ALTER TABLE pk_records ADD COLUMN source_pass TEXT DEFAULT 'xml_table'")
             except Exception:
                 pass  # column already exists
         print(f"  [DB] SQLite schema ready at {SQLITE_PATH}")
@@ -201,27 +244,30 @@ def insert_pk_parameters(params_list: list):
                     row["source_pass"] = p[12]
                 rows.append(row)
                 
-        sb.table("pk_parameters").insert(rows).execute()
-        print(f"  [DB] Inserted {len(rows)} rows into Supabase pk_parameters ✅")
+        sb.table("pk_records").insert(rows).execute()
+        print(f"  [DB] Inserted {len(rows)} rows into Supabase pk_records ✅")
     else:
         with _sqlite_conn() as conn:
             # We don't care about SQLite for this project currently, but we can add a basic implementation for dicts
             tuples = []
+            keys = [
+                "paper_id", "table_id", "record_id", "source_row_index", "source_column_index",
+                "source_row_label", "source_column_header", "parameter_raw", "parameter_normalized",
+                "parameter_category", "is_target_parameter", "organ_or_tissue", "compound",
+                "species", "sex", "route", "dose_value", "dose_unit", "dose_raw", "formulation",
+                "cohort_or_condition", "replicate_or_subject", "value_index", "value", "unit",
+                "qualifier", "deviation_value", "deviation_unit", "deviation_type", "interval_lower",
+                "interval_upper", "interval_unit", "interval_type", "raw_value", "notes", "source_pass"
+            ]
             for p in params_list:
                 if isinstance(p, dict):
-                    tuples.append((
-                        p.get("paper_id"), p.get("table_id"), p.get("species"), p.get("formulation"), 
-                        p.get("route"), p.get("dose"), p.get("parameter_name"), p.get("canonical_name"), 
-                        p.get("value"), p.get("start_value"), p.get("end_value"), p.get("deviation_value"), p.get("measure_type"), p.get("unit"), 
-                        p.get("source_pass", "xml_table"), p.get("compound"), p.get("cohort_or_condition")
-                    ))
+                    tuples.append(tuple(p.get(k) for k in keys))
+            
             if tuples:
-                conn.executemany("""
-                    INSERT INTO pk_parameters (
-                        paper_id, table_id, species, formulation, route, dose,
-                        parameter_name, canonical_name, value, start_value, end_value, deviation_value,
-                        measure_type, unit, source_pass, compound, cohort_or_condition
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                placeholders = ", ".join(["?"] * len(keys))
+                cols = ", ".join(keys)
+                conn.executemany(f"""
+                    INSERT INTO pk_records ({cols}) VALUES ({placeholders})
                 """, tuples)
         print(f"  [DB] Inserted {len(params_list)} rows into SQLite.")
 
@@ -230,12 +276,12 @@ def delete_paper_data(paper_id: str):
     """Remove all existing records for a paper before re-processing."""
     if DB_BACKEND == "supabase":
         sb = _get_supabase()
-        sb.table("pk_parameters").delete().eq("paper_id", paper_id).execute()
+        sb.table("pk_records").delete().eq("paper_id", paper_id).execute()
         sb.table("documents").delete().eq("paper_id", paper_id).execute()
         print(f"  [DB] Cleared existing Supabase records for: {paper_id}")
     else:
         with _sqlite_conn() as conn:
-            conn.execute("DELETE FROM pk_parameters WHERE paper_id = ?", (paper_id,))
+            conn.execute("DELETE FROM pk_records WHERE paper_id = ?", (paper_id,))
             conn.execute("DELETE FROM documents WHERE paper_id = ?", (paper_id,))
         print(f"  [DB] Cleared existing SQLite records for: {paper_id}")
 
@@ -243,7 +289,7 @@ def delete_paper_data(paper_id: str):
 def fetch_parameters(paper_id: str = None) -> list[dict]:
     if DB_BACKEND == "supabase":
         sb = _get_supabase()
-        q = sb.table("pk_parameters").select("*")
+        q = sb.table("pk_records").select("*")
         if paper_id:
             q = q.eq("paper_id", paper_id)
         result = q.limit(1000).execute()
@@ -252,8 +298,8 @@ def fetch_parameters(paper_id: str = None) -> list[dict]:
         with _sqlite_conn() as conn:
             cur = conn.cursor()
             if paper_id:
-                cur.execute("SELECT * FROM pk_parameters WHERE paper_id = ?", (paper_id,))
+                cur.execute("SELECT * FROM pk_records WHERE paper_id = ?", (paper_id,))
             else:
-                cur.execute("SELECT * FROM pk_parameters ORDER BY id DESC LIMIT 1000")
+                cur.execute("SELECT * FROM pk_records ORDER BY id DESC LIMIT 1000")
             cols = [d[0] for d in cur.description]
             return [dict(zip(cols, row)) for row in cur.fetchall()]

@@ -1,31 +1,68 @@
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Any
 from pydantic import BaseModel, Field
 
-class StudyContext(BaseModel):
-    compound: Optional[str] = Field(None, description="The specific compound or analyte (e.g. BPA, BPS)")
-    cohort_or_condition: Optional[str] = Field(None, description="The demographic cohort, subject ID, or experimental condition (e.g. Male, Volunteer 3, Fasted, Model Predicted)")
-    species: str = Field(description="Species like human, rat, mouse, dog, etc.")
-    formulation: str = Field(description="Formulation like ASD, tablet, solution, suspension, etc.")
-    route: str = Field(description="Administration route like oral, IV, SC, IP, etc.")
-    dose: float = Field(description="Dose amount")
-    dose_unit: str = Field(description="Dose unit like mg, mg/kg, ug, etc.")
+class TableContext(BaseModel):
+    caption: Optional[str] = None
+    species: Optional[str] = None
+    route: Optional[str] = None
+    dose_value: Optional[float] = None
+    dose_unit: Optional[str] = None
+    dose_raw: Optional[str] = None
+    formulation: Optional[str] = None
+    global_notes: List[str] = Field(default_factory=list)
 
-class PKParameterRecord(BaseModel):
-    compound: Optional[str] = Field(None, description="The specific compound or analyte for this row (e.g. BPA, BPS)")
-    cohort_or_condition: Optional[str] = Field(None, description="The specific demographic cohort, subject ID, or condition for this row")
-    parameter_name: str = Field(description="The PK parameter name, e.g., CL_ren, Vmax, Km, Kp")
-    value: Optional[float] = Field(None, description="The extracted static value")
-    start_value: Optional[float] = Field(None, description="The start/minimum value if the parameter is a range")
-    end_value: Optional[float] = Field(None, description="The end/maximum value if the parameter is a range")
-    deviation_value: Optional[float] = Field(None, description="Standard deviation or standard error, if any")
-    measure_type: str = Field(description="Type of measure: mean, SD, SE, median, etc.")
-    unit: str = Field(description="Unit of the parameter, e.g., ul/h/kg^0.25, mg/L")
+class ExtractionRecord(BaseModel):
+    record_id: str
+    source_row_index: int
+    source_column_index: int
+    source_row_label: Optional[str] = None
+    source_column_header: Optional[str] = None
+
+    parameter_raw: Optional[str] = None
+    parameter_normalized: Optional[str] = None
+    parameter_category: Optional[str] = None
+    is_target_parameter: bool = False
+    organ_or_tissue: Optional[str] = None
+
+    compound: Optional[str] = None
+    species: Optional[str] = None
+    sex: Optional[str] = None
+    route: Optional[str] = None
+    dose_value: Optional[float] = None
+    dose_unit: Optional[str] = None
+    dose_raw: Optional[str] = None
+    formulation: Optional[str] = None
+
+    cohort_or_condition: Optional[str] = None
+    replicate_or_subject: Optional[str] = None
+    value_index: int = 1
+
+    value: Optional[float] = None
+    unit: Optional[str] = None
+    qualifier: Optional[str] = None
+
+    deviation_value: Optional[float] = None
+    deviation_unit: Optional[str] = None
+    deviation_type: Optional[str] = None
+
+    interval_lower: Optional[float] = None
+    interval_upper: Optional[float] = None
+    interval_unit: Optional[str] = None
+    interval_type: Optional[str] = None
+
+    raw_value: Optional[str] = None
+    footnotes: List[str] = Field(default_factory=list)
+    notes: Optional[str] = None
+
+class RowAudit(BaseModel):
+    source_row_index: int
+    status: str
+    record_ids: List[str] = Field(default_factory=list)
 
 class ExtractedTablePayload(BaseModel):
-    paper_identifier: str = Field(description="DOI or PMCID of the paper")
-    table_id: str = Field(description="Table identifier, e.g., Table 1, Table 2")
-    caption: str = Field(description="Table caption text")
-    study_context: StudyContext = Field(description="Context of the study for this table")
-    blood_flow_fractions: Dict[str, float] = Field(description="Organ blood flow fractions (Q)")
-    volume_fractions: Dict[str, float] = Field(description="Organ volume fractions (V)")
-    biochemical_parameters: List[PKParameterRecord] = Field(description="List of biochemical and PK parameters")
+    paper_id: str
+    table_id: str
+    table_context: TableContext = Field(default_factory=TableContext)
+    records: List[ExtractionRecord] = Field(default_factory=list)
+    row_audit: List[RowAudit] = Field(default_factory=list)
+    warnings: List[str] = Field(default_factory=list)

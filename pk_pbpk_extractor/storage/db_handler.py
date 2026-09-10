@@ -240,6 +240,8 @@ def insert_pk_parameters(params_list: list):
                     p["dose"] = f"{dose_val} {dose_unit}".strip() if dose_val is not None else None
 
                 row = {k: v for k, v in p.items() if k in SUPABASE_PK_COLUMNS}
+                if row.get("value") is None:
+                    continue
                 rows.append(row)
             else:
                 # Fallback for old tuples if they ever happen
@@ -259,9 +261,12 @@ def insert_pk_parameters(params_list: list):
                 }
                 if len(p) >= 13:
                     row["source_pass"] = p[12]
+                if row.get("value") is None:
+                    continue
                 rows.append(row)
                 
-        sb.table("pk_parameters").insert(rows).execute()
+        if rows:
+            sb.table("pk_parameters").insert(rows).execute()
         print(f"  [DB] Inserted {len(rows)} rows into Supabase pk_parameters ✅")
     else:
         with _sqlite_conn() as conn:
@@ -278,6 +283,8 @@ def insert_pk_parameters(params_list: list):
             ]
             for p in params_list:
                 if isinstance(p, dict):
+                    if p.get("value") is None:
+                        continue
                     tuples.append(tuple(p.get(k) for k in keys))
             
             if tuples:

@@ -60,24 +60,35 @@ uploadZone.addEventListener('drop', (e) => {
 });
 fileInput.addEventListener('change', () => { if (fileInput.files.length) handleFile(fileInput.files[0]); });
 
+let currentExtractedRecords = [];
+let activeStudioSpecies = 'all';
+
 function resetUI() {
     currentParams = null;
-    generateBtn.style.display = 'none';
+    currentExtractedRecords = [];
+    if (generateBtn) generateBtn.style.display = 'none';
     extractBtn.disabled = false;
-    document.getElementById('params-content').innerHTML = '';
-    document.getElementById('params-content').style.display = 'none';
-    document.getElementById('params-empty').style.display = 'flex';
-    document.getElementById('compartment-diagram').innerHTML = '';
-    document.getElementById('compartment-diagram').style.display = 'none';
-    document.getElementById('flow-empty').style.display = 'flex';
-    document.getElementById('colpali-gallery').innerHTML = '';
-    document.getElementById('colpali-gallery').style.display = 'none';
-    document.getElementById('colpali-empty').style.display = 'flex';
-    document.getElementById('rcode-content').textContent = '';
-    document.getElementById('rcode-block').style.display = 'none';
-    document.getElementById('rcode-empty').style.display = 'flex';
-    logViewer.innerHTML = '';
+    
+    const resultsContainer = document.getElementById('params-results-container');
+    if (resultsContainer) resultsContainer.style.display = 'none';
+    const emptyState = document.getElementById('params-empty');
+    if (emptyState) emptyState.style.display = 'flex';
+    
+    const paramsContent = document.getElementById('params-content');
+    if (paramsContent) {
+        paramsContent.innerHTML = '';
+        paramsContent.style.display = 'none';
+    }
+    
+    logViewer.innerHTML = '<div class="term-line" style="color: var(--text-muted);">Ready to process scientific documents. Logs will stream here.</div>';
     setProgress(0);
+    
+    const countEl = document.getElementById('metric-params-count');
+    if (countEl) countEl.textContent = '0';
+    const compoundEl = document.getElementById('metric-compound');
+    if (compoundEl) compoundEl.textContent = 'None Selected';
+    const ontoEl = document.getElementById('metric-ontology-count');
+    if (ontoEl) ontoEl.textContent = '0 Mapped';
 }
 
 async function handleFile(file) {
@@ -153,6 +164,23 @@ async function runPipelineStep(stepName) {
     }
 }
 
+function _sourcePassBadge(sp) {
+    const map = {
+        'xml_table':          ['badge-green',  'XML Table'],
+        'colpali_page':       ['badge-orange', 'Visual OCR'],
+        'prose_pass':         ['badge-purple', 'Prose Text'],
+        'pubchem_enrichment': ['badge-blue',   'PubChem'],
+        'chembl_enrichment':  ['badge-pink',   'ChEMBL'],
+        'autopk_table':       ['badge-cyan',   'AutoPK']
+    };
+    const [cls, label] = map[sp] || ['badge-gray', sp || 'Extraction'];
+    return `<span class="modern-badge ${cls}">${label}</span>`;
+}
+
+function _safe(val) {
+    return (val === null || val === undefined || val === '') ? '-' : val;
+}
+
 function listenToJob(jobId, stepName) {
     const es = new EventSource(`/api/status/${jobId}`);
     es.onmessage = (event) => {
@@ -162,10 +190,11 @@ function listenToJob(jobId, stepName) {
         if (data.new_lines?.length) {
             data.new_lines.forEach(line => {
                 const div = document.createElement('div');
-                div.className = 'log-line';
+                div.className = 'term-line';
                 if (line.includes('✅')) div.classList.add('success');
-                else if (line.includes('❌')) div.classList.add('error');
-                else if (line.startsWith('STEP:')) div.classList.add('step');
+                else if (line.includes('❌') || line.toLowerCase().includes('error')) div.classList.add('error');
+                else if (line.startsWith('STEP:') || line.startsWith('[Auto-Routing]')) div.classList.add('step');
+                else if (line.includes('[Table') || line.includes('[DB]') || line.includes('[PBPKO]')) div.classList.add('table');
                 div.textContent = line;
                 logViewer.appendChild(div);
             });
@@ -189,10 +218,20 @@ function listenToJob(jobId, stepName) {
     es.onerror = () => { es.close(); setStatus('Connection lost', 'failed'); extractBtn.disabled = false; spinner.classList.remove('active'); };
 }
 
-extractBtn.addEventListener('click', () => { logViewer.innerHTML = ''; runPipelineStep('extract'); });
+extractBtn.addEventListener('click', () => { 
+    logViewer.innerHTML = '<div class="term-line" style="color: var(--cyan);">[Engine] Initializing extraction pipeline...</div>'; 
+    runPipelineStep('extract'); 
+});
+
+toggleLogBtn.addEventListener('click', () => {
+    if (logViewer.style.display === 'none') {
+        logViewer.style.display = 'block';
+    } else {
+        logViewer.innerHTML = '';
+    }
+});
 
 generateBtn.addEventListener('click', async () => {
-    // 1. Save params first
     try {
         setStatus('Saving parameters...', 'running');
         const resp = await fetch('/api/save-params', {
@@ -200,7 +239,6 @@ generateBtn.addEventListener('click', async () => {
             body: JSON.stringify({ paper_name: currentPaperName, parameters: currentParams })
         });
         if (!resp.ok) throw new Error("Failed to save parameters");
-        // 2. Run generation
         runPipelineStep('generate');
     } catch (e) {
         alert(e);
@@ -216,18 +254,209 @@ async function loadResults(paperName) {
         const data = await resp.json();
         currentParams = data.parameters || {};
         
-        renderEditableParameters(currentParams);
+        // Prefer rich Supabase DB records if present
+        if (data.db_records && data.db_records.length > 0) {
+            renderParametersTable(data.db_records);
+        } else if (Object.keys(currentParams).length > 0) {
+            // Fallback to legacy editable dictionary
+            renderEditableParameters(currentParams);
+        }
+        
         renderCompartmentFlow(currentParams);
         renderColpaliPages(data.colpali_pages);
         renderRCode(data.r_code);
         renderReview(data.review || null);
         
-        if (Object.keys(currentParams).length > 0) {
-            generateBtn.style.display = 'block';
-            generateBtn.disabled = false;
-        }
     } catch (err) { console.error('Failed to load results:', err); }
 }
+
+function renderParametersTable(records) {
+    currentExtractedRecords = records || [];
+    const container = document.getElementById('params-results-container');
+    const emptyState = document.getElementById('params-empty');
+    
+    if (!records || records.length === 0) {
+        if (!currentParams || Object.keys(currentParams).length === 0) {
+            if (container) container.style.display = 'none';
+            if (emptyState) emptyState.style.display = 'flex';
+            return;
+        }
+    }
+    
+    if (emptyState) emptyState.style.display = 'none';
+    if (container) container.style.display = 'block';
+    
+    // Calculate and update metrics
+    let foundCompound = '-';
+    let ontologyCount = 0;
+    records.forEach(r => {
+        if (foundCompound === '-' && r.compound) foundCompound = r.compound;
+        let pbpko = r.pbpko_term_id;
+        if (!pbpko && r.canonical_name) {
+            try {
+                const parsed = JSON.parse(r.canonical_name);
+                if (parsed.pbpko_id) pbpko = parsed.pbpko_id;
+            } catch(e) {}
+        }
+        if (pbpko && pbpko !== '-') ontologyCount++;
+    });
+    
+    const countEl = document.getElementById('metric-params-count');
+    if (countEl) countEl.textContent = records.length;
+    
+    const compoundEl = document.getElementById('metric-compound');
+    if (compoundEl) compoundEl.textContent = foundCompound;
+    
+    const ontoEl = document.getElementById('metric-ontology-count');
+    if (ontoEl) ontoEl.textContent = `${ontologyCount} mapped`;
+    
+    populateMainTableRows(records);
+}
+
+function populateMainTableRows(records) {
+    const tbody = document.getElementById('pbpk-table-body');
+    if (!tbody) return;
+    
+    if (records.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="10" style="text-align: center; padding: 40px; color: var(--text-muted);">No matching parameters found.</td></tr>`;
+        return;
+    }
+    
+    let html = '';
+    records.forEach(p => {
+        let canonName = p.parameter_normalized || '-';
+        let pbpkoId = p.pbpko_term_id || '';
+        
+        if (p.canonical_name) {
+            try {
+                const parsed = JSON.parse(p.canonical_name);
+                canonName = parsed.canonical_name || canonName;
+                pbpkoId = parsed.pbpko_id || pbpkoId;
+            } catch(e) {
+                canonName = p.canonical_name;
+            }
+        }
+        
+        let pbpkoHtml = `<div class="onto-name">${canonName}</div>`;
+        if (pbpkoId && pbpkoId !== '-') {
+            const iri = `https://fair-pbk.wur.nl/vocabularies/parameter/${pbpkoId}`;
+            pbpkoHtml += `<a class="onto-id-link" href="${iri}" target="_blank" title="View in FAIR-PBPK Ontology">${pbpkoId} ↗</a>`;
+        }
+
+        const rawParam = _safe(p.parameter_raw || p.parameter_name);
+        const val = _safe(p.value);
+        const dev = p.deviation_value ? `<span class="td-val-dev">±${p.deviation_value}</span>` : '';
+        const unit = p.unit ? `<span class="unit-tag">${p.unit}</span>` : '-';
+        const compound = p.compound ? `<span class="compound-tag">${p.compound}</span>` : '-';
+
+        let speciesBadge = '-';
+        if (p.species) {
+            const sp = p.species.toLowerCase();
+            if (sp.includes('human')) speciesBadge = `<span class="species-badge-human">Human</span>`;
+            else if (sp.includes('rat')) speciesBadge = `<span class="species-badge-rat">Rat</span>`;
+            else if (sp.includes('mouse')) speciesBadge = `<span class="species-badge-mouse">Mouse</span>`;
+            else speciesBadge = `<span class="species-badge-default">${p.species}</span>`;
+        }
+
+        const routeForm = [p.route, p.formulation].filter(Boolean).join(' · ') || '-';
+        const doseStr = p.dose_raw || (p.dose_value ? `${p.dose_value} ${p.dose_unit || ''}` : (p.dose ? `${p.dose}` : '-'));
+        const cohort = _safe(p.cohort_or_condition);
+        const sourceBadge = _sourcePassBadge(p.source_pass);
+
+        html += `
+            <tr>
+                <td class="td-ontology">${pbpkoHtml}</td>
+                <td style="color: #cbd5e1; font-weight: 500;">${rawParam}</td>
+                <td><span class="td-val-box">${val}</span> ${dev}</td>
+                <td>${unit}</td>
+                <td>${compound}</td>
+                <td>${speciesBadge}</td>
+                <td style="color: var(--text-secondary);">${routeForm}</td>
+                <td style="font-family: 'JetBrains Mono', monospace; color: #fbbf24;">${doseStr}</td>
+                <td style="color: var(--text-muted); font-size: 0.78rem;">${cohort}</td>
+                <td>${sourceBadge}</td>
+            </tr>
+        `;
+    });
+    tbody.innerHTML = html;
+}
+
+window.filterParametersTable = () => {
+    const query = (document.getElementById('param-search-input')?.value || '').toLowerCase();
+    const filtered = currentExtractedRecords.filter(p => {
+        const matchQuery = !query || 
+            (p.parameter_raw && p.parameter_raw.toLowerCase().includes(query)) ||
+            (p.parameter_name && p.parameter_name.toLowerCase().includes(query)) ||
+            (p.parameter_normalized && p.parameter_normalized.toLowerCase().includes(query)) ||
+            (p.canonical_name && p.canonical_name.toLowerCase().includes(query)) ||
+            (p.pbpko_term_id && p.pbpko_term_id.toLowerCase().includes(query)) ||
+            (p.compound && p.compound.toLowerCase().includes(query)) ||
+            (p.cohort_or_condition && p.cohort_or_condition.toLowerCase().includes(query));
+        
+        const matchSpecies = activeStudioSpecies === 'all' || 
+            (p.species && p.species.toLowerCase().includes(activeStudioSpecies));
+        
+        return matchQuery && matchSpecies;
+    });
+    populateMainTableRows(filtered);
+};
+
+window.setSpeciesFilter = (species, btn) => {
+    activeStudioSpecies = species;
+    document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    filterParametersTable();
+};
+
+window.exportParametersCSV = () => {
+    if (!currentExtractedRecords || currentExtractedRecords.length === 0) return;
+    const headers = ["Canonical_Name", "PBPKO_ID", "Parameter_Raw", "Value", "Deviation", "Unit", "Compound", "Species", "Route", "Formulation", "Dose", "Cohort", "Source_Pass"];
+    const rows = currentExtractedRecords.map(p => {
+        let pbpko = p.pbpko_term_id || '';
+        let canon = p.parameter_normalized || '';
+        if (p.canonical_name) {
+            try {
+                const parsed = JSON.parse(p.canonical_name);
+                canon = parsed.canonical_name || canon;
+                pbpko = parsed.pbpko_id || pbpko;
+            } catch(e) { canon = p.canonical_name; }
+        }
+        return [
+            `"${(canon || '').replace(/"/g, '""')}"`,
+            `"${pbpko}"`,
+            `"${(p.parameter_raw || p.parameter_name || '').replace(/"/g, '""')}"`,
+            p.value !== null ? p.value : '',
+            p.deviation_value !== null ? p.deviation_value : '',
+            `"${p.unit || ''}"`,
+            `"${p.compound || ''}"`,
+            `"${p.species || ''}"`,
+            `"${p.route || ''}"`,
+            `"${p.formulation || ''}"`,
+            `"${(p.dose_raw || p.dose_value || p.dose || '')}"`,
+            `"${(p.cohort_or_condition || '').replace(/"/g, '""')}"`,
+            `"${p.source_pass || ''}"`
+        ].join(',');
+    });
+    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(','), ...rows].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `${currentPaperName || 'parameters'}_pbpk.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+};
+
+window.exportParametersJSON = () => {
+    if (!currentExtractedRecords || currentExtractedRecords.length === 0) return;
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(currentExtractedRecords, null, 2));
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.setAttribute("href", dataStr);
+    downloadAnchor.setAttribute("download", `${currentPaperName || 'parameters'}_pbpk.json`);
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+};
 
 // ── Editable Parameters UI ───────────────────────────────────────────────
 function createEditableTable(sectionTitle, sectionObj, isStringValue=false) {

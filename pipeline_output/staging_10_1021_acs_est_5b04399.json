@@ -1,0 +1,55 @@
+{
+  "compound": "PFAS",
+  "species": "human",
+  "model_type": 2,
+  "model_description": "A mechanistic PBPK model for the pharmacokinetics of perfluoroalkyl substances (PFAS) in humans.",
+  "route": "oral",
+  "dose": 1.2,
+  "t_end": 24,
+  "parameters": {
+    "BW": {
+      "value": 75.0,
+      "unit": "kg",
+      "source": "llm_assigned"
+    },
+    "QCC": {
+      "value": 1.0,
+      "unit": "L/h/kg",
+      "source": "llm_assigned"
+    },
+    "Qliver": {
+      "value": 1.0,
+      "unit": "%",
+      "source": "llm_assigned"
+    },
+    "Vliver": {
+      "value": 170.0,
+      "unit": "%BW",
+      "source": "llm_assigned"
+    },
+    "V_plasma": {
+      "value": 170.0,
+      "unit": "%BW",
+      "source": "llm_assigned"
+    },
+    "Kp_liver": {
+      "value": 0.058,
+      "unit": "dimensionless",
+      "source": "llm_assigned"
+    },
+    "CL_hep": {
+      "value": 1.0,
+      "unit": "L/h",
+      "source": "llm_assigned"
+    },
+    "k_a": {
+      "value": 0.014,
+      "unit": "1/h",
+      "source": "llm_assigned"
+    }
+  },
+  "assignment_notes": "The parameters were assigned based on the extracted pharmacokinetic data and standard physiological reference values. The model type was chosen as 2 (Absolute L/L/h) due to the availability of multiple half-lives and plasma levels, which are typical for mechanistic PBPK models.",
+  "paper_id": "10.1021/acs.est.5b04399",
+  "paper_title": "Parsed from 10.1021/acs.est.5b04399",
+  "param_count": 48
+}

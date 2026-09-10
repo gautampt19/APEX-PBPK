@@ -236,11 +236,31 @@ def get_results(paper_name):
     r_script = PIPELINE_OUTPUT / f"{paper_name}_pbpk_model.R"
     colpali_dir = PIPELINE_OUTPUT / "colpali_pages"
 
-    if not params_file.exists():
-        return jsonify({"error": "No results found for this paper"}), 404
+    params = {}
+    if params_file.exists():
+        try:
+            with open(params_file, "r") as f:
+                params = json.load(f)
+        except Exception:
+            pass
 
-    with open(params_file, "r") as f:
-        params = json.load(f)
+    # Query Supabase for structured DB records
+    db_records = []
+    doc_info = None
+    try:
+        from pk_pbpk_extractor.storage.db_handler import _get_supabase
+        sb = _get_supabase()
+        res = sb.table("pk_parameters").select("*").or_(f"paper_id.eq.{paper_name},paper_id.ilike.%{paper_name}%").execute()
+        if res.data:
+            db_records = res.data
+        res_doc = sb.table("documents").select("*").or_(f"paper_id.eq.{paper_name},paper_id.ilike.%{paper_name}%").limit(1).execute()
+        if res_doc.data:
+            doc_info = res_doc.data[0]
+    except Exception:
+        pass
+
+    if not params and not db_records:
+        return jsonify({"error": "No results found for this paper"}), 404
 
     r_code = ""
     if r_script.exists():
@@ -270,7 +290,9 @@ def get_results(paper_name):
 
     return jsonify({
         "paper_name": paper_name,
+        "document": doc_info,
         "parameters": params,
+        "db_records": db_records,
         "r_code": r_code,
         "colpali_pages": colpali_images,
         "review": review,

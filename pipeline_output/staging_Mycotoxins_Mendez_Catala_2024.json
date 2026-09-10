@@ -1,0 +1,55 @@
+{
+  "compound": "9-9",
+  "species": "human",
+  "model_type": 1,
+  "model_description": "A PBPK model for the 9-9 compound in human tissue, including its excretion and absorption properties.",
+  "route": "oral",
+  "dose": 0.143,
+  "t_end": 24,
+  "parameters": {
+    "BW": {
+      "value": 70.0,
+      "unit": "kg",
+      "source": "llm_assigned"
+    },
+    "QCC": {
+      "value": 2.42,
+      "unit": "L/h/kg",
+      "source": "llm_assigned"
+    },
+    "Qliver": {
+      "value": 0.6,
+      "unit": "%",
+      "source": "llm_assigned"
+    },
+    "Vliver": {
+      "value": 0.089,
+      "unit": "%BW",
+      "source": "llm_assigned"
+    },
+    "V_plasma": {
+      "value": 0.103,
+      "unit": "%BW",
+      "source": "llm_assigned"
+    },
+    "Kp_liver": {
+      "value": 0.089,
+      "unit": "dimensionless",
+      "source": "llm_assigned"
+    },
+    "CL_hep": {
+      "value": 2.42,
+      "unit": "L/h",
+      "source": "llm_assigned"
+    },
+    "k_a": {
+      "value": 0.089,
+      "unit": "1/h",
+      "source": "llm_assigned"
+    }
+  },
+  "assignment_notes": "The dose of 0.143 mg/kg bw was chosen based on the reported oral dose of ZEN in the human bioassay, which is 2.4 ng/kg bw/day. The model parameters were estimated based on physiological default values.",
+  "paper_id": "Mycotoxins_Mendez_Catala_2024",
+  "paper_title": "Parsed from Mycotoxins_Mendez_Catala_2024",
+  "param_count": 84
+}

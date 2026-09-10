@@ -220,10 +220,27 @@ def insert_pk_parameters(params_list: list):
     if DB_BACKEND == "supabase":
         sb = _get_supabase()
         # Assume params_list is already a list of dicts!
+        SUPABASE_PK_COLUMNS = {
+            'paper_id', 'table_id', 'species', 'formulation', 'route', 'dose',
+            'parameter_name', 'canonical_name', 'value', 'deviation_value',
+            'measure_type', 'unit', 'extracted_at', 'source_pass', 'compound',
+            'cohort_or_condition'
+        }
         rows = []
         for p in params_list:
             if isinstance(p, dict):
-                rows.append(p)
+                # Translate new schema names to old schema names for Supabase compatibility
+                if "parameter_raw" in p and "parameter_name" not in p:
+                    p["parameter_name"] = p["parameter_raw"]
+                if "parameter_normalized" in p and "canonical_name" not in p:
+                    p["canonical_name"] = p["parameter_normalized"]
+                if "dose_value" in p and "dose" not in p:
+                    dose_val = p.get("dose_value")
+                    dose_unit = p.get("dose_unit", "")
+                    p["dose"] = f"{dose_val} {dose_unit}".strip() if dose_val is not None else None
+
+                row = {k: v for k, v in p.items() if k in SUPABASE_PK_COLUMNS}
+                rows.append(row)
             else:
                 # Fallback for old tuples if they ever happen
                 row = {
@@ -244,8 +261,8 @@ def insert_pk_parameters(params_list: list):
                     row["source_pass"] = p[12]
                 rows.append(row)
                 
-        sb.table("pk_records").insert(rows).execute()
-        print(f"  [DB] Inserted {len(rows)} rows into Supabase pk_records ✅")
+        sb.table("pk_parameters").insert(rows).execute()
+        print(f"  [DB] Inserted {len(rows)} rows into Supabase pk_parameters ✅")
     else:
         with _sqlite_conn() as conn:
             # We don't care about SQLite for this project currently, but we can add a basic implementation for dicts
@@ -276,7 +293,7 @@ def delete_paper_data(paper_id: str):
     """Remove all existing records for a paper before re-processing."""
     if DB_BACKEND == "supabase":
         sb = _get_supabase()
-        sb.table("pk_records").delete().eq("paper_id", paper_id).execute()
+        sb.table("pk_parameters").delete().eq("paper_id", paper_id).execute()
         sb.table("documents").delete().eq("paper_id", paper_id).execute()
         print(f"  [DB] Cleared existing Supabase records for: {paper_id}")
     else:
@@ -289,7 +306,7 @@ def delete_paper_data(paper_id: str):
 def fetch_parameters(paper_id: str = None) -> list[dict]:
     if DB_BACKEND == "supabase":
         sb = _get_supabase()
-        q = sb.table("pk_records").select("*")
+        q = sb.table("pk_parameters").select("*")
         if paper_id:
             q = q.eq("paper_id", paper_id)
         result = q.limit(1000).execute()

@@ -8,17 +8,17 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg:           #0a0e1a;
-      --surface:      rgba(255,255,255,0.04);
-      --surface-hover:rgba(255,255,255,0.07);
-      --border:       rgba(255,255,255,0.08);
-      --accent:       #6366f1;
-      --accent2:      #38bdf8;
-      --success:      #22d3a5;
-      --warn:         #f59e0b;
-      --danger:       #ef4444;
-      --text:         #e2e8f0;
-      --muted:        #64748b;
+      --bg:           #f3f4f6;
+      --surface:      #ffffff;
+      --surface-hover:#f9fafb;
+      --border:       #e5e7eb;
+      --accent:       #2563eb;
+      --accent2:      #059669;
+      --success:      #059669;
+      --warn:         #d97706;
+      --danger:       #e11d48;
+      --text:         #1f2937;
+      --muted:        #6b7280;
       --mono:         'JetBrains Mono', monospace;
       --radius:       14px;
     }
@@ -36,7 +36,7 @@
     .topbar {
       display: flex; align-items: center; gap: 14px;
       padding: 14px 28px;
-      background: rgba(255,255,255,0.03);
+      background: #ffffff;
       border-bottom: 1px solid var(--border);
       position: sticky; top: 0; z-index: 100;
       backdrop-filter: blur(12px);
@@ -139,7 +139,7 @@
     }
     .param-input {
       flex: 1;
-      background: rgba(0,0,0,0.35);
+      background: #f9fafb;
       border: 1px solid var(--border);
       border-radius: 8px;
       padding: 7px 11px;
@@ -155,6 +155,13 @@
       font-size: 0.78rem; color: var(--muted);
       white-space: nowrap; font-family: var(--mono);
     }
+    .param-unit-select {
+      font-size: 0.78rem; color: var(--text);
+      font-family: var(--mono); background: var(--surface);
+      border: 1px solid var(--border); border-radius: 4px;
+      padding: 2px 4px; cursor: pointer; outline: none;
+    }
+    .param-unit-select:focus { border-color: var(--accent); }
     .source-tag {
       display: inline-block;
       padding: 2px 8px; border-radius: 20px;
@@ -237,7 +244,7 @@
 
     .results-tabs {
       display: flex; border-bottom: 1px solid var(--border);
-      background: rgba(0,0,0,.2);
+      background: #f3f4f6;
     }
     .results-tab {
       padding: 12px 22px; font-size: 0.84rem; font-weight: 600;
@@ -256,7 +263,7 @@
       margin-bottom: 20px;
     }
     .metric-card {
-      background: rgba(0,0,0,.3);
+      background: #f3f4f6;
       border: 1px solid var(--border);
       border-radius: 10px;
       padding: 16px 18px;
@@ -276,15 +283,18 @@
     .r-code-wrap {
       position: relative;
     }
-    .copy-btn {
+    .code-actions {
       position: absolute; top: 10px; right: 10px;
+      display: flex; gap: 8px;
+    }
+    .copy-btn {
       padding: 5px 12px; border-radius: 6px; font-size: 0.75rem;
-      background: rgba(255,255,255,.08); border: 1px solid var(--border);
+      background: #e5e7eb; border: 1px solid var(--border);
       color: var(--muted); cursor: pointer; transition: all .2s;
     }
-    .copy-btn:hover { background: rgba(255,255,255,.15); color: var(--text); }
+    .copy-btn:hover { background: #d1d5db; color: var(--text); }
     pre.r-code {
-      background: rgba(0,0,0,.4);
+      background: #f3f4f6;
       border: 1px solid var(--border);
       border-radius: 10px;
       padding: 20px;
@@ -292,7 +302,7 @@
       font-family: var(--mono);
       font-size: 0.82rem;
       line-height: 1.6;
-      color: #a5f3fc;
+      color: #000;
       white-space: pre-wrap;
     }
 
@@ -392,14 +402,33 @@
     <div class="section-heading">⚗️ Compound Disposition & Clearance</div>
     <div class="params-grid" id="grid-compound"></div>
 
-    <!-- ── Dosing ── -->
-    <div class="section-heading">💊 Dosing & Study Design</div>
+    <!-- ── Dosing & Settings ── -->
+    <div class="section-heading">💊 Dosing & Global Settings</div>
     <div class="params-grid" id="grid-dosing"></div>
+    
+    <div class="params-grid">
+      <div class="param-card">
+        <div class="param-head">
+          <div class="param-title">
+            <span class="param-symbol" style="color:var(--accent)">MOD</span>
+            Model Structure
+          </div>
+        </div>
+        <div class="param-body">
+          <select id="modelType" class="param-input" style="cursor:pointer;">
+            <option value="1">Model 1: Default fractional scaling (% BW and % QCC)</option>
+            <option value="2">Model 2: Absolute physiological values</option>
+            <option value="3">Model 3: Mechanistic absorption (P_eff & R_gut)</option>
+            <option value="4">Model 4: Qliver as % of QCC</option>
+          </select>
+        </div>
+      </div>
+    </div>
 
     <!-- Action Bar -->
     <div class="action-bar">
-      <button id="btnRunSim" class="btn btn-primary" onclick="runSimulation()">
-        ⚡ Run R Simulation & Plot
+      <button id="btnGenCode" class="btn btn-primary" onclick="generateCodeOnly()">
+        💾 Generate & Save R Code
       </button>
       <button class="btn btn-warn" onclick="rerunLLM()">
         🔄 Re-run LLM Assignment
@@ -412,29 +441,21 @@
     <!-- Results Panel -->
     <div class="results-panel" id="resultsPanel">
       <div class="results-tabs">
-        <button class="results-tab active" data-pane="pane-metrics">📊 PK Metrics & Plot</button>
-        <button class="results-tab" data-pane="pane-rcode">📄 R Code</button>
-        <button class="results-tab" data-pane="pane-log">📋 Simulation Log</button>
+        <button class="results-tab active" data-pane="pane-rcode">📄 R Code</button>
       </div>
       <div class="results-content">
 
-        <!-- Metrics & Plot -->
-        <div class="results-pane active" id="pane-metrics">
-          <div class="metrics-grid" id="metricsGrid"></div>
-          <img id="plotImg" class="plot-img" style="display:none;" alt="PK Concentration-Time Curve" />
-        </div>
-
         <!-- R Code -->
-        <div class="results-pane" id="pane-rcode">
+        <div class="results-pane active" id="pane-rcode">
           <div class="r-code-wrap">
-            <button class="copy-btn" onclick="copyCode()">📋 Copy</button>
+              <div class="code-actions">
+                  <button class="copy-btn" onclick="copyCode()">📋 Copy</button>
+                  <button class="copy-btn" onclick="downloadCode()">📥 Browser Download</button>
+                  <button class="copy-btn" onclick="saveLocalCode()">💾 Save to Server</button>
+              </div>
+            </div>
             <pre class="r-code" id="rCodeBlock"></pre>
           </div>
-        </div>
-
-        <!-- Log -->
-        <div class="results-pane" id="pane-log">
-          <pre class="r-code" id="simLog" style="color:#94a3b8;"></pre>
         </div>
 
       </div>
@@ -447,20 +468,20 @@
 // ── Config ────────────────────────────────────────────────────────────────────
 const PARAM_META = {
   // Physiological
-  BW:       { label: "Body Weight",         symbol: "BW",       group: "physio",   unit: "kg" },
-  QCC:      { label: "Cardiac Output",      symbol: "QCC",      group: "physio",   unit: "L/h/kg" },
+  BW:       { label: "Body Weight",         symbol: "BW",       group: "physio",   units: ["kg"] },
+  QCC:      { label: "Cardiac Output",      symbol: "QCC",      group: "physio",   units: ["L/h/kg", "L/h"] },
   // Organ volumes & flows
-  Vliver:   { label: "Liver Volume",        symbol: "Vliver",   group: "organs",   unit: "%BW" },
-  V_plasma: { label: "Plasma Volume",       symbol: "V_plasma", group: "organs",   unit: "%BW" },
-  Qliver:   { label: "Liver Blood Flow",    symbol: "Qliver",   group: "organs",   unit: "%" },
+  Vliver:   { label: "Liver Volume",        symbol: "Vliver",   group: "organs",   units: ["%BW"] },
+  V_plasma: { label: "Plasma Volume",       symbol: "V_plasma", group: "organs",   units: ["%BW"] },
+  Qliver:   { label: "Liver Blood Flow",    symbol: "Qliver",   group: "organs",   units: ["% QCC", "%QCC/BW", "L/h"] },
   // Compound disposition
-  Kp_liver: { label: "Liver Partition Coeff", symbol: "Kp_liver", group: "compound", unit: "dimensionless" },
-  CL_hep:   { label: "Hepatic Clearance",   symbol: "CL_hep",  group: "compound", unit: "L/h" },
-  k_a:      { label: "Absorption Rate",     symbol: "k_a",      group: "compound", unit: "1/h" },
+  Kp_liver: { label: "Liver Partition Coeff", symbol: "Kp_liver", group: "compound", units: ["dimensionless", ""] },
+  CL_hep:   { label: "Hepatic Clearance",   symbol: "CL_hep",  group: "compound", units: ["L/h", "ml/min"] },
+  k_a:      { label: "Absorption Rate",     symbol: "k_a",      group: "compound", units: ["1/h"] },
   // Dosing
-  dose:     { label: "Dose",               symbol: "dose",     group: "dosing",   unit: "mg/kg" },
-  route:    { label: "Route",              symbol: "route",    group: "dosing",   unit: "" },
-  t_end:    { label: "Simulation Duration", symbol: "t_end",   group: "dosing",   unit: "hours" },
+  dose:     { label: "Dose",               symbol: "dose",     group: "dosing",   units: ["mg/kg", "mg", "ug/kg", "ug", "Ug"] },
+  route:    { label: "Route",              symbol: "route",    group: "dosing",   units: [""] },
+  t_end:    { label: "Simulation Duration", symbol: "t_end",   group: "dosing",   units: ["hours"] },
 };
 
 let staged = null;
@@ -494,6 +515,7 @@ async function loadStaging() {
     if (res.ok) {
       staged = await res.json();
       renderStaging();
+      hideLoading();
     } else {
       // Not staged yet — trigger staging now
       hideLoading();
@@ -558,6 +580,11 @@ function renderStaging() {
     document.getElementById("notesCard").style.display = "block";
     document.getElementById("notesText").textContent = staged.assignment_notes;
   }
+  
+  if (staged.model_type) {
+    const modSelect = document.getElementById("modelType");
+    if (modSelect) modSelect.value = String(staged.model_type);
+  }
 
   // Render parameter grids
   renderGrid("grid-physio",    ["BW", "QCC"],                             staged.parameters);
@@ -576,11 +603,14 @@ function renderGrid(gridId, keys, paramsObj) {
   grid.innerHTML = "";
 
   keys.forEach(key => {
-    const meta = PARAM_META[key] || { label: key, symbol: key, unit: "" };
+    const meta = PARAM_META[key] || { label: key, symbol: key, units: [""] };
     const entry = paramsObj?.[key];
     const value = typeof entry === "object" ? entry?.value ?? "" : entry ?? "";
     const source = typeof entry === "object" ? (entry?.source || "default") : "default";
-    const unit = meta.unit;
+    let unit = typeof entry === "object" ? (entry?.unit || meta.units[0]) : meta.units[0];
+    
+    // Fallback if the saved unit doesn't exactly match the options (e.g. % vs % QCC)
+    if (key === "Qliver" && unit === "%") unit = "% QCC";
 
     const srcClass = source.includes("extracted") ? "src-extracted"
                    : source.includes("estimated")  ? "src-estimated"
@@ -597,6 +627,18 @@ function renderGrid(gridId, keys, paramsObj) {
       </select>
     ` : `<input class="param-input" id="param_${key}" type="number" step="any" value="${value}">`;
 
+    let unitHtml = "";
+    if (meta.units && meta.units.length > 1) {
+      unitHtml = `<select class="param-unit-select" id="unit_${key}">`;
+      meta.units.forEach(u => {
+        const selected = (u.toLowerCase() === unit.toLowerCase()) ? "selected" : "";
+        unitHtml += `<option value="${u}" ${selected}>${u}</option>`;
+      });
+      unitHtml += `</select>`;
+    } else if (meta.units && meta.units[0]) {
+      unitHtml = `<span class="param-unit" id="unit_${key}">${meta.units[0]}</span>`;
+    }
+
     grid.innerHTML += `
       <div class="param-card">
         <div class="param-name">
@@ -605,7 +647,7 @@ function renderGrid(gridId, keys, paramsObj) {
         </div>
         <div class="param-input-row">
           ${inputType}
-          ${unit ? `<span class="param-unit">${unit}</span>` : ""}
+          ${unitHtml}
         </div>
         <span class="source-tag ${srcClass}">${srcLabel}</span>
       </div>
@@ -619,12 +661,64 @@ function collectParams() {
   const params  = {};
   allKeys.forEach(key => {
     const el = document.getElementById(`param_${key}`);
+    const unitEl = document.getElementById(`unit_${key}`);
     if (el) {
       const val = el.value;
-      params[key] = isNaN(val) || val === "" ? val : parseFloat(val);
+      const numVal = isNaN(val) || val === "" ? val : parseFloat(val);
+      let unitVal = "";
+      if (unitEl) {
+        unitVal = (unitEl.tagName === "SELECT") ? unitEl.value : unitEl.textContent;
+      }
+      params[key] = { value: numVal, unit: unitVal };
     }
   });
   return params;
+}
+
+// ── Generate R Code Only ─────────────────────────────────────────────────────
+async function generateCodeOnly() {
+  const btn = document.getElementById("btnGenCode");
+  btn.disabled = true;
+  btn.textContent = "Generating...";
+  
+  const collected = collectParams();
+  const payload = Object.assign({}, staged, {
+    model_type: parseInt(document.getElementById('modelType')?.value || staged.model_type || "1", 10),
+    dose:  collected.dose?.value  || staged.dose,
+    dose_unit: collected.dose?.unit || "mg/kg",
+    route: collected.route?.value || staged.route,
+    t_end: collected.t_end?.value || staged.t_end,
+    parameters: {},
+  });
+  const paramKeys = ["BW","QCC","Vliver","V_plasma","Qliver","Kp_liver","CL_hep","k_a"];
+  paramKeys.forEach(k => {
+    if (collected[k]?.value != null) {
+      payload.parameters[k] = collected[k];
+    } else if (staged.parameters?.[k]) {
+      payload.parameters[k] = staged.parameters[k];
+    }
+  });
+
+  try {
+    const res = await fetch("/api/model/generate_rcode_only", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ staged: payload })
+    });
+    const data = await res.json();
+    if (res.ok) {
+        document.getElementById("rCodeBlock").textContent = data.r_code;
+        document.getElementById("resultsPanel").classList.add("visible");
+        alert("✅ R code generated.");
+    } else {
+        showError("Generation failed: " + data.error);
+    }
+  } catch(e) {
+    showError("Request failed: " + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "💾 Generate & Save R Code";
+  }
 }
 
 // ── Run Simulation ────────────────────────────────────────────────────────────
@@ -638,9 +732,11 @@ async function runSimulation() {
 
   // Rebuild staged payload with current UI values
   const payload = Object.assign({}, staged, {
-    dose:  parseFloat(collected.dose)  || staged.dose,
-    route: collected.route             || staged.route,
-    t_end: parseFloat(collected.t_end) || staged.t_end,
+    model_type: parseInt(document.getElementById('modelType')?.value || staged.model_type || "1", 10),
+    dose:  collected.dose?.value  || staged.dose,
+    dose_unit: collected.dose?.unit || "mg/kg",
+    route: collected.route?.value || staged.route,
+    t_end: collected.t_end?.value || staged.t_end,
     parameters: {},
   });
 
@@ -721,8 +817,8 @@ function renderResults(data) {
   // Switch to metrics tab
   document.querySelectorAll(".results-tab").forEach(t => t.classList.remove("active"));
   document.querySelectorAll(".results-pane").forEach(p => p.classList.remove("active"));
-  document.querySelector('[data-pane="pane-metrics"]').classList.add("active");
-  document.getElementById("pane-metrics").classList.add("active");
+  document.querySelector('[data-pane="pane-rcode"]').classList.add("active");
+  document.getElementById("pane-rcode").classList.add("active");
 
   // Scroll into view
   setTimeout(() => document.getElementById("resultsPanel").scrollIntoView({ behavior: "smooth" }), 100);
@@ -749,6 +845,45 @@ function copyCode() {
     btn.textContent = "✅ Copied!";
     setTimeout(() => btn.textContent = "📋 Copy", 2000);
   });
+}
+
+function downloadCode() {
+  const code = document.getElementById("rCodeBlock").textContent;
+  if (!code) return;
+  const blob = new Blob([code], { type: "text/plain" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  const safeName = (staged?.paper_id || "model").replace(/[^a-zA-Z0-9_-]/g, "_");
+  a.download = safeName + "_pbpk_model.R";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+async function saveLocalCode() {
+  const code = document.getElementById("rCodeBlock").textContent;
+  if (!code) return;
+  
+  try {
+    const res = await fetch("/api/model/save_rcode", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        paper_id: paperId,
+        r_code: code
+      })
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      alert("✅ R code successfully saved to: " + data.path);
+    } else {
+      showError(data.error || "Failed to save code to server");
+    }
+  } catch(e) {
+    showError("Request failed: " + e.message);
+  }
 }
 </script>
 </body>

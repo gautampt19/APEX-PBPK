@@ -29,49 +29,61 @@ p          <- params_data$parameters
 cat(sprintf("[PBPK-R] Running Model %d (%s) for %s | Dose: %g | Route: %s\n", 
             model_type, params_data$model_description, params_data$compound, dose, route))
 
+# Helper to safely get parameter or default
+get_val <- function(x, default = 0) {
+  if (is.null(x)) return(default)
+  return(as.numeric(x))
+}
+
 # ── 1. Calculate Micro-Rate Constants (k12, k21, k10, ka) ──────────────────────
 if (model_type == 1) {
   # Model 1: Percentages of BW & QCC
-  V_liv <- (p$Vliver / 100) * p$BW
-  V_pla <- (p$V_plasma / 100) * p$BW
-  Q_liv <- (p$Qliver / 100) * p$QCC * p$BW * p$BW
+  V_liv <- (get_val(p$Vliver) / 100) * get_val(p$BW)
+  V_pla <- (get_val(p$V_plasma) / 100) * get_val(p$BW)
+  Q_liv <- (get_val(p$Qliver) / 100) * get_val(p$QCC) * get_val(p$BW)
   
   k12 <- Q_liv / V_pla
-  k21 <- Q_liv / (p$Kp_liver * V_liv)
-  k10 <- p$CL_hep / V_liv
-  ka  <- p$k_a
+  k21 <- Q_liv / (get_val(p$Kp_liver, 1) * V_liv)
+  k10 <- get_val(p$CL_hep) / V_liv
+  ka  <- get_val(p$k_a)
 
 } else if (model_type == 2) {
   # Model 2: Absolute Physiological Values (L, L/h)
-  V_liv <- p$V_liver
-  V_pla <- p$V_plasma
+  V_liv <- get_val(p$V_liver, get_val(p$Vliver))
+  V_pla <- get_val(p$V_plasma)
   
-  k12 <- p$QLiver / V_pla
-  k21 <- p$QLiver / (p$Kp_liver * V_liv)
-  k10 <- p$CL_hep / V_liv
-  ka  <- p$k_a
+  Q_liv <- get_val(p$QLiver, get_val(p$Qliver))
+  k12 <- Q_liv / V_pla
+  k21 <- Q_liv / (get_val(p$Kp_liver, 1) * V_liv)
+  k10 <- get_val(p$CL_hep) / V_liv
+  ka  <- get_val(p$k_a)
 
 } else if (model_type == 3) {
   # Model 3: Mechanistic Absorption via Peff & Rgut
-  V_liv <- (p$Vliver / 100) * p$BW
-  V_pla <- (p$V_plasma / 100) * p$BW
-  Q_liv <- (p$Qliver / 100) * p$QCC * p$BW * p$BW
+  V_liv <- (get_val(p$Vliver) / 100) * get_val(p$BW)
+  V_pla <- (get_val(p$V_plasma) / 100) * get_val(p$BW)
+  Q_liv <- (get_val(p$Qliver) / 100) * get_val(p$QCC) * get_val(p$BW)
   
   k12 <- Q_liv / V_pla
-  k21 <- Q_liv / (p$Kp_liver * V_liv)
-  k10 <- p$CL_hep / V_liv
-  ka  <- p$P_eff * (2 / p$R_gut)
+  k21 <- Q_liv / (get_val(p$Kp_liver, 1) * V_liv)
+  k10 <- get_val(p$CL_hep) / V_liv
+  
+  if (!is.null(p$P_eff) && !is.null(p$R_gut) && p$R_gut > 0) {
+    ka  <- get_val(p$P_eff) * (2 / get_val(p$R_gut))
+  } else {
+    ka <- get_val(p$k_a)
+  }
 
 } else if (model_type == 4) {
   # Model 4: Flow as % of QCC
-  V_liv <- (p$Vliver / 100) * p$BW
-  V_pla <- (p$V_plasma / 100) * p$BW
-  Q_liv <- (p$Qliver / 100) * p$QCC * p$BW
+  V_liv <- (get_val(p$Vliver) / 100) * get_val(p$BW)
+  V_pla <- (get_val(p$V_plasma) / 100) * get_val(p$BW)
+  Q_liv <- (get_val(p$Qliver) / 100) * get_val(p$QCC) * get_val(p$BW)
   
   k12 <- Q_liv / V_pla
-  k21 <- Q_liv / (p$Kp_liver * V_liv)
-  k10 <- p$CL_hep / V_liv
-  ka  <- p$k_a
+  k21 <- Q_liv / (get_val(p$Kp_liver, 1) * V_liv)
+  k10 <- get_val(p$CL_hep) / V_liv
+  ka  <- get_val(p$k_a)
 }
 
 rate_parms <- list(
@@ -104,7 +116,8 @@ init_state <- if (route == "oral") {
 }
 
 times <- seq(0, t_end, by = 0.05)
-out <- as.data.frame(ode(y = init_state, times = times, func = pbpk_ode, parms = rate_parms, method = "lsoda"))
+ode_method <- ifelse(!is.null(params_data$ode_method), params_data$ode_method, "lsoda")
+out <- as.data.frame(ode(y = init_state, times = times, func = pbpk_ode, parms = rate_parms, method = ode_method))
 
 # ── 4. PK Metrics Calculation ────────────────────────────────────────────────
 c_max  <- max(out$C_plasma)

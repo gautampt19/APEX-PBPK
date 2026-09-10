@@ -1,343 +1,351 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>APEX-PBPK — Intelligent PBPK Parameter Extraction</title>
-    <meta name="description" content="AI-driven visual and structural extraction of Pharmacokinetic (PK) and PBPK parameters with FAIR-PBPKO ontology alignment.">
+    <meta name="description"
+        content="AI-driven visual and structural extraction of Pharmacokinetic (PK) and PBPK parameters with FAIR-PBPKO ontology alignment.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="/static/style.css">
     <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.29.2/cytoscape.min.js"></script>
 </head>
+
 <body>
-<div class="app-container">
+    <div class="app-container">
 
-    <!-- ═══ Unified Modern Navigation Bar ═══ -->
-    <header class="app-nav-bar">
-        <div class="nav-left">
-            <a href="/" class="nav-brand-lockup">
-                <div class="brand-logo-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                        <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#22d3ee" stroke-width="2" stroke-linejoin="round"/>
-                        <path d="M2 17L12 22L22 17" stroke="#818cf8" stroke-width="2" stroke-linejoin="round"/>
-                        <path d="M2 12L12 17L22 12" stroke="#34d399" stroke-width="2" stroke-linejoin="round"/>
-                    </svg>
-                </div>
-                <div>
-                    <div class="brand-title"><span class="brand-gradient">APEX-PBPK</span> <span class="brand-tag">v2.5 Pro</span></div>
-                    <div class="brand-caption">AI-Powered Pharmacokinetics &amp; PBPK Extraction Engine</div>
-                </div>
-            </a>
-        </div>
-
-        <!-- Centered Segmented Control -->
-        <div class="nav-center">
-            <nav class="nav-segmented-control">
-                <a href="/" class="nav-segment active">
-                    <span class="segment-icon">⚡</span>
-                    <span class="segment-text">Extractor Studio</span>
-                </a>
-                <a href="/database" class="nav-segment">
-                    <span class="segment-icon">🗄️</span>
-                    <span class="segment-text">Parameter Database</span>
-                </a>
-            </nav>
-        </div>
-
-        <!-- Right System Status Chips -->
-        <div class="nav-right">
-            <div class="system-status-chip">
-                <span class="pulse-indicator"></span>
-                <span class="chip-label">Ollama <span class="chip-accent" id="model-badge">qwen3.8:latest</span></span>
-            </div>
-            <div class="system-status-chip">
-                <span class="pulse-indicator cyan"></span>
-                <span class="chip-label">Supabase <span class="chip-accent">Live Cloud</span></span>
-            </div>
-        </div>
-    </header>
-
-    <!-- ═══ Main Layout ═══ -->
-    <div class="main-layout" style="max-width: 1720px; padding: 24px 32px;">
-
-        <!-- ── Sidebar (Controls & Upload) ── -->
-        <aside class="sidebar">
-
-            <!-- PDF Upload Card -->
-            <div class="card" style="border-top: 2px solid var(--cyan);">
-                <div class="card-title"><span class="icon">📑</span> Document Ingestion</div>
-                <div class="upload-zone" id="upload-zone">
-                    <div class="upload-icon">
-                        <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color: var(--cyan);">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                            <polyline points="14 2 14 8 20 8"></polyline>
-                            <line x1="12" y1="18" x2="12" y2="12"></line>
-                            <line x1="9" y1="15" x2="12" y2="12"></line>
-                            <line x1="15" y1="15" x2="12" y2="12"></line>
+        <!-- ═══ Unified Modern Navigation Bar ═══ -->
+        <header class="app-nav-bar">
+            <div class="nav-left">
+                <a href="/" class="nav-brand-lockup">
+                    <div class="brand-logo-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#22d3ee" stroke-width="2"
+                                stroke-linejoin="round" />
+                            <path d="M2 17L12 22L22 17" stroke="#818cf8" stroke-width="2" stroke-linejoin="round" />
+                            <path d="M2 12L12 17L22 12" stroke="#34d399" stroke-width="2" stroke-linejoin="round" />
                         </svg>
                     </div>
-                    <div class="upload-text">
-                        <strong>Drop scientific PDF here</strong><br>
-                        <span style="font-size:0.75rem; color:var(--text-muted);">Supports PubMed, ScienceDirect, PMC XML</span>
+                    <div>
+                        <div class="brand-title"><span class="brand-gradient">APEX-PBPK</span></div>
+                        <div class="brand-caption">AI-Powered Pharmacokinetics &amp; PBPK Extraction Engine</div>
                     </div>
-                    <input type="file" id="file-input" accept=".pdf">
-                </div>
-                <div id="uploaded-info"></div>
+                </a>
             </div>
 
-            <!-- Pipeline Engine Card -->
-            <div class="card">
-                <div class="card-title"><span class="icon">⚙️</span> Extraction Engine</div>
-                <div class="controls">
-                    <div class="control-row" style="display: none;">
-                        <span>ColPali Retrieval</span>
-                        <label class="toggle">
-                            <input type="checkbox" id="use-colpali">
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                    <div class="control-row">
-                        <span>LLM Inference Model</span>
-                        <select id="model-select" style="background: var(--bg-input); border: 1px solid var(--border); color: #fff; padding: 7px 10px; border-radius: 8px; font-weight: 500;">
-                            <option value="qwen3.8:latest" selected>qwen3.8:latest (Local GPU)</option>
-                            <option value="gemma4:31b">gemma4:31b</option>
-                        </select>
-                    </div>
-                    <div class="control-row">
-                        <span>Extraction Strategy</span>
-                        <div style="font-size:0.78rem; color:var(--cyan); font-weight:600;">Multi-Pass (XML + OCR + Prose)</div>
-                    </div>
-                    <div class="control-row" style="display: none;">
-                        <span>Top-K Pages</span>
-                        <input type="number" id="top-k" value="5" min="1" max="20">
-                    </div>
-                    <div class="control-row" style="display: none;">
-                        <span>Backend</span>
-                        <select id="backend-select">
-                            <option value="ollama" selected>Ollama</option>
-                            <option value="vllm">vLLM</option>
-                        </select>
-                    </div>
-                </div>
-
-                <button class="btn-primary-glow" id="extract-btn" disabled style="margin-top: 18px; width: 100%;">
-                    <span>⚡</span> Run Parameter Extraction
-                </button>
-                <button class="btn btn-success" id="generate-btn" disabled style="margin-top: 8px; width: 100%; display: none; background-color: #10b981; color: white;">
-                    <span>💻</span> Generate Model
-                </button>
+            <!-- Centered Segmented Control -->
+            <div class="nav-center">
+                <nav class="nav-segmented-control">
+                    <a href="/" class="nav-segment active">
+                        <span class="segment-icon">⚡</span>
+                        <span class="segment-text">Extractor Studio</span>
+                    </a>
+                    <a href="/database" class="nav-segment">
+                        <span class="segment-icon">🗄️</span>
+                        <span class="segment-text">Parameter Database</span>
+                    </a>
+                </nav>
             </div>
 
-            <!-- Live Execution Terminal -->
-            <div class="card" style="padding: 0; overflow: hidden;">
-                <div class="terminal-header">
-                    <div class="terminal-dots">
-                        <span class="terminal-dot dot-red"></span>
-                        <span class="terminal-dot dot-yellow"></span>
-                        <span class="terminal-dot dot-green"></span>
-                    </div>
-                    <div class="terminal-title">Execution Console</div>
-                    <button class="action-btn-secondary" id="toggle-log-btn" style="padding: 2px 8px; font-size: 0.7rem;">Clear / Fold</button>
-                </div>
-                <div class="terminal-body" id="log-viewer">
-                    <div class="term-line" style="color: var(--text-muted);">Ready to process scientific documents. Logs will stream here.</div>
-                </div>
-            </div>
+        </header>
 
-        </aside>
+        <!-- ═══ Main Layout ═══ -->
+        <div class="main-layout" style="max-width: 1720px; padding: 24px 32px;">
 
-        <!-- ── Content Area (Metrics & Results) ── -->
-        <main class="content">
+            <!-- ── Sidebar (Controls & Upload) ── -->
+            <aside class="sidebar">
 
-            <!-- Executive Metric Strip -->
-            <div class="metrics-strip">
-                <div class="metric-card cyan">
-                    <div class="metric-icon-box">🧪</div>
-                    <div class="metric-info">
-                        <span class="metric-label">Target Compound</span>
-                        <span class="metric-value" id="metric-compound">None Selected</span>
+                <!-- PDF Upload Card -->
+                <div class="card" style="border-top: 2px solid var(--cyan);">
+                    <div class="card-title"><span class="icon">📑</span> Document Ingestion</div>
+                    <div class="upload-zone" id="upload-zone">
+                        <div class="upload-icon">
+                            <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
+                                style="color: var(--cyan);">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="12" y1="18" x2="12" y2="12"></line>
+                                <line x1="9" y1="15" x2="12" y2="12"></line>
+                                <line x1="15" y1="15" x2="12" y2="12"></line>
+                            </svg>
+                        </div>
+                        <div class="upload-text">
+                            <strong>Drop scientific PDF here</strong><br>
+                            <span style="font-size:0.75rem; color:var(--text-muted);">Supports PubMed, ScienceDirect,
+                                PMC XML</span>
+                        </div>
+                        <input type="file" id="file-input" accept=".pdf">
                     </div>
+                    <div id="uploaded-info"></div>
                 </div>
-                <div class="metric-card emerald">
-                    <div class="metric-icon-box">📊</div>
-                    <div class="metric-info">
-                        <span class="metric-label">Parameters Extracted</span>
-                        <span class="metric-value" id="metric-params-count">0</span>
-                    </div>
-                </div>
-                <div class="metric-card purple">
-                    <div class="metric-icon-box">🏷️</div>
-                    <div class="metric-info">
-                        <span class="metric-label">PBPKO FAIR Alignment</span>
-                        <span class="metric-value" id="metric-ontology-count">0 Mapped</span>
-                    </div>
-                </div>
-                <div class="metric-card amber">
-                    <div class="metric-icon-box">⚡</div>
-                    <div class="metric-info">
-                        <span class="metric-label">Inference Engine</span>
-                        <span class="metric-value" style="font-size: 1.1rem;" id="metric-engine">Ollama GPU</span>
-                    </div>
-                </div>
-            </div>
 
-            <!-- Tabs Navigation -->
-            <div class="tabs" style="margin-bottom: 0; border-bottom: 1px solid var(--border);">
-                <button class="tab-btn active" data-tab="params" style="border-bottom: 2px solid var(--cyan);">
-                    <span>📊</span> Extracted Parameters
-                </button>
-                <button class="tab-btn" data-tab="flow" style="display: none;">
-                    <span>🔀</span> Compartment Flow
-                </button>
-                <button class="tab-btn" data-tab="colpali" style="display: none;">
-                    <span>🔍</span> ColPali Pages
-                </button>
-                <button class="tab-btn" data-tab="rcode" style="display: none;">
-                    <span>💻</span> R Model Code
-                </button>
-                <button class="tab-btn" data-tab="review" style="display: none;">
-                    <span>🔬</span> Model Review
-                </button>
-            </div>
-
-            <div class="tab-content" style="padding-top: 16px;">
-                <!-- Parameters Tab -->
-                <div class="tab-panel active" id="tab-params">
-                    <!-- Empty State -->
-                    <div class="empty-state" id="params-empty" style="background: rgba(16, 24, 42, 0.4); border: 1px dashed var(--border); border-radius: 12px; min-height: 480px;">
-                        <div class="empty-icon" style="color: var(--cyan); opacity: 0.8;">🧬</div>
-                        <div class="empty-text" style="max-width: 480px; text-align: center;">
-                            <h3 style="color: #f8fafc; margin-bottom: 8px; font-size: 1.15rem;">No Parameters Loaded</h3>
-                            <p style="color: var(--text-muted); font-size: 0.85rem; line-height: 1.6;">
-                                Drop a scientific paper PDF in the ingestion panel on the left and click <strong>Run Parameter Extraction</strong> to extract physiological, biochemical, and kinetic values with FAIR-PBPKO ontology alignment.
-                            </p>
+                <!-- Pipeline Engine Card -->
+                <div class="card">
+                    <div class="card-title"><span class="icon">⚙️</span> Extraction Engine</div>
+                    <div class="controls">
+                        <div class="control-row" style="display: none;">
+                            <span>ColPali Retrieval</span>
+                            <label class="toggle">
+                                <input type="checkbox" id="use-colpali">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="control-row">
+                            <span>LLM Inference Model</span>
+                            <select id="model-select"
+                                style="background: var(--bg-input); border: 1px solid var(--border); color: #fff; padding: 7px 10px; border-radius: 8px; font-weight: 500;">
+                                <option value="qwen3.8:latest" selected>qwen3.8:latest (Local GPU)</option>
+                                <option value="gemma4:31b">gemma4:31b</option>
+                            </select>
+                        </div>
+                        <div class="control-row">
+                            <span>Extraction Strategy</span>
+                            <div style="font-size:0.78rem; color:var(--cyan); font-weight:600;">Multi-Pass (XML + OCR +
+                                Prose)</div>
+                        </div>
+                        <div class="control-row" style="display: none;">
+                            <span>Top-K Pages</span>
+                            <input type="number" id="top-k" value="5" min="1" max="20">
+                        </div>
+                        <div class="control-row" style="display: none;">
+                            <span>Backend</span>
+                            <select id="backend-select">
+                                <option value="ollama" selected>Ollama</option>
+                                <option value="vllm">vLLM</option>
+                            </select>
                         </div>
                     </div>
 
-                    <!-- Dynamic Results Container -->
-                    <div id="params-results-container" style="display: none;">
-                        <!-- Data Toolbar -->
-                        <div class="data-toolbar">
-                            <div class="toolbar-left">
-                                <div class="search-field">
-                                    <svg class="search-icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <circle cx="11" cy="11" r="8"></circle>
-                                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                                    </svg>
-                                    <input type="text" id="param-search-input" placeholder="Search parameters, PBPKO, organs, compounds..." oninput="filterParametersTable()">
+                    <button class="btn-primary-glow" id="extract-btn" disabled style="margin-top: 18px; width: 100%;">
+                        <span>⚡</span> Run Parameter Extraction
+                    </button>
+                    <button class="btn btn-success" id="generate-btn" disabled
+                        style="margin-top: 8px; width: 100%; display: none; background-color: #10b981; color: white;">
+                        <span>💻</span> Generate Model
+                    </button>
+                </div>
+
+                <!-- Live Execution Terminal -->
+                <div class="card" style="padding: 0; overflow: hidden;">
+                    <div class="terminal-header">
+                        <div class="terminal-dots">
+                            <span class="terminal-dot dot-red"></span>
+                            <span class="terminal-dot dot-yellow"></span>
+                            <span class="terminal-dot dot-green"></span>
+                        </div>
+                        <div class="terminal-title">Execution Console</div>
+                        <button class="action-btn-secondary" id="toggle-log-btn"
+                            style="padding: 2px 8px; font-size: 0.7rem;">Clear / Fold</button>
+                    </div>
+                    <div class="terminal-body" id="log-viewer">
+                        <div class="term-line" style="color: var(--text-muted);">Ready to process scientific documents.
+                            Logs will stream here.</div>
+                    </div>
+                </div>
+
+            </aside>
+
+            <!-- ── Content Area (Metrics & Results) ── -->
+            <main class="content">
+
+                <!-- Executive Metric Strip -->
+                <div class="metrics-strip">
+                    <div class="metric-card emerald">
+                        <div class="metric-icon-box">📊</div>
+                        <div class="metric-info">
+                            <span class="metric-label">Parameters Extracted</span>
+                            <span class="metric-value" id="metric-params-count">0</span>
+                        </div>
+                    </div>
+                    <div class="metric-card purple">
+                        <div class="metric-icon-box">🏷️</div>
+                        <div class="metric-info">
+                            <span class="metric-label">PBPKO FAIR Alignment</span>
+                            <span class="metric-value" id="metric-ontology-count">0 Mapped</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabs Navigation -->
+                <div class="tabs" style="margin-bottom: 0; border-bottom: 1px solid var(--border);">
+                    <button class="tab-btn active" data-tab="params" style="border-bottom: 2px solid var(--cyan);">
+                        <span>📊</span> Extracted Parameters
+                    </button>
+                    <button class="tab-btn" data-tab="flow" style="display: none;">
+                        <span>🔀</span> Compartment Flow
+                    </button>
+                    <button class="tab-btn" data-tab="colpali" style="display: none;">
+                        <span>🔍</span> ColPali Pages
+                    </button>
+                    <button class="tab-btn" data-tab="rcode" style="display: none;">
+                        <span>💻</span> R Model Code
+                    </button>
+                    <button class="tab-btn" data-tab="review" style="display: none;">
+                        <span>🔬</span> Model Review
+                    </button>
+                </div>
+
+                <div class="tab-content" style="padding-top: 16px;">
+                    <!-- Parameters Tab -->
+                    <div class="tab-panel active" id="tab-params">
+                        <!-- Empty State -->
+                        <div class="empty-state" id="params-empty"
+                            style="background: rgba(16, 24, 42, 0.4); border: 1px dashed var(--border); border-radius: 12px; min-height: 480px;">
+                            <div class="empty-icon" style="color: var(--cyan); opacity: 0.8;">🧬</div>
+                            <div class="empty-text" style="max-width: 480px; text-align: center;">
+                                <h3 style="color: #f8fafc; margin-bottom: 8px; font-size: 1.15rem;">No Parameters Loaded
+                                </h3>
+                                <p style="color: var(--text-muted); font-size: 0.85rem; line-height: 1.6;">
+                                    Drop a scientific paper PDF in the ingestion panel on the left and click <strong>Run
+                                        Parameter Extraction</strong> to extract physiological, biochemical, and kinetic
+                                    values with FAIR-PBPKO ontology alignment.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Dynamic Results Container -->
+                        <div id="params-results-container" style="display: none;">
+                            <!-- Data Toolbar -->
+                            <div class="data-toolbar">
+                                <div class="toolbar-left">
+                                    <div class="search-field">
+                                        <svg class="search-icon-svg" width="16" height="16" viewBox="0 0 24 24"
+                                            fill="none" stroke="currentColor" stroke-width="2">
+                                            <circle cx="11" cy="11" r="8"></circle>
+                                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                        </svg>
+                                        <input type="text" id="param-search-input"
+                                            placeholder="Search parameters, PBPKO, organs, compounds..."
+                                            oninput="filterParametersTable()">
+                                    </div>
+                                    <div class="toolbar-pills">
+                                        <button class="filter-chip active" onclick="setSpeciesFilter('all', this)">All
+                                            Species</button>
+                                        <button class="filter-chip"
+                                            onclick="setSpeciesFilter('human', this)">Human</button>
+                                        <button class="filter-chip" onclick="setSpeciesFilter('rat', this)">Rat</button>
+                                        <button class="filter-chip"
+                                            onclick="setSpeciesFilter('mouse', this)">Mouse</button>
+                                    </div>
                                 </div>
-                                <div class="toolbar-pills">
-                                    <button class="filter-chip active" onclick="setSpeciesFilter('all', this)">All Species</button>
-                                    <button class="filter-chip" onclick="setSpeciesFilter('human', this)">Human</button>
-                                    <button class="filter-chip" onclick="setSpeciesFilter('rat', this)">Rat</button>
-                                    <button class="filter-chip" onclick="setSpeciesFilter('mouse', this)">Mouse</button>
+                                <div class="toolbar-actions">
+                                    <button class="action-btn-secondary" onclick="exportParametersCSV()">
+                                        <span>📥</span> Export CSV
+                                    </button>
+                                    <button class="action-btn-secondary" onclick="exportParametersJSON()">
+                                        <span>📥</span> Export JSON
+                                    </button>
                                 </div>
                             </div>
-                            <div class="toolbar-actions">
-                                <button class="action-btn-secondary" onclick="exportParametersCSV()">
-                                    <span>📥</span> Export CSV
-                                </button>
-                                <button class="action-btn-secondary" onclick="exportParametersJSON()">
-                                    <span>📥</span> Export JSON
-                                </button>
+
+                            <!-- Modern PBPK Data Table -->
+                            <div class="table-responsive-box">
+                                <table class="pbpk-data-table" id="pbpk-main-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Canonical Name &amp; PBPKO ID</th>
+                                            <th>Parameter (Raw)</th>
+                                            <th>Value ± Dev</th>
+                                            <th>Unit</th>
+                                            <th>Compound</th>
+                                            <th>Species</th>
+                                            <th>Route &amp; Formulation</th>
+                                            <th>Dose</th>
+                                            <th>Cohort / Condition</th>
+                                            <th>Source</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="pbpk-table-body">
+                                        <!-- Dynamic rows will be inserted here -->
+                                    </tbody>
+                                </table>
                             </div>
+
+                            <!-- Editable Legacy Table Sections (if available) -->
+                            <div id="params-content" style="display:none; margin-top: 24px;"></div>
                         </div>
+                    </div>
 
-                        <!-- Modern PBPK Data Table -->
-                        <div class="table-responsive-box">
-                            <table class="pbpk-data-table" id="pbpk-main-table">
-                                <thead>
-                                    <tr>
-                                        <th>Canonical Name &amp; PBPKO ID</th>
-                                        <th>Parameter (Raw)</th>
-                                        <th>Value ± Dev</th>
-                                        <th>Unit</th>
-                                        <th>Compound</th>
-                                        <th>Species</th>
-                                        <th>Route &amp; Formulation</th>
-                                        <th>Dose</th>
-                                        <th>Cohort / Condition</th>
-                                        <th>Source</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="pbpk-table-body">
-                                    <!-- Dynamic rows will be inserted here -->
-                                </tbody>
-                            </table>
+                    <!-- Compartment Flow Tab (Hidden) -->
+                    <div class="tab-panel" id="tab-flow" style="display: none;">
+                        <div class="flow-mode-bar">
+                            <button id="flow-view-btn" class="active" onclick="setFlowMode('view')">🔀 View
+                                Diagram</button>
+                            <button id="flow-edit-btn" onclick="setFlowMode('edit')">✏️ Edit Layout</button>
+                            <span style="font-size:0.75rem; color:var(--text-muted); margin-left:4px;"
+                                id="flow-connect-hint"></span>
                         </div>
-
-                        <!-- Editable Legacy Table Sections (if available) -->
-                        <div id="params-content" style="display:none; margin-top: 24px;"></div>
-                    </div>
-                </div>
-
-                <!-- Compartment Flow Tab (Hidden) -->
-                <div class="tab-panel" id="tab-flow" style="display: none;">
-                    <div class="flow-mode-bar">
-                        <button id="flow-view-btn" class="active" onclick="setFlowMode('view')">🔀 View Diagram</button>
-                        <button id="flow-edit-btn" onclick="setFlowMode('edit')">✏️ Edit Layout</button>
-                        <span style="font-size:0.75rem; color:var(--text-muted); margin-left:4px;" id="flow-connect-hint"></span>
-                    </div>
-                    <div id="flow-view-pane">
-                        <div class="empty-state" id="flow-empty">
-                            <div class="empty-icon">🔀</div>
-                            <div class="empty-text">Compartment flow diagram will be generated from extracted parameters</div>
+                        <div id="flow-view-pane">
+                            <div class="empty-state" id="flow-empty">
+                                <div class="empty-icon">🔀</div>
+                                <div class="empty-text">Compartment flow diagram will be generated from extracted
+                                    parameters</div>
+                            </div>
+                            <div id="compartment-diagram" style="display:none;"></div>
                         </div>
-                        <div id="compartment-diagram" style="display:none;"></div>
+                    </div>
+
+                    <!-- ColPali Pages Tab (Hidden) -->
+                    <div class="tab-panel" id="tab-colpali" style="display: none;">
+                        <div class="empty-state" id="colpali-empty">
+                            <div class="empty-icon">🔍</div>
+                            <div class="empty-text">ColPali page images</div>
+                        </div>
+                        <div class="gallery" id="colpali-gallery" style="display:none;"></div>
+                    </div>
+
+                    <!-- R Code Tab (Hidden) -->
+                    <div class="tab-panel" id="tab-rcode" style="display: none;">
+                        <div class="empty-state" id="rcode-empty">
+                            <div class="empty-icon">💻</div>
+                            <div class="empty-text">Generated R/deSolve model code</div>
+                        </div>
+                        <div class="code-block" id="rcode-block" style="display:none;">
+                            <pre id="rcode-content"></pre>
+                        </div>
+                    </div>
+
+                    <!-- Model Review Tab (Hidden) -->
+                    <div class="tab-panel" id="tab-review" style="display: none;">
+                        <div class="empty-state" id="review-empty">
+                            <div class="empty-icon">🔬</div>
+                            <div class="empty-text">LLM model review</div>
+                        </div>
+                        <div id="review-content" style="display:none;"></div>
                     </div>
                 </div>
-
-                <!-- ColPali Pages Tab (Hidden) -->
-                <div class="tab-panel" id="tab-colpali" style="display: none;">
-                    <div class="empty-state" id="colpali-empty">
-                        <div class="empty-icon">🔍</div>
-                        <div class="empty-text">ColPali page images</div>
-                    </div>
-                    <div class="gallery" id="colpali-gallery" style="display:none;"></div>
-                </div>
-
-                <!-- R Code Tab (Hidden) -->
-                <div class="tab-panel" id="tab-rcode" style="display: none;">
-                    <div class="empty-state" id="rcode-empty">
-                        <div class="empty-icon">💻</div>
-                        <div class="empty-text">Generated R/deSolve model code</div>
-                    </div>
-                    <div class="code-block" id="rcode-block" style="display:none;">
-                        <pre id="rcode-content"></pre>
-                    </div>
-                </div>
-
-                <!-- Model Review Tab (Hidden) -->
-                <div class="tab-panel" id="tab-review" style="display: none;">
-                    <div class="empty-state" id="review-empty">
-                        <div class="empty-icon">🔬</div>
-                        <div class="empty-text">LLM model review</div>
-                    </div>
-                    <div id="review-content" style="display:none;"></div>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <!-- ═══ Status Bar ═══ -->
-    <footer class="status-bar" style="background: rgba(8, 12, 20, 0.9); border-top: 1px solid rgba(255,255,255,0.06); padding: 8px 24px;">
-        <div class="spinner" id="spinner"></div>
-        <span class="status-text" id="status-text" style="font-weight: 500;">Ready</span>
-        <div class="progress-container" style="flex: 1; max-width: 400px; height: 6px; background: rgba(255,255,255,0.06); border-radius: 4px;">
-            <div class="progress-bar" id="progress-bar" style="height: 100%; border-radius: 4px; background: linear-gradient(90deg, #06b6d4, #6366f1);"></div>
+            </main>
         </div>
-        <span id="progress-pct" style="font-size: 0.75rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace;">0%</span>
-    </footer>
 
-    <!-- Lightbox -->
-    <div class="lightbox" id="lightbox">
-        <img id="lightbox-img" src="" alt="Page preview">
+        <!-- ═══ Status Bar ═══ -->
+        <footer class="status-bar"
+            style="background: rgba(8, 12, 20, 0.9); border-top: 1px solid rgba(255,255,255,0.06); padding: 8px 24px;">
+            <div class="spinner" id="spinner"></div>
+            <span class="status-text" id="status-text" style="font-weight: 500;">Ready</span>
+            <div class="progress-container"
+                style="flex: 1; max-width: 400px; height: 6px; background: rgba(255,255,255,0.06); border-radius: 4px;">
+                <div class="progress-bar" id="progress-bar"
+                    style="height: 100%; border-radius: 4px; background: linear-gradient(90deg, #06b6d4, #6366f1);">
+                </div>
+            </div>
+            <span id="progress-pct"
+                style="font-size: 0.75rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace;">0%</span>
+        </footer>
+
+        <!-- Lightbox -->
+        <div class="lightbox" id="lightbox">
+            <img id="lightbox-img" src="" alt="Page preview">
+        </div>
     </div>
-</div>
 
-<script src="/static/app.js?v=2.5"></script>
+    <script src="/static/app.js?v=2.5"></script>
 </body>
+
 </html>

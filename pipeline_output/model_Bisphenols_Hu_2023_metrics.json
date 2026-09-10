@@ -1,0 +1,9 @@
+{
+  "compound": ["BPS"],
+  "model_type": [1],
+  "Cmax": [0.0002],
+  "Tmax": [0.05],
+  "AUC_0_t": [0.0043],
+  "dose": [7.5],
+  "route": ["oral"]
+}

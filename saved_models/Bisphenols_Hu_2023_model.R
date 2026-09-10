@@ -2,7 +2,7 @@
 # APEX-PBPK Generated Standalone Model
 # Paper: Parsed from Bisphenols_Hu_2023
 # Compound: BPS | Route: oral | Dose: 7.5 mg/kg
-# Model Type: 3 — A PBPK model for the human dermal exposure of BPS.
+# Model Type: 1 — A PBPK model for the human dermal exposure of BPS.
 # ==============================================================================
 
 # Install deSolve if missing
@@ -29,12 +29,7 @@ Q_liv <- (Qliver / 100) * QCC * BW
 k12 <- Q_liv / V_pla
 k21 <- Q_liv / (Kp_liver * V_liv)
 k10 <- CL_hep / V_liv
-
-if (!is.na(P_eff) && !is.na(R_gut) && R_gut > 0) {
-  ka <- P_eff * (2 / R_gut)
-} else {
-  ka <- k_a
-}
+ka  <- k_a
 
 rate_parms <- list(
   k_a = ka, k12 = k12, k21 = k21, k10 = k10,
@@ -71,7 +66,7 @@ if (requireNamespace("ggplot2", quietly = TRUE)) {
     geom_line(aes(y = C_plasma, color = "Plasma Concentration"), linewidth = 1.2) +
     geom_line(aes(y = C_liver,  color = "Liver Concentration"), linewidth = 1.0, linetype = "dashed") +
     scale_color_manual(values = c("Plasma Concentration" = "#1f77b4", "Liver Concentration" = "#d62728")) +
-    labs(title = "BPS PBPK Simulation (Model 3)", x = "Time (h)", y = "Concentration", color = "") +
+    labs(title = "BPS PBPK Simulation (Model 1)", x = "Time (h)", y = "Concentration", color = "") +
     theme_minimal()
   print(p)
 } else {

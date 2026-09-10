@@ -45,16 +45,8 @@
             </nav>
         </div>
 
-        <!-- Right Status Chips -->
+        <!-- Right Status Chips (Removed) -->
         <div class="nav-right">
-            <div class="system-status-chip">
-                <span class="pulse-indicator"></span>
-                <span class="chip-label">Ollama <span class="chip-accent">Online</span></span>
-            </div>
-            <div class="system-status-chip">
-                <span class="pulse-indicator cyan"></span>
-                <span class="chip-label">Supabase <span class="chip-accent">Live Cloud</span></span>
-            </div>
         </div>
     </header>
 
@@ -241,12 +233,6 @@
                                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                             </svg>
                             <input type="text" id="db-param-search" placeholder="Filter parameters, compound, PBPKO..." oninput="filterDBParameters()">
-                        </div>
-                        <div class="toolbar-pills">
-                            <button class="filter-chip ${activeSpeciesFilter === 'all' ? 'active' : ''}" onclick="setDBSpeciesFilter('all', this)">All</button>
-                            <button class="filter-chip ${activeSpeciesFilter === 'human' ? 'active' : ''}" onclick="setDBSpeciesFilter('human', this)">Human</button>
-                            <button class="filter-chip ${activeSpeciesFilter === 'rat' ? 'active' : ''}" onclick="setDBSpeciesFilter('rat', this)">Rat</button>
-                            <button class="filter-chip ${activeSpeciesFilter === 'mouse' ? 'active' : ''}" onclick="setDBSpeciesFilter('mouse', this)">Mouse</button>
                         </div>
                     </div>
                     <div class="toolbar-actions">

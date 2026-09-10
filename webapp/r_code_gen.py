@@ -76,7 +76,7 @@ if (!is.na(P_eff) && !is.na(R_gut) && R_gut > 0) {
     elif model_type == 4:
         r_script += """V_liv <- (Vliver / 100) * BW
 V_pla <- (V_plasma / 100) * BW
-Q_liv <- (Qliver / 100) * QCC * BW
+Q_liv <- (Qliver / 100) * QCC
 
 k12 <- Q_liv / V_pla
 k21 <- Q_liv / (Kp_liver * V_liv)

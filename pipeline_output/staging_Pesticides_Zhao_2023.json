@@ -1,0 +1,55 @@
+{
+  "compound": "CYP2C19 inhibitor",
+  "species": "human",
+  "model_type": 1,
+  "model_description": "This model simulates the pharmacokinetics of a CYP2C19 inhibitor in humans, focusing on the absorption, distribution, metabolism, and excretion of the drug.",
+  "route": "oral",
+  "dose": 0.5,
+  "t_end": 24,
+  "parameters": {
+    "BW": {
+      "value": 70.0,
+      "unit": "kg",
+      "source": "llm_assigned"
+    },
+    "QCC": {
+      "value": 0.46,
+      "unit": "L/h/kg",
+      "source": "llm_assigned"
+    },
+    "Qliver": {
+      "value": 0.22,
+      "unit": "%",
+      "source": "llm_assigned"
+    },
+    "Vliver": {
+      "value": 0.026,
+      "unit": "%BW",
+      "source": "llm_assigned"
+    },
+    "V_plasma": {
+      "value": 0.079,
+      "unit": "%BW",
+      "source": "llm_assigned"
+    },
+    "Kp_liver": {
+      "value": 0.46,
+      "unit": "dimensionless",
+      "source": "llm_assigned"
+    },
+    "CL_hep": {
+      "value": 0.46,
+      "unit": "L/h",
+      "source": "llm_assigned"
+    },
+    "k_a": {
+      "value": 0.46,
+      "unit": "1/h",
+      "source": "llm_assigned"
+    }
+  },
+  "assignment_notes": "The dose of 0.5 mg/kg was chosen based on the pharmacological properties of the CYP2C19 inhibitor and the need to simulate a moderate dose that would be clinically relevant.",
+  "paper_id": "Pesticides_Zhao_2023",
+  "paper_title": "Parsed from Pesticides_Zhao_2023",
+  "param_count": 130
+}

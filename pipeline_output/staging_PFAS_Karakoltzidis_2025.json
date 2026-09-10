@@ -1,0 +1,55 @@
+{
+  "compound": "PFOA",
+  "species": "human",
+  "model_type": 2,
+  "model_description": "A mechanistic PBPK model for PFOA considering the distribution and metabolism in the human body.",
+  "route": "oral",
+  "dose": 0.6,
+  "t_end": 24,
+  "parameters": {
+    "BW": {
+      "value": 70.0,
+      "unit": "kg",
+      "source": "llm_assigned"
+    },
+    "QCC": {
+      "value": 0.25,
+      "unit": "L/h/kg",
+      "source": "llm_assigned"
+    },
+    "Qliver": {
+      "value": 0.25,
+      "unit": "%",
+      "source": "llm_assigned"
+    },
+    "Vliver": {
+      "value": 0.026,
+      "unit": "%BW",
+      "source": "llm_assigned"
+    },
+    "V_plasma": {
+      "value": 0.184,
+      "unit": "%BW",
+      "source": "llm_assigned"
+    },
+    "Kp_liver": {
+      "value": 0.1,
+      "unit": "dimensionless",
+      "source": "llm_assigned"
+    },
+    "CL_hep": {
+      "value": 0.04,
+      "unit": "L/h",
+      "source": "llm_assigned"
+    },
+    "k_a": {
+      "value": 0.001,
+      "unit": "1/h",
+      "source": "llm_assigned"
+    }
+  },
+  "assignment_notes": "Parameters were assigned based on the extracted values, standard physiological reference values, and the specific route and dose provided in the paper.",
+  "paper_id": "PFAS_Karakoltzidis_2025",
+  "paper_title": "Parsed from PFAS_Karakoltzidis_2025",
+  "param_count": 48
+}

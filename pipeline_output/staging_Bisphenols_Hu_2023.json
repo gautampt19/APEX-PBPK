@@ -1,0 +1,55 @@
+{
+  "compound": "BPS",
+  "species": "human",
+  "model_type": "3",
+  "model_description": "A PBPK model for the human dermal exposure of BPS.",
+  "route": "oral",
+  "dose": 0.1,
+  "t_end": 24,
+  "parameters": {
+    "BW": {
+      "value": 75.0,
+      "unit": "kg",
+      "source": "llm_assigned"
+    },
+    "QCC": {
+      "value": 0.3,
+      "unit": "L/h/kg",
+      "source": "llm_assigned"
+    },
+    "Qliver": {
+      "value": 195.12,
+      "unit": "%",
+      "source": "llm_assigned"
+    },
+    "Vliver": {
+      "value": 19.45,
+      "unit": "%BW",
+      "source": "llm_assigned"
+    },
+    "V_plasma": {
+      "value": 0.076,
+      "unit": "%BW",
+      "source": "llm_assigned"
+    },
+    "Kp_liver": {
+      "value": 137.6,
+      "unit": "dimensionless",
+      "source": "llm_assigned"
+    },
+    "CL_hep": {
+      "value": 265.3,
+      "unit": "L/h",
+      "source": "llm_assigned"
+    },
+    "k_a": {
+      "value": 0.001055,
+      "unit": "1/h",
+      "source": "llm_assigned"
+    }
+  },
+  "assignment_notes": "The model was assigned based on the highest dose of 0.1 mg/kg bw, which is typical for dermal exposure studies.",
+  "paper_id": "Bisphenols_Hu_2023",
+  "paper_title": "Parsed from Bisphenols_Hu_2023",
+  "param_count": 133
+}

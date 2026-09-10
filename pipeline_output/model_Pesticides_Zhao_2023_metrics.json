@@ -1,0 +1,9 @@
+{
+  "compound": ["CYP2C19 inhibitor"],
+  "model_type": [1],
+  "Cmax": [0.6292],
+  "Tmax": [1.2],
+  "AUC_0_t": [2.3797],
+  "dose": [0.5],
+  "route": ["oral"]
+}

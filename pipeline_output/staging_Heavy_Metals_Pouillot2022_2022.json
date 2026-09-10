@@ -1,0 +1,56 @@
+{
+  "compound": "Unknown",
+  "species": "human",
+  "model_type": 1,
+  "model_description": "Fractional Scaling (%BW and %QCC) \u2014 using physiological defaults",
+  "route": "oral",
+  "dose": 50.0,
+  "t_end": 24.0,
+  "parameters": {
+    "BW": {
+      "value": 70.0,
+      "unit": "kg",
+      "source": "physiological_default"
+    },
+    "QCC": {
+      "value": 15.0,
+      "unit": "L/h/kg",
+      "source": "physiological_default"
+    },
+    "Qliver": {
+      "value": 25.0,
+      "unit": "%",
+      "source": "physiological_default"
+    },
+    "Vliver": {
+      "value": 2.6,
+      "unit": "%BW",
+      "source": "physiological_default"
+    },
+    "V_plasma": {
+      "value": 4.3,
+      "unit": "%BW",
+      "source": "physiological_default"
+    },
+    "Kp_liver": {
+      "value": 1.2,
+      "unit": "dimensionless",
+      "source": "physiological_default"
+    },
+    "CL_hep": {
+      "value": 45.0,
+      "unit": "L/h",
+      "source": "physiological_default"
+    },
+    "k_a": {
+      "value": 1.5,
+      "unit": "1/h",
+      "source": "physiological_default"
+    }
+  },
+  "assignment_notes": "LLM assignment was unavailable. Standard human physiological defaults applied.",
+  "llm_error": "model 'qwen3:8b' not found (status code: 404)",
+  "paper_id": "Heavy Metals_Pouillot2022_2022",
+  "paper_title": "Parsed from Heavy Metals_Pouillot2022_2022",
+  "param_count": 51
+}

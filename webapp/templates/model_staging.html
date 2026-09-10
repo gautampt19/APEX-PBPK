@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>APEX-PBPK — Model Staging & Review</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:           #0a0e1a;
+      --surface:      rgba(255,255,255,0.04);
+      --surface-hover:rgba(255,255,255,0.07);
+      --border:       rgba(255,255,255,0.08);
+      --accent:       #6366f1;
+      --accent2:      #38bdf8;
+      --success:      #22d3a5;
+      --warn:         #f59e0b;
+      --danger:       #ef4444;
+      --text:         #e2e8f0;
+      --muted:        #64748b;
+      --mono:         'JetBrains Mono', monospace;
+      --radius:       14px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── Topbar ── */
+    .topbar {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 28px;
+      background: rgba(255,255,255,0.03);
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 100;
+      backdrop-filter: blur(12px);
+    }
+    .topbar-logo {
+      font-size: 1.1rem; font-weight: 800;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .topbar-sep { opacity: 0.3; font-size: 1.3rem; }
+    .topbar-title { font-weight: 600; font-size: 0.95rem; color: var(--text); }
+    .topbar-spacer { flex: 1; }
+    .topbar-back {
+      display: flex; align-items: center; gap: 6px;
+      padding: 7px 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--muted);
+      font-size: 0.82rem; cursor: pointer; text-decoration: none;
+      transition: all .2s;
+    }
+    .topbar-back:hover { color: var(--text); background: var(--surface-hover); }
+
+    /* ── Layout ── */
+    .main-wrap {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 28px 24px 60px;
+    }
+
+    /* ── Paper Header Card ── */
+    .paper-header {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px 28px;
+      margin-bottom: 24px;
+      display: flex; align-items: flex-start; gap: 18px;
+    }
+    .paper-icon {
+      width: 48px; height: 48px; flex-shrink: 0;
+      background: linear-gradient(135deg, rgba(99,102,241,0.2), rgba(56,189,248,0.2));
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+      border: 1px solid rgba(99,102,241,0.3);
+    }
+    .paper-info { flex: 1; }
+    .paper-title {
+      font-size: 1.05rem; font-weight: 700; color: var(--text);
+      margin-bottom: 6px;
+    }
+    .paper-meta {
+      display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+    }
+    .meta-badge {
+      padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;
+    }
+    .badge-blue   { background: rgba(56,189,248,.15); color: #38bdf8; border: 1px solid rgba(56,189,248,.25); }
+    .badge-purple { background: rgba(99,102,241,.15); color: #a78bfa; border: 1px solid rgba(99,102,241,.25); }
+    .badge-green  { background: rgba(34,211,165,.15); color: #22d3a5; border: 1px solid rgba(34,211,165,.25); }
+    .badge-orange { background: rgba(245,158,11,.15); color: #f59e0b; border: 1px solid rgba(245,158,11,.25); }
+    .badge-gray   { background: rgba(100,116,139,.15); color: #94a3b8; border: 1px solid rgba(100,116,139,.25); }
+
+    /* ── Section heading ── */
+    .section-heading {
+      font-size: 0.78rem; font-weight: 700; letter-spacing: .08em;
+      text-transform: uppercase; color: var(--muted);
+      margin-bottom: 14px; margin-top: 30px;
+    }
+
+    /* ── Parameter Cards Grid ── */
+    .params-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 14px;
+      margin-bottom: 10px;
+    }
+
+    .param-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      transition: border-color .2s, background .2s;
+    }
+    .param-card:hover { border-color: rgba(99,102,241,.35); background: var(--surface-hover); }
+
+    .param-name {
+      font-size: 0.78rem; color: var(--muted); margin-bottom: 6px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .param-symbol {
+      font-size: 0.9rem; font-weight: 700; color: var(--accent2);
+      font-family: var(--mono);
+    }
+    .param-input-row {
+      display: flex; gap: 8px; align-items: center; margin-bottom: 8px;
+    }
+    .param-input {
+      flex: 1;
+      background: rgba(0,0,0,0.35);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 7px 11px;
+      color: var(--text);
+      font-size: 0.92rem;
+      font-family: var(--mono);
+      font-weight: 500;
+      outline: none;
+      transition: border-color .2s;
+    }
+    .param-input:focus { border-color: var(--accent); }
+    .param-unit {
+      font-size: 0.78rem; color: var(--muted);
+      white-space: nowrap; font-family: var(--mono);
+    }
+    .source-tag {
+      display: inline-block;
+      padding: 2px 8px; border-radius: 20px;
+      font-size: 0.7rem; font-weight: 600;
+    }
+    .src-extracted { background: rgba(34,211,165,.12); color: #22d3a5; border: 1px solid rgba(34,211,165,.2); }
+    .src-estimated { background: rgba(99,102,241,.12); color: #a78bfa; border: 1px solid rgba(99,102,241,.2); }
+    .src-default   { background: rgba(100,116,139,.12); color: #94a3b8; border: 1px solid rgba(100,116,139,.2); }
+
+    /* ── Notes Card ── */
+    .notes-card {
+      background: rgba(99,102,241,.06);
+      border: 1px solid rgba(99,102,241,.2);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin-bottom: 24px;
+    }
+    .notes-label {
+      font-size: 0.78rem; font-weight: 700; color: var(--accent); margin-bottom: 6px;
+    }
+    .notes-text { font-size: 0.88rem; color: var(--text); line-height: 1.6; }
+
+    /* ── LLM Error Banner ── */
+    .error-banner {
+      background: rgba(239,68,68,.08);
+      border: 1px solid rgba(239,68,68,.25);
+      border-radius: var(--radius);
+      padding: 14px 18px;
+      margin-bottom: 20px;
+      font-size: 0.85rem;
+      color: #fca5a5;
+    }
+
+    /* ── Action Buttons ── */
+    .action-bar {
+      display: flex; gap: 12px; flex-wrap: wrap;
+      margin: 28px 0;
+    }
+    .btn {
+      display: flex; align-items: center; gap: 8px;
+      padding: 11px 22px; border-radius: 10px;
+      font-size: 0.9rem; font-weight: 600;
+      cursor: pointer; border: none; outline: none;
+      transition: all .2s; text-decoration: none;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), #4f46e5);
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(99,102,241,.35);
+    }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(99,102,241,.45); }
+    .btn-primary:disabled { opacity: .5; transform: none; cursor: not-allowed; }
+    .btn-secondary {
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover { background: var(--surface-hover); }
+    .btn-warn {
+      background: rgba(245,158,11,.12);
+      color: #f59e0b;
+      border: 1px solid rgba(245,158,11,.25);
+    }
+    .btn-warn:hover { background: rgba(245,158,11,.2); }
+
+    .spinner { animation: spin .8s linear infinite; display:inline-block; }
+    @keyframes spin { from{transform:rotate(0)} to{transform:rotate(360deg)} }
+
+    /* ── Results Panel ── */
+    .results-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-top: 30px;
+      display: none;
+    }
+    .results-panel.visible { display: block; animation: fadeIn .4s ease; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:none} }
+
+    .results-tabs {
+      display: flex; border-bottom: 1px solid var(--border);
+      background: rgba(0,0,0,.2);
+    }
+    .results-tab {
+      padding: 12px 22px; font-size: 0.84rem; font-weight: 600;
+      color: var(--muted); cursor: pointer; border: none; background: none;
+      border-bottom: 2px solid transparent; transition: all .2s;
+    }
+    .results-tab.active { color: var(--accent2); border-color: var(--accent2); }
+
+    .results-content { padding: 24px; }
+    .results-pane { display: none; }
+    .results-pane.active { display: block; animation: fadeIn .3s ease; }
+
+    /* PK Metrics */
+    .metrics-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+      margin-bottom: 20px;
+    }
+    .metric-card {
+      background: rgba(0,0,0,.3);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 18px;
+      text-align: center;
+    }
+    .metric-label { font-size: 0.75rem; color: var(--muted); margin-bottom: 6px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+    .metric-value { font-size: 1.6rem; font-weight: 800; font-family: var(--mono); color: var(--accent2); }
+    .metric-unit  { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+
+    .plot-img {
+      width: 100%; max-width: 720px; display: block;
+      border-radius: 10px; margin: 0 auto;
+      border: 1px solid var(--border);
+    }
+
+    /* R Code */
+    .r-code-wrap {
+      position: relative;
+    }
+    .copy-btn {
+      position: absolute; top: 10px; right: 10px;
+      padding: 5px 12px; border-radius: 6px; font-size: 0.75rem;
+      background: rgba(255,255,255,.08); border: 1px solid var(--border);
+      color: var(--muted); cursor: pointer; transition: all .2s;
+    }
+    .copy-btn:hover { background: rgba(255,255,255,.15); color: var(--text); }
+    pre.r-code {
+      background: rgba(0,0,0,.4);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      overflow-x: auto;
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      line-height: 1.6;
+      color: #a5f3fc;
+      white-space: pre-wrap;
+    }
+
+    /* Loading Overlay */
+    .loading-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(10,14,26,.85);
+      backdrop-filter: blur(6px);
+      z-index: 1000;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+    }
+    .loading-overlay.visible { display: flex; }
+    .loading-ring {
+      width: 56px; height: 56px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    .loading-text { font-size: 1rem; font-weight: 600; color: var(--text); }
+    .loading-sub  { font-size: 0.85rem; color: var(--muted); }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center; padding: 60px 20px;
+      color: var(--muted);
+    }
+    .empty-icon { font-size: 3rem; margin-bottom: 14px; }
+    .empty-title { font-size: 1.1rem; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+    .empty-sub   { font-size: 0.88rem; }
+  </style>
+</head>
+<body>
+
+<!-- Topbar -->
+<div class="topbar">
+  <div class="topbar-logo">APEX-PBPK</div>
+  <div class="topbar-sep">›</div>
+  <div class="topbar-title">Model Staging & Review</div>
+  <div class="topbar-spacer"></div>
+  <a href="/database" class="topbar-back">← Back to Database</a>
+</div>
+
+<!-- Loading Overlay -->
+<div id="loadingOverlay" class="loading-overlay">
+  <div class="loading-ring"></div>
+  <div class="loading-text" id="loadingText">Running R Simulation…</div>
+  <div class="loading-sub" id="loadingSub">Please wait, this may take 10-30 seconds.</div>
+</div>
+
+<div class="main-wrap">
+
+  <!-- Empty state (shown when no paper selected) -->
+  <div id="emptyState" class="empty-state" style="display:none;">
+    <div class="empty-icon">🧪</div>
+    <div class="empty-title">No paper selected</div>
+    <div class="empty-sub">Return to the <a href="/database" style="color:var(--accent2)">Database viewer</a> and click "Create R Model" on a paper.</div>
+  </div>
+
+  <!-- Main content (hidden until data loads) -->
+  <div id="mainContent" style="display:none;">
+
+    <!-- Paper Header -->
+    <div class="paper-header">
+      <div class="paper-icon">🔬</div>
+      <div class="paper-info">
+        <div class="paper-title" id="paperTitle">Loading…</div>
+        <div class="paper-meta" id="paperMeta"></div>
+      </div>
+    </div>
+
+    <!-- LLM Error Banner -->
+    <div id="llmErrorBanner" class="error-banner" style="display:none;">
+      ⚠️ <strong>LLM unavailable:</strong> <span id="llmErrorMsg"></span><br>
+      <span style="color:var(--muted)">Showing physiological defaults. You can edit values manually below.</span>
+    </div>
+
+    <!-- Assignment Notes -->
+    <div id="notesCard" class="notes-card" style="display:none;">
+      <div class="notes-label">🧠 LLM Assignment Notes</div>
+      <div class="notes-text" id="notesText"></div>
+    </div>
+
+    <!-- ── Physiological & Anatomical ── -->
+    <div class="section-heading">🫀 Physiological & Anatomical</div>
+    <div class="params-grid" id="grid-physio"></div>
+
+    <!-- ── Organ Volumes & Flows ── -->
+    <div class="section-heading">🏗️ Organ Volumes & Blood Flows</div>
+    <div class="params-grid" id="grid-organs"></div>
+
+    <!-- ── Compound Disposition ── -->
+    <div class="section-heading">⚗️ Compound Disposition & Clearance</div>
+    <div class="params-grid" id="grid-compound"></div>
+
+    <!-- ── Dosing ── -->
+    <div class="section-heading">💊 Dosing & Study Design</div>
+    <div class="params-grid" id="grid-dosing"></div>
+
+    <!-- Action Bar -->
+    <div class="action-bar">
+      <button id="btnRunSim" class="btn btn-primary" onclick="runSimulation()">
+        ⚡ Run R Simulation & Plot
+      </button>
+      <button class="btn btn-warn" onclick="rerunLLM()">
+        🔄 Re-run LLM Assignment
+      </button>
+      <a href="/database" class="btn btn-secondary">
+        ← Back to Database
+      </a>
+    </div>
+
+    <!-- Results Panel -->
+    <div class="results-panel" id="resultsPanel">
+      <div class="results-tabs">
+        <button class="results-tab active" data-pane="pane-metrics">📊 PK Metrics & Plot</button>
+        <button class="results-tab" data-pane="pane-rcode">📄 R Code</button>
+        <button class="results-tab" data-pane="pane-log">📋 Simulation Log</button>
+      </div>
+      <div class="results-content">
+
+        <!-- Metrics & Plot -->
+        <div class="results-pane active" id="pane-metrics">
+          <div class="metrics-grid" id="metricsGrid"></div>
+          <img id="plotImg" class="plot-img" style="display:none;" alt="PK Concentration-Time Curve" />
+        </div>
+
+        <!-- R Code -->
+        <div class="results-pane" id="pane-rcode">
+          <div class="r-code-wrap">
+            <button class="copy-btn" onclick="copyCode()">📋 Copy</button>
+            <pre class="r-code" id="rCodeBlock"></pre>
+          </div>
+        </div>
+
+        <!-- Log -->
+        <div class="results-pane" id="pane-log">
+          <pre class="r-code" id="simLog" style="color:#94a3b8;"></pre>
+        </div>
+
+      </div>
+    </div>
+
+  </div><!-- /mainContent -->
+</div><!-- /main-wrap -->
+
+<script>
+// ── Config ────────────────────────────────────────────────────────────────────
+const PARAM_META = {
+  // Physiological
+  BW:       { label: "Body Weight",         symbol: "BW",       group: "physio",   unit: "kg" },
+  QCC:      { label: "Cardiac Output",      symbol: "QCC",      group: "physio",   unit: "L/h/kg" },
+  // Organ volumes & flows
+  Vliver:   { label: "Liver Volume",        symbol: "Vliver",   group: "organs",   unit: "%BW" },
+  V_plasma: { label: "Plasma Volume",       symbol: "V_plasma", group: "organs",   unit: "%BW" },
+  Qliver:   { label: "Liver Blood Flow",    symbol: "Qliver",   group: "organs",   unit: "%" },
+  // Compound disposition
+  Kp_liver: { label: "Liver Partition Coeff", symbol: "Kp_liver", group: "compound", unit: "dimensionless" },
+  CL_hep:   { label: "Hepatic Clearance",   symbol: "CL_hep",  group: "compound", unit: "L/h" },
+  k_a:      { label: "Absorption Rate",     symbol: "k_a",      group: "compound", unit: "1/h" },
+  // Dosing
+  dose:     { label: "Dose",               symbol: "dose",     group: "dosing",   unit: "mg/kg" },
+  route:    { label: "Route",              symbol: "route",    group: "dosing",   unit: "" },
+  t_end:    { label: "Simulation Duration", symbol: "t_end",   group: "dosing",   unit: "hours" },
+};
+
+let staged = null;
+let paperId = null;
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+document.addEventListener("DOMContentLoaded", () => {
+  const params = new URLSearchParams(window.location.search);
+  paperId = params.get("paper_id");
+  if (!paperId) {
+    document.getElementById("emptyState").style.display = "block";
+    return;
+  }
+  loadStaging();
+
+  // Tab switching
+  document.querySelectorAll(".results-tab").forEach(tab => {
+    tab.addEventListener("click", () => {
+      document.querySelectorAll(".results-tab").forEach(t => t.classList.remove("active"));
+      document.querySelectorAll(".results-pane").forEach(p => p.classList.remove("active"));
+      tab.classList.add("active");
+      document.getElementById(tab.dataset.pane).classList.add("active");
+    });
+  });
+});
+
+async function loadStaging() {
+  showLoading("Loading staged parameters…", "Fetching LLM-assigned values from server…");
+  try {
+    const res = await fetch(`/api/model/staging/${encodeURIComponent(paperId)}`);
+    if (res.ok) {
+      staged = await res.json();
+      renderStaging();
+    } else {
+      // Not staged yet — trigger staging now
+      hideLoading();
+      await stageNow();
+    }
+  } catch(e) {
+    hideLoading();
+    showError("Failed to load staging: " + e.message);
+  }
+}
+
+async function stageNow() {
+  showLoading("Querying database & LLM…", "Fetching parameters and asking Ollama to assign PBPK values…");
+  try {
+    const res = await fetch("/api/model/stage", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ paper_id: paperId })
+    });
+    const data = await res.json();
+    hideLoading();
+    if (!res.ok || !data.staged) {
+      showError(data.error || "Staging failed");
+      return;
+    }
+    staged = data.staged;
+    renderStaging();
+  } catch(e) {
+    hideLoading();
+    showError("Staging request failed: " + e.message);
+  }
+}
+
+async function rerunLLM() {
+  await stageNow();
+}
+
+function renderStaging() {
+  if (!staged) return;
+  document.getElementById("mainContent").style.display = "block";
+  document.getElementById("emptyState").style.display  = "none";
+
+  // Header
+  document.getElementById("paperTitle").textContent = staged.paper_title || staged.paper_id || "Unknown Paper";
+  const meta = document.getElementById("paperMeta");
+  meta.innerHTML = `
+    <span class="meta-badge badge-purple">Model ${staged.model_type}</span>
+    <span class="meta-badge badge-blue">${staged.compound || "?"}</span>
+    <span class="meta-badge badge-green">${staged.species || "?"}</span>
+    <span class="meta-badge badge-orange">${staged.route || "?"}</span>
+    <span class="meta-badge badge-gray">${staged.param_count || "?"} params extracted</span>
+  `;
+
+  // LLM error
+  if (staged.llm_error) {
+    document.getElementById("llmErrorBanner").style.display = "block";
+    document.getElementById("llmErrorMsg").textContent = staged.llm_error;
+  }
+
+  // Notes
+  if (staged.assignment_notes) {
+    document.getElementById("notesCard").style.display = "block";
+    document.getElementById("notesText").textContent = staged.assignment_notes;
+  }
+
+  // Render parameter grids
+  renderGrid("grid-physio",    ["BW", "QCC"],                             staged.parameters);
+  renderGrid("grid-organs",    ["Vliver", "V_plasma", "Qliver"],          staged.parameters);
+  renderGrid("grid-compound",  ["Kp_liver", "CL_hep", "k_a"],            staged.parameters);
+  renderGrid("grid-dosing",    ["dose", "route", "t_end"],                {
+    dose:  { value: staged.dose,  unit: "mg/kg",  source: "staged" },
+    route: { value: staged.route, unit: "",        source: "staged" },
+    t_end: { value: staged.t_end, unit: "hours",   source: "staged" },
+  });
+}
+
+function renderGrid(gridId, keys, paramsObj) {
+  const grid = document.getElementById(gridId);
+  if (!grid) return;
+  grid.innerHTML = "";
+
+  keys.forEach(key => {
+    const meta = PARAM_META[key] || { label: key, symbol: key, unit: "" };
+    const entry = paramsObj?.[key];
+    const value = typeof entry === "object" ? entry?.value ?? "" : entry ?? "";
+    const source = typeof entry === "object" ? (entry?.source || "default") : "default";
+    const unit = meta.unit;
+
+    const srcClass = source.includes("extracted") ? "src-extracted"
+                   : source.includes("estimated")  ? "src-estimated"
+                   : "src-default";
+    const srcLabel = source.includes("extracted") ? "From DB"
+                   : source.includes("estimated")  ? "LLM Inferred"
+                   : "Physiological Default";
+
+    const inputType = (key === "route") ? `
+      <select class="param-input" id="param_${key}">
+        <option ${value === "oral" ? "selected" : ""}>oral</option>
+        <option ${value === "iv"   ? "selected" : ""}>iv</option>
+        <option ${value === "sc"   ? "selected" : ""}>sc</option>
+      </select>
+    ` : `<input class="param-input" id="param_${key}" type="number" step="any" value="${value}">`;
+
+    grid.innerHTML += `
+      <div class="param-card">
+        <div class="param-name">
+          <span class="param-symbol">${meta.symbol}</span>
+          ${meta.label}
+        </div>
+        <div class="param-input-row">
+          ${inputType}
+          ${unit ? `<span class="param-unit">${unit}</span>` : ""}
+        </div>
+        <span class="source-tag ${srcClass}">${srcLabel}</span>
+      </div>
+    `;
+  });
+}
+
+// ── Collect current form values ───────────────────────────────────────────────
+function collectParams() {
+  const allKeys = Object.keys(PARAM_META);
+  const params  = {};
+  allKeys.forEach(key => {
+    const el = document.getElementById(`param_${key}`);
+    if (el) {
+      const val = el.value;
+      params[key] = isNaN(val) || val === "" ? val : parseFloat(val);
+    }
+  });
+  return params;
+}
+
+// ── Run Simulation ────────────────────────────────────────────────────────────
+async function runSimulation() {
+  const btn = document.getElementById("btnRunSim");
+  btn.disabled = true;
+  btn.innerHTML = `<span class="spinner">⏳</span> Running…`;
+  showLoading("Running R Simulation…", "Executing ODE solver in R via deSolve…");
+
+  const collected = collectParams();
+
+  // Rebuild staged payload with current UI values
+  const payload = Object.assign({}, staged, {
+    dose:  parseFloat(collected.dose)  || staged.dose,
+    route: collected.route             || staged.route,
+    t_end: parseFloat(collected.t_end) || staged.t_end,
+    parameters: {},
+  });
+
+  // Rebuild parameters dict
+  const paramKeys = ["BW","QCC","Vliver","V_plasma","Qliver","Kp_liver","CL_hep","k_a"];
+  paramKeys.forEach(k => {
+    const orig = staged.parameters?.[k];
+    payload.parameters[k] = {
+      value:  parseFloat(collected[k]) || (typeof orig === "object" ? orig?.value : orig) || 0,
+      unit:   typeof orig === "object" ? orig?.unit : (PARAM_META[k]?.unit || ""),
+      source: typeof orig === "object" ? orig?.source : "manual",
+    };
+  });
+
+  try {
+    const res = await fetch("/api/model/execute", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ staged: payload })
+    });
+    const data = await res.json();
+    hideLoading();
+
+    if (!res.ok || !data.success) {
+      showError("Simulation failed: " + (data.error || "unknown error") + "\n\n" + (data.stderr || ""));
+      btn.disabled = false;
+      btn.innerHTML = "⚡ Run R Simulation & Plot";
+      return;
+    }
+
+    renderResults(data);
+    btn.disabled = false;
+    btn.innerHTML = "⚡ Run R Simulation & Plot";
+  } catch(e) {
+    hideLoading();
+    showError("Request failed: " + e.message);
+    btn.disabled = false;
+    btn.innerHTML = "⚡ Run R Simulation & Plot";
+  }
+}
+
+function renderResults(data) {
+  document.getElementById("resultsPanel").classList.add("visible");
+
+  // Metrics
+  const m = data.metrics || {};
+  document.getElementById("metricsGrid").innerHTML = `
+    <div class="metric-card">
+      <div class="metric-label">C<sub>max</sub></div>
+      <div class="metric-value">${m.Cmax ?? "—"}</div>
+      <div class="metric-unit">mg/L</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">T<sub>max</sub></div>
+      <div class="metric-value">${m.Tmax ?? "—"}</div>
+      <div class="metric-unit">hours</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">AUC<sub>0-t</sub></div>
+      <div class="metric-value">${m.AUC_0_t ?? "—"}</div>
+      <div class="metric-unit">mg·h/L</div>
+    </div>
+  `;
+
+  // Plot
+  if (data.plot_b64) {
+    const img = document.getElementById("plotImg");
+    img.src = "data:image/png;base64," + data.plot_b64;
+    img.style.display = "block";
+  }
+
+  // R Code
+  document.getElementById("rCodeBlock").textContent = data.r_code || "";
+
+  // Log
+  document.getElementById("simLog").textContent = data.stdout || "No log output.";
+
+  // Switch to metrics tab
+  document.querySelectorAll(".results-tab").forEach(t => t.classList.remove("active"));
+  document.querySelectorAll(".results-pane").forEach(p => p.classList.remove("active"));
+  document.querySelector('[data-pane="pane-metrics"]').classList.add("active");
+  document.getElementById("pane-metrics").classList.add("active");
+
+  // Scroll into view
+  setTimeout(() => document.getElementById("resultsPanel").scrollIntoView({ behavior: "smooth" }), 100);
+}
+
+// ── Utilities ─────────────────────────────────────────────────────────────────
+function showLoading(title, sub) {
+  document.getElementById("loadingText").textContent = title;
+  document.getElementById("loadingSub").textContent  = sub;
+  document.getElementById("loadingOverlay").classList.add("visible");
+}
+function hideLoading() {
+  document.getElementById("loadingOverlay").classList.remove("visible");
+}
+
+function showError(msg) {
+  alert("❌ " + msg);
+}
+
+function copyCode() {
+  const code = document.getElementById("rCodeBlock").textContent;
+  navigator.clipboard.writeText(code).then(() => {
+    const btn = document.querySelector(".copy-btn");
+    btn.textContent = "✅ Copied!";
+    setTimeout(() => btn.textContent = "📋 Copy", 2000);
+  });
+}
+</script>
+</body>
+</html>

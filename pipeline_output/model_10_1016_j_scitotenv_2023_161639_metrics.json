@@ -1,0 +1,9 @@
+{
+  "compound": ["Unknown"],
+  "model_type": [1],
+  "Cmax": [1.0022],
+  "Tmax": [0.2],
+  "AUC_0_t": [0.9256],
+  "dose": [50],
+  "route": ["oral"]
+}

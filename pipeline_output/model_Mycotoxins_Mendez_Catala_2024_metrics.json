@@ -1,0 +1,9 @@
+{
+  "compound": ["9-9"],
+  "model_type": [1],
+  "Cmax": [0.0586],
+  "Tmax": [0.5],
+  "AUC_0_t": [0.6063],
+  "dose": [0.143],
+  "route": ["oral"]
+}

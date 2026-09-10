@@ -1,0 +1,55 @@
+{
+  "compound": "Rilutor",
+  "species": "human",
+  "model_type": "3",
+  "model_description": "A detailed physiologically-based pharmacokinetic (PBPK) model for the human body, including the brain, liver, and plasma compartments.",
+  "route": "oral",
+  "dose": 50,
+  "t_end": 24,
+  "parameters": {
+    "BW": {
+      "value": 70.0,
+      "unit": "kg",
+      "source": "llm_assigned"
+    },
+    "QCC": {
+      "value": 0.01,
+      "unit": "L/h/kg",
+      "source": "llm_assigned"
+    },
+    "Qliver": {
+      "value": 0.01,
+      "unit": "%",
+      "source": "llm_assigned"
+    },
+    "Vliver": {
+      "value": 0.01,
+      "unit": "%BW",
+      "source": "llm_assigned"
+    },
+    "V_plasma": {
+      "value": 0.01,
+      "unit": "%BW",
+      "source": "llm_assigned"
+    },
+    "Kp_liver": {
+      "value": 0.01,
+      "unit": "dimensionless",
+      "source": "llm_assigned"
+    },
+    "CL_hep": {
+      "value": 0.01,
+      "unit": "L/h",
+      "source": "llm_assigned"
+    },
+    "k_a": {
+      "value": 0.01,
+      "unit": "1/h",
+      "source": "llm_assigned"
+    }
+  },
+  "assignment_notes": "The PBPK model was developed using human physiological data and extrapolated to the human body. The parameters were set based on the average human body composition and physiological characteristics.",
+  "paper_id": "10.1208/s12249-023-02680-y",
+  "paper_title": "Parsed from 10.1208/s12249-023-02680-y",
+  "param_count": 175
+}

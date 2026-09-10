@@ -153,8 +153,9 @@ def remove_references_section(text: str) -> str:
     (like Appendices, Supplementary Data, etc.) that starts with a heading.
     """
     import re
-    # Find the References heading (case-insensitive, allows whitespace)
-    ref_heading_re = re.compile(r"^#{1,4}\s*(?:References?|Bibliography)\s*$", re.IGNORECASE | re.MULTILINE)
+    # Often the reference heading is # References or ## References. Sometimes it has no #.
+    # The OCR from MinerU might just output "References" on a line by itself.
+    ref_heading_re = re.compile(r"^(?:#{1,4}\s*)?(?:References?|Bibliography)\s*$", re.IGNORECASE | re.MULTILINE)
     
     match = ref_heading_re.search(text)
     if not match:
@@ -183,53 +184,59 @@ def chunk_text(
     chunk_size: int = 8000,
     overlap_words: int = 15,
 ) -> List[str]:
-    """Split *text* into chunks at paragraph/sentence boundaries.
-
-    Inspired by the llm_aided_ocr project's chunking logic.
-    Each chunk is at most *chunk_size* characters.  Consecutive chunks share
-    *overlap_words* trailing words from the previous chunk for context continuity.
+    """Split *text* into chunks at paragraph boundaries.
+    Crucially, this ensures markdown tables (lines starting with '|') are NEVER split, 
+    even if they exceed chunk_size, because splitting a table separates the rows 
+    from the headers and breaks LLM extraction.
     """
-    paragraphs = re.split(r"\n\s*\n", text)
-    chunks: List[str] = []
-    current_chunk: List[str] = []
-    current_length = 0
-
-    for paragraph in paragraphs:
-        para_len = len(paragraph)
-        if current_length + para_len <= chunk_size:
-            current_chunk.append(paragraph)
-            current_length += para_len
+    lines = text.split('\n')
+    blocks = []
+    current_block = []
+    
+    for line in lines:
+        is_table_row = bool(re.match(r"^\s*\|", line))
+        # We consider a block boundary if it's a blank line AND the previous line wasn't a table row
+        # (MinerU sometimes has blank lines inside or right after tables)
+        if not line.strip() and not (current_block and bool(re.match(r"^\s*\|", current_block[-1]))):
+            if current_block:
+                blocks.append("\n".join(current_block))
+                current_block = []
         else:
-            # Flush current chunk
+            current_block.append(line)
+            
+    if current_block:
+        blocks.append("\n".join(current_block))
+        
+    chunks = []
+    current_chunk = []
+    current_length = 0
+    
+    for block in blocks:
+        block_len = len(block)
+        if current_length + block_len <= chunk_size:
+            current_chunk.append(block)
+            current_length += block_len
+        else:
             if current_chunk:
                 chunks.append("\n\n".join(current_chunk))
-            # If the paragraph itself is bigger than chunk_size, split by sentence
-            if para_len > chunk_size:
-                sentences = re.split(r"(?<=[.!?])\s+", paragraph)
+            
+            if block_len > chunk_size:
+                # If a single block (like a huge table) is > chunk_size, we just keep it as an oversized chunk!
+                # Splitting it by sentence would destroy the table formatting.
+                chunks.append(block)
                 current_chunk = []
                 current_length = 0
-                for sentence in sentences:
-                    s_len = len(sentence)
-                    if current_length + s_len <= chunk_size:
-                        current_chunk.append(sentence)
-                        current_length += s_len
-                    else:
-                        if current_chunk:
-                            chunks.append(" ".join(current_chunk))
-                        current_chunk = [sentence]
-                        current_length = s_len
             else:
-                current_chunk = [paragraph]
-                current_length = para_len
-
-    # Flush remaining
+                current_chunk = [block]
+                current_length = block_len
+                
     if current_chunk:
-        chunks.append("\n\n".join(current_chunk) if len(current_chunk) > 1 else current_chunk[0])
-
+        chunks.append("\n\n".join(current_chunk))
+        
     # Add overlap between chunks for context continuity
     for i in range(1, len(chunks)):
         overlap_text = chunks[i - 1].split()[-overlap_words:]
-        chunks[i] = " ".join(overlap_text) + " " + chunks[i]
+        chunks[i] = " ".join(overlap_text) + "\n\n" + chunks[i]
 
     return chunks
 

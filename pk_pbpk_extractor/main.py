@@ -13,10 +13,16 @@ import os
 import json
 import math
 import ollama
+import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from .inference.ollama_worker import OllamaWorker
+
+# Concurrency: max parallel Ollama requests (tune for your GPU VRAM)
+OLLAMA_MAX_WORKERS = int(os.environ.get("OLLAMA_MAX_WORKERS", "1"))
 
 from .ingestion.xml_parser import parse_xml_tables
 from .ingestion.pdf_mineru import run_mineru
-from .ingestion.colpali_retriever import retrieve_top_k_pages
+# colpali_retriever is imported lazily if not skipped
 from .ingestion.pmc_fetcher import (
     resolve_paper,
     extract_doi_from_pdf,
@@ -24,7 +30,7 @@ from .ingestion.pmc_fetcher import (
     fetch_supplementary_pdfs
 )
 import sys, importlib.util as _ilu, os as _os
-_cm_path = _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.dirname(__file__))), "clean_markdown.py")
+_cm_path = _os.path.join(_os.path.dirname(_os.path.dirname(__file__)), "clean_markdown.py")
 if _os.path.exists(_cm_path):
     _spec = _ilu.spec_from_file_location("clean_markdown", _cm_path)
     _cm_mod = _ilu.module_from_spec(_spec); _spec.loader.exec_module(_cm_mod)
@@ -33,7 +39,7 @@ if _os.path.exists(_cm_path):
 else:
     clean_markdown_fn = lambda x, **kw: x
     chunk_text_fn     = lambda x, chunk_size=8000, **kw: [x]
-from .inference.vllm_worker import OllamaWorker
+# VllmWorker removed, using OllamaWorker
 from .storage.db_handler import setup_database, upsert_document, insert_pk_parameters, delete_paper_data
 from .normalization.unit_normalizer import normalize_unit
 from .normalization.entity_linker import link_pk_entity
@@ -45,14 +51,88 @@ from .schemas.pbpk_schema import ExtractedTablePayload
 
 
 # ─────────────────────────────────────────────────────────────
+# Dynamic context sizing helper
+# ─────────────────────────────────────────────────────────────
+
+def _dynamic_options(prompt_text: str, temperature: float = 0.0) -> dict:
+    """
+    Dynamically calculate num_ctx and num_predict based on prompt length.
+    Avoids wasting RAM on huge contexts while guaranteeing sufficient output room.
+    """
+    est_tokens = len(prompt_text) // 4
+    num_predict = max(4096, min(8192, max(est_tokens * 2, 4096)))
+    num_ctx = max(8192, min(16384, est_tokens + num_predict + 1024))
+    num_ctx = ((num_ctx + 1023) // 1024) * 1024
+    num_predict = ((num_predict + 1023) // 1024) * 1024
+    return {"temperature": temperature, "num_predict": num_predict, "num_ctx": num_ctx}
+
+
+def _parse_and_validate_payload(response_text: str, table_id: str) -> dict:
+    """
+    Resilient JSON parser for table extraction payloads.
+    Attempts Pydantic validation, then clean json.loads, then partial_json_parser
+    to recover all completed records even if the LLM output was truncated mid-string.
+    """
+    if not response_text:
+        return {"table_id": table_id, "records": []}
+
+    # 1. Try standard Pydantic validation
+    try:
+        validated = ExtractedTablePayload.model_validate_json(response_text)
+        payload = validated.model_dump()
+        payload["table_id"] = table_id
+        return payload
+    except Exception as e:
+        pass
+
+    # Clean markdown fences if present
+    cleaned = response_text.strip()
+    if cleaned.startswith("```"):
+        cleaned = re.sub(r"^```(?:json)?\s*|\s*```$", "", cleaned, flags=re.DOTALL).strip()
+
+    # 2. Try standard json.loads
+    try:
+        raw = json.loads(cleaned)
+        if isinstance(raw, dict):
+            raw["table_id"] = table_id
+            return raw
+    except Exception:
+        pass
+
+    # 3. Truncation salvage via partial_json_parser
+    try:
+        import partial_json_parser
+        raw = partial_json_parser.loads(cleaned, partial_json_parser.ALL)
+        if isinstance(raw, dict):
+            raw["table_id"] = table_id
+            records = raw.get("records", [])
+            if isinstance(records, list):
+                # Filter out any trailing half-written object lacking essential fields
+                valid = [
+                    r for r in records
+                    if isinstance(r, dict) and (r.get("parameter_raw") or r.get("parameter_name") or r.get("value") is not None)
+                ]
+                raw["records"] = valid
+                print(f"  [Salvage] Truncated JSON recovered: {len(valid)} records preserved from {table_id}!")
+            return raw
+    except Exception as e3:
+        print(f"  [Salvage] Partial JSON recovery failed: {e3}")
+
+    return {"table_id": table_id, "records": []}
+
+
+# ─────────────────────────────────────────────────────────────
 # XML fast-path extraction
 # ─────────────────────────────────────────────────────────────
 
-def _extract_xml_table_text_only(client, model, json_schema, table: dict, paper_id: str) -> dict:
-    rows_as_text = "\n".join([" | ".join(cell for cell in row) for row in table["rows"]])
+def _extract_xml_table_text_only(worker: OllamaWorker, table: dict, paper_id: str) -> dict:
+    rows = table.get("rows", [])
     caption = table.get("caption", "")
     footer  = table.get("footer", "")
+    table_id = table.get("table_id", "Unknown")
 
+    # Standard extraction for <= 16 rows
+    rows_as_text = "\n".join([" | ".join(cell for cell in row) for row in rows])
     table_text = (
         f"Caption: {caption}\n"
         f"Table Footer: {footer}\n\n"
@@ -61,29 +141,22 @@ def _extract_xml_table_text_only(client, model, json_schema, table: dict, paper_
     prompt = build_prompt(
         "pharmacometrics_table",
         paper_id=paper_id,
-        table_id=table["table_id"],
+        table_id=table_id,
         table_text=table_text,
     )
 
-    print(f"  [XML Fast-Path] Extracting {table['table_id']} via {model}...")
-    response = client.chat(
-        model=model,
-        messages=[{"role": "user", "content": prompt}],
-        format=json_schema,
-        options={"temperature": 0.0, "num_predict": 16384, "num_ctx": 32768},
-    )
-
-    result_text = response["message"]["content"]
+    print(f"  [XML Fast-Path] Extracting {table_id} ({len(rows)} rows) via {worker.model}...")
+    options = _dynamic_options(prompt)
+    
     try:
-        validated = ExtractedTablePayload.model_validate_json(result_text)
-        payload = validated.model_dump()
-        payload["table_id"] = table["table_id"]
-        return payload
+        response_text = worker.chat(
+            messages=[{"role": "user", "content": prompt}],
+            options=options
+        )
+        return _parse_and_validate_payload(response_text, table_id)
     except Exception as e:
-        print(f"  [XML Fast-Path] Validation warning: {e}")
-        raw = json.loads(result_text)
-        raw["table_id"] = table["table_id"]
-        return raw
+        print(f"  [XML Fast-Path] Error on {table_id}: {e}")
+        return {"table_id": table_id, "records": []}
 
 
 def process_xml(xml_path: str, worker: OllamaWorker, paper_id: str = None):
@@ -96,11 +169,29 @@ def process_xml(xml_path: str, worker: OllamaWorker, paper_id: str = None):
     upsert_document(paper_id, f"Parsed from {paper_id}", {"source": "xml"})
     print(f"  Found {len(tables)} tables in the XML.")
 
-    for table in tables:
-        payload = _extract_xml_table_text_only(
-            worker.client, worker.model, worker.json_schema, table, paper_id
-        )
-        _save_payload(payload, paper_id, source_pass="xml_table")
+    t0 = time.time()
+    if len(tables) > 1 and OLLAMA_MAX_WORKERS > 1:
+        print(f"  ⚡ Parallel extraction with {OLLAMA_MAX_WORKERS} workers...")
+        with ThreadPoolExecutor(max_workers=OLLAMA_MAX_WORKERS) as pool:
+            futures = {
+                pool.submit(
+                    _extract_xml_table_text_only,
+                    worker, table, paper_id
+                ): table["table_id"]
+                for table in tables
+            }
+            for future in as_completed(futures):
+                tid = futures[future]
+                try:
+                    payload = future.result()
+                    _save_payload(payload, paper_id, source_pass="xml_table")
+                except Exception as e:
+                    print(f"  [XML] ⚠ Error on {tid}: {e}")
+    else:
+        for table in tables:
+            payload = _extract_xml_table_text_only(worker, table, paper_id)
+            _save_payload(payload, paper_id, source_pass="xml_table")
+    print(f"  ⏱ XML extraction completed in {time.time() - t0:.1f}s")
 
 
 # ─────────────────────────────────────────────────────────────
@@ -128,16 +219,73 @@ def process_md_text_pass(md_raw: str, worker: OllamaWorker, paper_id: str, outpu
 
     # Split into chunks (8k chars each with overlap)
     chunks = chunk_text_fn(cleaned, chunk_size=8000, overlap_words=15)
-    print(f"  Processing {len(chunks)} text chunk(s) via Qwen...")
+    
+    import re as _re
+    _PK_HINT = _re.compile(
+        r"\b(CL|CLint|Vd|Vss|Vc|Vmax|Km|fu|fup|ka|kabs|kel|k10|k12|k21|Kp|AUC|Cmax|Tmax|MRT|t1/2|half.life|"
+        r"clearance|volume|bioavailability|partition|unbound|hematocrit|hct|logp|pka|"
+        r"absorption|elimination|distribution)\b",
+        _re.IGNORECASE
+    )
+    _NUM_HINT = _re.compile(r"\d+\.?\d*\s*(L|mL|h|min|mg|kg|nmol|uM|nM|ng|%)")
 
+    candidate_chunks = []
     for idx, chunk in enumerate(chunks):
+        if _PK_HINT.search(chunk) and _NUM_HINT.search(chunk):
+            candidate_chunks.append((idx, chunk))
+
+    print(f"  [MD Text] {len(candidate_chunks)} candidate chunks (of {len(chunks)} total) contain PK parameters.")
+    if not candidate_chunks:
+        print("  ⏱ MD text pass complete: 0 candidate chunks.")
+        return
+
+    def _process_md_chunk(idx_chunk):
+        idx, chunk = idx_chunk
         prompt = (
             "You are a Senior Pharmacometrics Data Extractor.\n"
             "The following is a section of a scientific paper on pharmacokinetics (PK) "
-            "and physiologically based pharmacokinetic (PBPK) modelling.\n"
-            "Extract ALL numerical PK/PBPK parameters mentioned (values, units, species, etc.).\n"
-            "Include organ volumes, blood flow fractions, partition coefficients, clearance, "
-            "absorption rates, Cmax, AUC, t1/2, Vd — everything numerical.\n"
+            "and physiologically based pharmacokinetic (PBPK) modelling.\n\n"
+            "TASK: Extract ALL numerical PK/PBPK parameters from this text.\n\n"
+            "CRITICAL RULES:\n"
+            "1. The field `parameter_raw` MUST contain the EXACT parameter name as written in the text "
+            "(e.g., 'PFOA Half-life', 'Volume of distribution', 'milk/plasma partition coefficient', "
+            "'CLint', 'Vd', 'fu', 'ka', 'maternal PFOA level at delivery').\n"
+            "   - NEVER leave parameter_raw as null.\n"
+            "   - NEVER use auto-generated IDs like 'c5_001' or 'T2-01' as parameter names.\n"
+            "2. The field `value` MUST be a number extracted from the text. If no number, set value to null.\n"
+            "3. The field `unit` MUST be the unit as written (e.g., 'ng/mL', 'years', 'L/h/kg', '%').\n"
+            "4. The field `compound` should identify the specific compound (e.g., 'PFOA', 'PFOS', 'PFHxS').\n"
+            "5. The field `species` MUST identify the species. Look for clues like 'maternal', 'child', "
+            "'infant', 'women', 'patient', 'volunteer' → 'human'; 'rat', 'Sprague-Dawley' → 'rat'; "
+            "'mouse', 'mice' → 'mouse'. NEVER leave species null if the context mentions any organism.\n"
+            "6. For values with ± deviation (e.g., '3.8 ± 1.7'), put 3.8 in `value` and 1.7 in `deviation_value`.\n"
+            "7. For ranges (e.g., '0.6-7.0'), put null in `value`, 0.6 in `interval_lower`, 7.0 in `interval_upper`.\n"
+            "8. `record_id` should be a unique ID like 'R1C1V1'. Do NOT put parameter names in record_id.\n"
+            "9. If there are NO extractable parameters, return an empty records list.\n"
+            "10. The field `route` should capture the route of administration (e.g., 'oral', 'iv', 'dermal', "
+            "'inhalation', 'breastfeeding', 'placental transfer', 'dietary intake').\n"
+            "11. The field `formulation` should capture the formulation if mentioned (e.g., 'tablet', "
+            "'solution', 'suspension', 'capsule', 'environmental exposure').\n"
+            "12. The field `dose_value` and `dose_unit` should capture the dose when stated "
+            "(e.g., dose_value: 10, dose_unit: 'mg/kg').\n"
+            "13. The field `dose_raw` should preserve the original dose text (e.g., '10 mg/kg/day').\n"
+            "14. The field `cohort_or_condition` should capture the specific subgroup, study arm, or physiological state "
+            "(e.g., 'German study, 6 months', 'fasted', 'pregnant', 'in vitro', 'smokers').\n\n"
+            "EXAMPLE of a correct record:\n"
+            '{\n'
+            '  "record_id": "R1C1V1",\n'
+            '  "parameter_raw": "PFOA Half-life",\n'
+            '  "value": 3.8,\n'
+            '  "deviation_value": 1.7,\n'
+            '  "unit": "years",\n'
+            '  "compound": "PFOA",\n'
+            '  "species": "human",\n'
+            '  "route": "oral",\n'
+            '  "formulation": "tablet",\n'
+            '  "dose_value": 10,\n'
+            '  "dose_unit": "mg/kg",\n'
+            '  "cohort_or_condition": "German study, 6 months"\n'
+            '}\n\n'
             "Return ONLY valid JSON matching the schema.\n\n"
             f"=== PAPER TEXT (chunk {idx + 1}/{len(chunks)}) ===\n"
             f"{chunk}"
@@ -145,24 +293,61 @@ def process_md_text_pass(md_raw: str, worker: OllamaWorker, paper_id: str, outpu
 
         print(f"  [MD Chunk {idx + 1}/{len(chunks)}] Sending to {worker.model} (text-only)...")
         try:
-            response = worker.client.chat(
+            response = worker.chat(
                 model=worker.model,
                 messages=[{"role": "user", "content": prompt}],
                 format=worker.json_schema,
-                options={"temperature": 0.0, "num_predict": 16384, "num_ctx": 32768},
+                options=_dynamic_options(prompt),
             )
-            result_text = response["message"]["content"]
-            try:
-                validated = ExtractedTablePayload.model_validate_json(result_text)
-                payload = validated.model_dump()
-            except Exception:
-                import json as _json
-                payload = _json.loads(result_text)
-
-            payload["table_id"] = f"MD_Chunk_{idx + 1}"
-            _save_payload(payload, paper_id, source_pass="xml_table")
+            result_text = response
+            payload = _parse_and_validate_payload(result_text, f"MD_Chunk_{idx + 1}")
+            
+            # Post-filter: drop records with no meaningful data
+            if payload and "records" in payload:
+                filtered = []
+                for rec in payload["records"]:
+                    param = rec.get("parameter_raw") or rec.get("parameter_normalized")
+                    val = rec.get("value")
+                    # Keep if we have EITHER a real parameter name OR a value
+                    if param and not _is_auto_id(param):
+                        filtered.append(rec)
+                    elif val is not None:
+                        filtered.append(rec)
+                dropped = len(payload["records"]) - len(filtered)
+                if dropped > 0:
+                    print(f"  [MD Chunk {idx + 1}] Filtered out {dropped} empty/auto-ID records.")
+                payload["records"] = filtered
+            
+            return payload
         except Exception as e:
             print(f"  [MD Chunk {idx + 1}] Error: {e}")
+            return None
+
+    def _is_auto_id(name: str) -> bool:
+        """Detect auto-generated IDs like 'c5_001', 'T2-01', 'es5b04399_chunk2_001'."""
+        import re
+        if re.match(r'^[A-Za-z]\d+[_-]\d+$', name):
+            return True
+        if re.match(r'^[a-z]+\d+[a-z]*_chunk\d+_\d+$', name):
+            return True
+        if re.match(r'^R\d+C\d+V\d+$', name):
+            return True
+        return False
+
+    t0 = time.time()
+    if len(candidate_chunks) > 1 and OLLAMA_MAX_WORKERS > 1:
+        print(f"  ⚡ Parallel MD chunk extraction with {OLLAMA_MAX_WORKERS} workers...")
+        with ThreadPoolExecutor(max_workers=OLLAMA_MAX_WORKERS) as pool:
+            results = pool.map(_process_md_chunk, candidate_chunks)
+            for payload in results:
+                if payload:
+                    _save_payload(payload, paper_id, source_pass="md_text")
+    else:
+        for idx_chunk in candidate_chunks:
+            payload = _process_md_chunk(idx_chunk)
+            if payload:
+                _save_payload(payload, paper_id, source_pass="md_text")
+    print(f"  ⏱ MD text pass completed in {time.time() - t0:.1f}s")
 
 
 def _split_md_by_page(md_content: str) -> dict:
@@ -181,7 +366,7 @@ def _split_md_by_page(md_content: str) -> dict:
     return pages
 
 
-def process_pdf(pdf_path: str, worker: OllamaWorker, paper_id: str = None):
+def process_pdf(pdf_path: str, worker: OllamaWorker, paper_id: str = None, skip_colpali: bool = False):
     print(f"\n[PDF OCR Path] Processing {pdf_path}...")
     output_dir = "/tmp/mineru_output"
     os.makedirs(output_dir, exist_ok=True)
@@ -227,7 +412,7 @@ def process_pdf(pdf_path: str, worker: OllamaWorker, paper_id: str = None):
                     "=======================\n"
                 )
                 
-                response = worker.client.chat(
+                response = worker.chat(
                     model=worker.model,
                     messages=[{"role": "user", "content": prompt}],
                     format=worker.json_schema,
@@ -235,7 +420,7 @@ def process_pdf(pdf_path: str, worker: OllamaWorker, paper_id: str = None):
                 )
                 
                 try:
-                    res_dict = ExtractedTablePayload.model_validate_json(response["message"]["content"]).model_dump()
+                    res_dict = ExtractedTablePayload.model_validate_json(response).model_dump()
                     _save_payload(res_dict, paper_id, source_pass="autopk_table")
                 except Exception as e:
                     print(f"  [AutoPK] Extraction warning: {e}")
@@ -244,48 +429,58 @@ def process_pdf(pdf_path: str, worker: OllamaWorker, paper_id: str = None):
 
 
     # ── Pass 2: Multimodal image extraction via ColPali ───────────────────
-    # Split the full markdown into per-page sections for targeted context
-    md_pages = _split_md_by_page(md_content)
-    print(f"  Parsed {len(md_pages)} page text sections from markdown.")
+    if skip_colpali:
+        print("\n  [Pass 2] ⏭ Skipping ColPali multimodal retrieval (--skip-colpali enabled).")
+    else:
+        # Split the full markdown into per-page sections for targeted context
+        md_pages = _split_md_by_page(md_content)
+        print(f"  Parsed {len(md_pages)} page text sections from markdown.")
 
-    queries = [
-        "Table of physiological parameters organ volumes blood flow fractions",
-        "Pharmacokinetic parameters clearance partition coefficients Kp Vmax Km",
-    ]
+        queries = [
+            "Table of physiological parameters organ volumes blood flow fractions",
+            "Pharmacokinetic parameters clearance partition coefficients Kp Vmax Km",
+        ]
 
-    print("  Retrieving top-K pages via ColPali...")
-    top_k_images, indices = retrieve_top_k_pages(pdf_path, queries, top_k=5)
-    print(f"  Selected pages: {indices}")
+        print("  Retrieving top-K pages via ColPali...")
+        try:
+            from .ingestion.colpali_retriever import retrieve_top_k_pages
+            top_k_images, indices = retrieve_top_k_pages(pdf_path, queries, top_k=5)
+            print(f"  Selected pages: {indices}")
 
-    for i, img in enumerate(top_k_images):
-        page_idx = indices[i]
+            for i, img in enumerate(top_k_images):
+                page_idx = indices[i]
 
-        # Use the page-specific markdown section (± 1 neighbouring page for context)
-        page_text_parts = []
-        for offset in [-1, 0, 1]:
-            pt = md_pages.get(page_idx + offset, "")
-            if pt:
-                page_text_parts.append(pt)
-        page_context = "\n\n".join(page_text_parts)[:4000]  # cap at 4k chars
+                # Use the page-specific markdown section (± 1 neighbouring page for context)
+                page_text_parts = []
+                for offset in [-1, 0, 1]:
+                    pt = md_pages.get(page_idx + offset, "")
+                    if pt:
+                        page_text_parts.append(pt)
+                page_context = "\n\n".join(page_text_parts)[:4000]  # cap at 4k chars
 
-        if page_context.strip():
-            print(f"  [Page {page_idx}] Using {len(page_context)} chars of page-specific markdown.")
-        else:
-            # Fallback: first 3000 chars of the full document
-            page_context = md_content[:3000]
-            print(f"  [Page {page_idx}] No page-specific text found, using document header.")
+                if page_context.strip():
+                    print(f"  [Page {page_idx}] Using {len(page_context)} chars of page-specific markdown.")
+                else:
+                    # Fallback: first 3000 chars of the full document
+                    page_context = md_content[:3000]
+                    print(f"  [Page {page_idx}] No page-specific text found, using document header.")
 
-        print(f"\n  [Page {page_idx}] Running multimodal extraction...")
-        payload = worker.extract_table_data(
-            img, page_context, {},
-            paper_id=paper_id,
-            table_id=f"Page_{page_idx}"
-        )
-        _save_payload(payload, paper_id, source_pass="colpali_page")
+                print(f"\n  [Page {page_idx}] Running multimodal extraction...")
+                payload = worker.extract_table_data(
+                    img, page_context, {},
+                    paper_id=paper_id,
+                    table_id=f"Page_{page_idx}"
+                )
+                _save_payload(payload, paper_id, source_pass="colpali_page")
+        except Exception as e:
+            print(f"  [ColPali] Retrieval error: {e}")
 
-    # ── Pass 3: Prose text scan ──────────────────────────────────────────
-    print("\n  [Pass 3] Scanning prose paragraphs for inline PK values...")
-    _prose_scan_pass(md_content, worker, paper_id)
+    # ── Pass 3: Prose text scan (DISABLED — redundant with Pass 1) ────────
+    # Pass 1 (MD text pass) already extracts inline PK values from the same
+    # markdown with a better prompt. Pass 3 re-scanned the same text in tiny
+    # 1500-char chunks using a broken template (referenced 'biochemical_parameters'
+    # instead of 'records'), always returned 0, and wasted ~4 min of LLM time.
+    # _prose_scan_pass(md_content, worker, paper_id)
 
     # ── Pass 4: PBPK Compound Skill Enrichment (PubChem, ChEMBL, DrugBank) ──
     _compound_enrichment_pass(paper_id, paper_title=paper_id, text_context=md_content)
@@ -304,8 +499,8 @@ def _prose_scan_pass(md_content: str, worker, paper_id: str):
     import re as _re
     # Simple heuristic: only scan chunks that likely contain a PK value
     _PK_HINT = _re.compile(
-        r"\b(CL|Vd|Vmax|Km|fu|fup|ka|Kp|AUC|Cmax|t1/2|half.life|"
-        r"clearance|volume|bioavailability|partition|unbound|hematocrit|"
+        r"\b(CL|CLint|Vd|Vss|Vc|Vmax|Km|fu|fup|ka|kabs|kel|k10|k12|k21|Kp|AUC|Cmax|Tmax|MRT|t1/2|half.life|"
+        r"clearance|volume|bioavailability|partition|unbound|hematocrit|hct|logp|pka|"
         r"absorption|elimination|distribution)\b",
         _re.IGNORECASE
     )
@@ -325,14 +520,20 @@ def _prose_scan_pass(md_content: str, worker, paper_id: str):
     client = worker.client
     model = worker.model
 
-    total_saved = 0
+    # Filter to only chunks that look promising
+    candidate_chunks = []
     for idx, chunk in enumerate(chunks):
-        # Skip chunks that don't look like they contain PK parameter prose
-        if not _PK_HINT.search(chunk):
-            continue
-        if not _NUM_HINT.search(chunk):
-            continue
+        if _PK_HINT.search(chunk) and _NUM_HINT.search(chunk):
+            candidate_chunks.append((idx, chunk))
 
+    if not candidate_chunks:
+        print(f"\n  [Pass 3] Prose scan complete. 0 candidate chunks found.")
+        return
+
+    print(f"    [Prose] {len(candidate_chunks)} candidate chunks (of {len(chunks)} total)")
+
+    def _process_prose_chunk(idx_chunk):
+        idx, chunk = idx_chunk
         chunk_id = f"prose_chunk_{idx}"
         prompt = build_prompt(
             "pharmacometrics_text",
@@ -341,36 +542,41 @@ def _prose_scan_pass(md_content: str, worker, paper_id: str):
             text_chunk=chunk,
         )
         print(f"    [Prose] Scanning {chunk_id} ({len(chunk)} chars)...")
-
         try:
-            response = client.chat(
+            response = worker.chat(
                 model=model,
                 messages=[{"role": "user", "content": prompt}],
                 format=schema,
-                options={"temperature": 0.0, "num_predict": 4096, "num_ctx": 8192},
+                options=_dynamic_options(prompt),
             )
-            result_text = response["message"]["content"]
-
-            from .schemas.pbpk_schema import ExtractedTablePayload
-            import json
-            try:
-                validated = ExtractedTablePayload.model_validate_json(result_text)
-                payload = validated.model_dump()
-            except Exception:
-                payload = json.loads(result_text)
-
-            payload["table_id"] = chunk_id
-            n_params = len(payload.get("biochemical_parameters", []))
-            if n_params > 0:
-                _save_payload(payload, paper_id, source_pass="prose_pass")
-                total_saved += n_params
-                print(f"    [Prose] ✓ Found {n_params} parameters in {chunk_id}")
-
+            result_text = response
+            payload = _parse_and_validate_payload(result_text, chunk_id)
+            return payload
         except Exception as e:
             print(f"    [Prose] ⚠ Skipped {chunk_id}: {e}")
-            continue
+            return None
 
-    print(f"\n  [Pass 3] Prose scan complete. {total_saved} parameters saved.")
+    total_saved = 0
+    t0 = time.time()
+    if len(candidate_chunks) > 1 and OLLAMA_MAX_WORKERS > 1:
+        with ThreadPoolExecutor(max_workers=OLLAMA_MAX_WORKERS) as pool:
+            results = pool.map(_process_prose_chunk, candidate_chunks)
+            for payload in results:
+                if payload:
+                    n_params = len(payload.get("records", []))
+                    if n_params > 0:
+                        _save_payload(payload, paper_id, source_pass="prose_pass")
+                        total_saved += n_params
+    else:
+        for item in candidate_chunks:
+            payload = _process_prose_chunk(item)
+            if payload:
+                n_params = len(payload.get("records", []))
+                if n_params > 0:
+                    _save_payload(payload, paper_id, source_pass="prose_pass")
+                    total_saved += n_params
+
+    print(f"\n  [Pass 3] Prose scan complete. {total_saved} parameters saved in {time.time() - t0:.1f}s.")
 
 
 # ─────────────────────────────────────────────────────────────
@@ -429,6 +635,85 @@ def _save_payload(payload: dict, paper_id: str, source_pass: str = "xml_table"):
         dose_unit = rec.get("dose_unit") or global_dose_unit
         formulation = rec.get("formulation") or global_formulation
         
+        parameter_raw = rec.get("parameter_raw") or rec.get("record_id")
+        
+        # Apply ontology mapping
+        parameter_normalized = rec.get("parameter_normalized")
+        pbpko_term_id = rec.get("pbpko_term_id")
+        if not parameter_normalized and parameter_raw:
+            onto = link_pk_entity(parameter_raw)
+            parameter_normalized = onto.get("canonical_name", parameter_raw)
+            if not pbpko_term_id:
+                pbpko_term_id = onto.get("pbpko_id")
+
+        # ── Smart post-processing: fill gaps the LLM missed ──────────
+        import re as _re
+        
+        # 1. Extract compound from parameter_raw if LLM left it null
+        if not compound and parameter_raw:
+            _KNOWN_COMPOUNDS = [
+                'PFOA', 'PFOS', 'PFHxS', 'PFNA', 'PFDA', 'PFUnDA', 'PFDoDA',
+                'PCB-153', 'BPA', 'DEHP', 'MEHP',
+            ]
+            for cmp in _KNOWN_COMPOUNDS:
+                if cmp.lower() in parameter_raw.lower():
+                    compound = cmp
+                    break
+        
+        # 2. Infer species from context clues in parameter_raw / formulation / route
+        if not species:
+            _human_hints = ['maternal', 'mother', 'child', 'infant', 'women',
+                            'human', 'patient', 'volunteer', 'breastfeed',
+                            'cord', 'prenatal', 'postnatal', 'placenta']
+            _rat_hints = ['rat', 'sprague', 'wistar']
+            _mouse_hints = ['mouse', 'mice', 'murine']
+            combined_ctx = " ".join(filter(None, [
+                parameter_raw, formulation, route,
+                rec.get("cohort_or_condition"), rec.get("notes")
+            ])).lower()
+            for hint in _human_hints:
+                if hint in combined_ctx:
+                    species = "human"
+                    break
+            if not species:
+                for hint in _rat_hints:
+                    if hint in combined_ctx:
+                        species = "rat"
+                        break
+            if not species:
+                for hint in _mouse_hints:
+                    if hint in combined_ctx:
+                        species = "mouse"
+                        break
+        
+        # 3. Extract unit from parenthetical text in parameter_raw if LLM left it null
+        unit = rec.get("unit")
+        if not unit and parameter_raw:
+            paren_match = _re.search(r'\(([^)]+)\)\s*$', parameter_raw)
+            if paren_match:
+                candidate_unit = paren_match.group(1).strip()
+                _KNOWN_UNITS = ['years', 'months', 'days', 'hours', 'min', 'kg',
+                                'g', 'mg', 'ng', 'L', 'mL', 'ng/mL', 'ng/kg/day',
+                                'ng/day', 'L/h', 'mL/min', 'mL/min/kg', '%',
+                                'nmol/min/mg', 'mg/kg', 'μg/L', 'mg/L']
+                for ku in _KNOWN_UNITS:
+                    if ku.lower() == candidate_unit.lower():
+                        unit = candidate_unit
+                        break
+                # Also match common unit patterns
+                if not unit and _re.match(r'^[a-zA-Zμ°/·%]+$', candidate_unit):
+                    if len(candidate_unit) <= 15:
+                        unit = candidate_unit
+        
+        # 4. For dimensionless parameters, set unit explicitly
+        if not unit and parameter_raw:
+            _DIMENSIONLESS = ['partition', 'ratio', 'fraction', 'multiplier',
+                              'bioavailability', 'fu', 'fup', 'Kp']
+            for dl in _DIMENSIONLESS:
+                if dl.lower() in parameter_raw.lower():
+                    unit = "dimensionless"
+                    break
+
         # Prepare row for DB
         row = {
             "paper_id": paper_id,
@@ -439,8 +724,9 @@ def _save_payload(payload: dict, paper_id: str, source_pass: str = "xml_table"):
             "source_row_label": rec.get("source_row_label"),
             "source_column_header": rec.get("source_column_header"),
             
-            "parameter_raw": rec.get("parameter_raw"),
-            "parameter_normalized": rec.get("parameter_normalized"),
+            "parameter_raw": parameter_raw,
+            "parameter_normalized": parameter_normalized,
+            "pbpko_term_id": pbpko_term_id,
             "parameter_category": rec.get("parameter_category"),
             "is_target_parameter": rec.get("is_target_parameter", False),
             "organ_or_tissue": rec.get("organ_or_tissue"),
@@ -459,7 +745,7 @@ def _save_payload(payload: dict, paper_id: str, source_pass: str = "xml_table"):
             "value_index": rec.get("value_index", 1),
             
             "value": rec.get("value"),
-            "unit": rec.get("unit"),
+            "unit": unit,
             "qualifier": rec.get("qualifier"),
             
             "deviation_value": rec.get("deviation_value"),
@@ -524,11 +810,13 @@ Examples:
     parser.add_argument("--pdf",     type=str, help="Path to a local PDF file")
     parser.add_argument("--pmc-xml", type=str, help="Path to a local PMC-OA XML file (skips all API calls)")
     parser.add_argument("--compound", type=str, help="Target compound name for PBPK skill enrichment (PubChem/ChEMBL)")
+    parser.add_argument("--skip-colpali", action="store_true", default=os.environ.get("SKIP_COLPALI", "").lower() in ("1", "true", "yes"), help="Skip ColPali multimodal retrieval pass (saves VRAM & time)")
+    parser.add_argument("--model", type=str, default=None, help="Ollama model to use for extraction (e.g. qwen2.5-coder:7b, qwen2.5:1.5b, qwen3.8:latest)")
     args = parser.parse_args()
 
     print("Setting up database...")
     setup_database()
-    worker = OllamaWorker()
+    worker = OllamaWorker(model=args.model)
 
     # ── 0. Explicit local XML ───────────────────────────────────
     if args.pmc_xml:
@@ -576,18 +864,18 @@ Examples:
             supp_pdfs = fetch_supplementary_pdfs(pmcid)
             for supp_pdf in supp_pdfs:
                 print(f"\n[Auto-Routing] Processing supplementary file: {supp_pdf}")
-                process_pdf(supp_pdf, worker, paper_id=paper_id)
+                process_pdf(supp_pdf, worker, paper_id=paper_id, skip_colpali=args.skip_colpali)
             return
 
         if resolved["pdf_path"]:
             print(f"\n[Auto-Routing] ✓ Got PDF via {resolved['source']}. Using OCR path.")
-            process_pdf(resolved["pdf_path"], worker, paper_id=paper_id)
+            process_pdf(resolved["pdf_path"], worker, paper_id=paper_id, skip_colpali=args.skip_colpali)
             return
 
     # ── 3. Fallback: local PDF ──────────────────────────────────
     if args.pdf:
         print(f"\n[Fallback] No free source found. Using local PDF OCR for {args.pdf}")
-        process_pdf(args.pdf, worker, paper_id=paper_id)
+        process_pdf(args.pdf, worker, paper_id=paper_id, skip_colpali=args.skip_colpali)
     else:
         print("\n[Error] No input provided and no API source found. Use --pdf or --doi.")
         parser.print_help()

@@ -37,28 +37,36 @@
   "body mass index": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00007",
     "id": "PBPKO_00007",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "BMI"
+    ],
     "related_synonyms": [],
     "definition": "A physiological parameter calculated as an individual's weight (kg) divided by the square of their height (m)."
   },
   "bodyweight": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00008",
     "id": "PBPKO_00008",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "bw"
+    ],
     "related_synonyms": [],
     "definition": "A physiological parameter representing the mass or quantity of heaviness of an individual."
   },
   "height": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00009",
     "id": "PBPKO_00009",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "ht"
+    ],
     "related_synonyms": [],
     "definition": "A physiological parameter describing the distance from the bottom to the top of someone standing upright."
   },
   "surface area": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00010",
     "id": "PBPKO_00010",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "BSA/SA"
+    ],
     "related_synonyms": [],
     "definition": "A physiological parameter representing the total area that the surface of an object occupies."
   },
@@ -72,350 +80,450 @@
   "blood flow rate to compartment": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00012",
     "id": "PBPKO_00012",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "Q"
+    ],
     "related_synonyms": [],
     "definition": "A bodily fluid flow rate parameter representing the rate of blood flow in different parts of the body"
   },
   "cardiac output rate": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00013",
     "id": "PBPKO_00013",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "CO"
+    ],
     "related_synonyms": [],
     "definition": "A blood flow rate parameter representing the volume of blood pumped by the heart compartment per unit of time."
   },
   "blood flow rate to stomach": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00014",
     "id": "PBPKO_00014",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "qstomach"
+    ],
     "related_synonyms": [],
     "definition": "A blood flow rate parameter specifically describing the rate to the stomach compartment."
   },
   "fraction of blood flow to stomach": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00015",
     "id": "PBPKO_00015",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fqstomach"
+    ],
     "related_synonyms": [],
     "definition": "The dimensionless fraction of cardiac output delivered to the stomach compartment."
   },
   "blood flow rate to intestine": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00016",
     "id": "PBPKO_00016",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "qintestine"
+    ],
     "related_synonyms": [],
     "definition": "A blood flow parameter specifically describing the rate to the intestine compartment."
   },
   "fraction of blood flow to intestine": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00017",
     "id": "PBPKO_00017",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fqintestine"
+    ],
     "related_synonyms": [],
     "definition": "The dimensionless fraction of cardiac output delivered to the intestine compartment."
   },
   "blood flow rate to small intestine": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00018",
     "id": "PBPKO_00018",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "qsmall intestine"
+    ],
     "related_synonyms": [],
     "definition": "A blood flow rate parameter specifically describing the rate to the small intestine compartment."
   },
   "fraction of blood flow to small intestine": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00019",
     "id": "PBPKO_00019",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fqsmallintestine"
+    ],
     "related_synonyms": [],
     "definition": "The dimensionless fraction of cardiac output delivered to the small intestine compartment."
   },
   "blood flow rate to large intestine": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00020",
     "id": "PBPKO_00020",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "qlargeintestine"
+    ],
     "related_synonyms": [],
     "definition": "A blood flow rate parameter specifically describing the rate to the large intestine compartment."
   },
   "fraction of blood flow to large intestine": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00021",
     "id": "PBPKO_00021",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fqlargeinestine"
+    ],
     "related_synonyms": [],
     "definition": "The dimensionless fraction of cardiac output delivered to the large intestine compartment."
   },
   "blood flow rate to pancreas": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00022",
     "id": "PBPKO_00022",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "qpancreas"
+    ],
     "related_synonyms": [],
     "definition": "A blood flow rate parameter specifically describing the rate to the pancreas compartment."
   },
   "fraction of blood flow to pancreas": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00023",
     "id": "PBPKO_00023",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fqpancreas"
+    ],
     "related_synonyms": [],
     "definition": "The dimensionless fraction of cardiac output delivered to the pancreas compartment."
   },
   "blood flow rate to liver": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00024",
     "id": "PBPKO_00024",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "qliver"
+    ],
     "related_synonyms": [],
     "definition": "A blood flow rate parameter specifically describing the rate to the liver compartment."
   },
   "fraction of blood flow to liver": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00025",
     "id": "PBPKO_00025",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fqliver"
+    ],
     "related_synonyms": [],
     "definition": "The dimensionless fraction of cardiac output delivered to the liver compartment."
   },
   "blood flow rate to kidney": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00026",
     "id": "PBPKO_00026",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "qkidney"
+    ],
     "related_synonyms": [],
     "definition": "A blood flow rate parameter specifically describing the rate to the kidney compartment."
   },
   "fraction of blood flow to kidney": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00027",
     "id": "PBPKO_00027",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fqkidney"
+    ],
     "related_synonyms": [],
     "definition": "The dimensionless fraction of cardiac output delivered to the kidney compartment."
   },
   "blood flow rate to muscle": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00028",
     "id": "PBPKO_00028",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "qmuscle"
+    ],
     "related_synonyms": [],
     "definition": "A blood flow rate parameter specifically describing the rate to the muscle compartment."
   },
   "fraction of blood flow to muscle": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00029",
     "id": "PBPKO_00029",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fqmuscle"
+    ],
     "related_synonyms": [],
     "definition": "The dimensionless fraction of cardiac output delivered to the muscle compartment."
   },
   "blood flow rate to heart": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00030",
     "id": "PBPKO_00030",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "qheart"
+    ],
     "related_synonyms": [],
     "definition": "A blood flow rate parameter specifically describing the rate to the heart compartment."
   },
   "fraction of blood flow to heart": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00031",
     "id": "PBPKO_00031",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fqheart"
+    ],
     "related_synonyms": [],
     "definition": "The dimensionless fraction of cardiac output delivered to the heart compartment."
   },
   "blood flow rate to fat": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00032",
     "id": "PBPKO_00032",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "qfat"
+    ],
     "related_synonyms": [],
     "definition": "A blood flow rate parameter specifically describing the rate to the fat (adipose tissue) compartment."
   },
   "fraction of blood flow to fat": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00033",
     "id": "PBPKO_00033",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fqfat"
+    ],
     "related_synonyms": [],
     "definition": "The dimensionless fraction of cardiac output delivered to the fat compartment."
   },
   "blood flow rate to gonad": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00034",
     "id": "PBPKO_00034",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "qgonad"
+    ],
     "related_synonyms": [],
     "definition": "A blood flow parameter specifically describing the rate to the gonads compartment."
   },
   "fraction of blood flow to gonad": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00035",
     "id": "PBPKO_00035",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fqgonad"
+    ],
     "related_synonyms": [],
     "definition": "The dimensionless fraction of cardiac output delivered to the gonad compartment."
   },
   "blood flow rate to skin": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00036",
     "id": "PBPKO_00036",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "qskin"
+    ],
     "related_synonyms": [],
     "definition": "A blood flow rate parameter specifically describing the rate to the skin compartment."
   },
   "fraction of blood flow to skin": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00037",
     "id": "PBPKO_00037",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fqskin"
+    ],
     "related_synonyms": [],
     "definition": "The dimensionless fraction of cardiac output delivered to the skin compartment."
   },
   "blood flow rate to bone": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00038",
     "id": "PBPKO_00038",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "qbone"
+    ],
     "related_synonyms": [],
     "definition": "A blood flow rate parameter specifically describing the rate to the bone compartment."
   },
   "fraction of blood flow to bone": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00039",
     "id": "PBPKO_00039",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fqbone"
+    ],
     "related_synonyms": [],
     "definition": "The dimensionless fraction of cardiac output delivered to the bone compartment."
   },
   "blood flow rate to brain": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00040",
     "id": "PBPKO_00040",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "qbrain"
+    ],
     "related_synonyms": [],
     "definition": "A blood flow rate parameter specifically describing the rate to the brain compartment."
   },
   "fraction of blood flow to brain": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00041",
     "id": "PBPKO_00041",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fqbrain"
+    ],
     "related_synonyms": [],
     "definition": "The dimensionless fraction of cardiac output delivered to the brain compartment."
   },
   "blood flow rate to spleen": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00042",
     "id": "PBPKO_00042",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "qspleen"
+    ],
     "related_synonyms": [],
     "definition": "A blood flow rate parameter specifically describing the rate to the spleen compartment."
   },
   "fraction of blood flow to spleen": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00043",
     "id": "PBPKO_00043",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fqspleen"
+    ],
     "related_synonyms": [],
     "definition": "The dimensionless fraction of cardiac output delivered to the spleen compartment."
   },
   "blood flow rate to lung": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00044",
     "id": "PBPKO_00044",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "qlung"
+    ],
     "related_synonyms": [],
     "definition": "A blood flow rate parameter specifically describing the rate to the lung compartment."
   },
   "fraction of blood flow to lung": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00045",
     "id": "PBPKO_00045",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fqlung"
+    ],
     "related_synonyms": [],
     "definition": "The dimensionless fraction of cardiac output delivered to the lung compartment."
   },
   "blood flow rate to poorly perfused": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00046",
     "id": "PBPKO_00046",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "qpoorlyperfused"
+    ],
     "related_synonyms": [],
     "definition": "A blood flow rate parameter specifically describing the rate to the poorly perfused organ/tissue compartment."
   },
   "fraction of blood flow to poorly perfused": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00047",
     "id": "PBPKO_00047",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fqpoorlyperfused"
+    ],
     "related_synonyms": [],
     "definition": "The dimensionless fraction of cardiac output delivered to the poorly perfused compartment."
   },
   "blood flow rate to richly perfused": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00048",
     "id": "PBPKO_00048",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "qrichlyperfused"
+    ],
     "related_synonyms": [],
     "definition": "A blood flow rate parameter specifically describing the rate to the richly perfused organ/tissue compartment."
   },
   "fraction of blood flow to richly perfused": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00049",
     "id": "PBPKO_00049",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fqrichlyperfused"
+    ],
     "related_synonyms": [],
     "definition": "The dimensionless fraction of cardiac output delivered to the richly perfused compartment."
   },
   "blood flow rate to restbody": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00050",
     "id": "PBPKO_00050",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "qrestbody"
+    ],
     "related_synonyms": [],
     "definition": "A blood flow rate parameter specifically describing the rate to the rest of body compartment (total minus specified organs)."
   },
   "fraction of blood flow to restbody": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00051",
     "id": "PBPKO_00051",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fqrestbody"
+    ],
     "related_synonyms": [],
     "definition": "The dimensionless fraction of cardiac output delivered to the rest of the body compartment."
   },
   "blood flow rate to gall bladder": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00052",
     "id": "PBPKO_00052",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "qgallbladder"
+    ],
     "related_synonyms": [],
     "definition": "A blood flow rate parameter specifically describing the rate to the gall bladder compartment."
   },
   "fraction of blood flow to gall bladder": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00053",
     "id": "PBPKO_00053",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fqgallbladder"
+    ],
     "related_synonyms": [],
     "definition": "The dimensionless fraction of cardiac output delivered to the gall bladder compartment."
   },
   "blood flow rate to portal vein": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00054",
     "id": "PBPKO_00054",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "qportalvein"
+    ],
     "related_synonyms": [],
     "definition": "A blood flow rate parameter specifically describing the rate to the portal vein compartment."
   },
   "fraction of blood flow to portal vein": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00055",
     "id": "PBPKO_00055",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fqportalvein"
+    ],
     "related_synonyms": [],
     "definition": "The dimensionless fraction of cardiac output delivered to the portal vein compartment."
   },
   "blood flow rate to lymph": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00056",
     "id": "PBPKO_00056",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "qlymph"
+    ],
     "related_synonyms": [],
     "definition": "A blood flow rate parameter specifically describing the rate to the lymph compartment."
   },
   "fraction of blood flow to lymph": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00057",
     "id": "PBPKO_00057",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fqlymph"
+    ],
     "related_synonyms": [],
     "definition": "The dimensionless fraction of cardiac output delivered to the lymph compartment."
   },
   "amount of metabolized": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00058",
     "id": "PBPKO_00058",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "ametab"
+    ],
     "related_synonyms": [],
     "definition": "An output parameter representing the total amount of compound metabolized."
   },
   "fraction of blood flow to stratum corneum": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00060",
     "id": "PBPKO_00060",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "scfblood"
+    ],
     "related_synonyms": [],
     "definition": "The dimensionless fraction of cardiac output delivered to the stratum corneum compartment."
   },
   "fraction of exposed skin": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00061",
     "id": "PBPKO_00061",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fskin e"
+    ],
     "related_synonyms": [],
     "definition": "A dimensionless fraction of volume defined as the exposed skin volume divided per unit of total body weight."
   },
   "fraction of unexposed skin": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00062",
     "id": "PBPKO_00062",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fskin u"
+    ],
     "related_synonyms": [],
     "definition": "A dimensionless fraction of volume defined as the unexposed skin volume divided per unit of total body weight."
   },
@@ -436,392 +544,504 @@
   "glomerular filtration rate": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00065",
     "id": "PBPKO_00065",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "gfr"
+    ],
     "related_synonyms": [],
     "definition": "A bodily fluid flow rate parameter (or physiological process measure) describing the flow rate of filtered fluid through the kidney compartment."
   },
   "volume of compartment": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00066",
     "id": "PBPKO_00066",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "Vorgan"
+    ],
     "related_synonyms": [],
     "definition": "A physiological parameter representing the volume of a specific organ or tissue."
   },
   "volume of stomach": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00067",
     "id": "PBPKO_00067",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "vstomach"
+    ],
     "related_synonyms": [],
     "definition": "A volume parameter representing the total volume of the stomach compartment."
   },
   "fraction of stomach": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00068",
     "id": "PBPKO_00068",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fstomach"
+    ],
     "related_synonyms": [],
     "definition": "A dimensionless fraction of volume defined as the stomach volume divided per unit of total body weight."
   },
   "volume of intestine": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00069",
     "id": "PBPKO_00069",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "vintestine"
+    ],
     "related_synonyms": [],
     "definition": "A volume parameter representing the total volume of the intestine compartment."
   },
   "fraction of intestine": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00070",
     "id": "PBPKO_00070",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fintestine"
+    ],
     "related_synonyms": [],
     "definition": "A dimensionless fraction of volume defined as the intestine volume divided per unit of total body weight."
   },
   "volume of small intestine": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00071",
     "id": "PBPKO_00071",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "vsmall intestine"
+    ],
     "related_synonyms": [],
     "definition": "A volume parameter representing the total volume of the small intestine compartment."
   },
   "fraction of small intestine": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00072",
     "id": "PBPKO_00072",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fsmall intestine"
+    ],
     "related_synonyms": [],
     "definition": "A dimensionless fraction of volume defined as the small intestine volume divided per unit of total body weight."
   },
   "volume of large intestine": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00073",
     "id": "PBPKO_00073",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "vlarge intestine"
+    ],
     "related_synonyms": [],
     "definition": "A volume parameter representing the total volume of the large intestine compartment."
   },
   "fraction of large intestine": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00074",
     "id": "PBPKO_00074",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "flarge intestine"
+    ],
     "related_synonyms": [],
     "definition": "A dimensionless fraction of volume defined as the large intestine volume divided per unit of total body weight."
   },
   "volume of pancreas": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00075",
     "id": "PBPKO_00075",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "vpancreas"
+    ],
     "related_synonyms": [],
     "definition": "A volume parameter representing the total volume of the pancreas compartment."
   },
   "fraction of pancreas": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00076",
     "id": "PBPKO_00076",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fpancreas"
+    ],
     "related_synonyms": [],
     "definition": "A dimensionless fraction of volume defined as the pancreas volume divided per unit of total body weight."
   },
   "volume of liver": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00077",
     "id": "PBPKO_00077",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "vliver"
+    ],
     "related_synonyms": [],
     "definition": "A volume parameter representing the total volume of the liver compartment."
   },
   "fraction of liver": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00078",
     "id": "PBPKO_00078",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fliver"
+    ],
     "related_synonyms": [],
     "definition": "A dimensionless fraction of volume defined as the liver volume divided per unit of total body weight."
   },
   "volume of kidney": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00079",
     "id": "PBPKO_00079",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "vkidney"
+    ],
     "related_synonyms": [],
     "definition": "A volume parameter representing the total volume of the kidney compartment."
   },
   "fraction of kidney": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00080",
     "id": "PBPKO_00080",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fkidney"
+    ],
     "related_synonyms": [],
     "definition": "A dimensionless fraction of volume defined as the kidney volume divided per unit of total body weight."
   },
   "volume of muscle": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00081",
     "id": "PBPKO_00081",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "vmuscle"
+    ],
     "related_synonyms": [],
     "definition": "A volume parameter representing the total volume of muscle compartment."
   },
   "fraction of muscle": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00082",
     "id": "PBPKO_00082",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fmuscle"
+    ],
     "related_synonyms": [],
     "definition": "A dimensionless fraction of volume defined as the muscle volume divided per unit of total body weight."
   },
   "volume of heart": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00083",
     "id": "PBPKO_00083",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "vheart"
+    ],
     "related_synonyms": [],
     "definition": "A volume parameter representing the total volume of the heart compartment."
   },
   "fraction of heart": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00084",
     "id": "PBPKO_00084",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fheart"
+    ],
     "related_synonyms": [],
     "definition": "A dimensionless fraction of volume defined as the heart volume divided per unit of total body weight."
   },
   "volume of fat": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00085",
     "id": "PBPKO_00085",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "vfat"
+    ],
     "related_synonyms": [],
     "definition": "A volume parameter representing the total volume of fat (adipose tissue) compartment."
   },
   "fraction of fat": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00086",
     "id": "PBPKO_00086",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "ffat"
+    ],
     "related_synonyms": [],
     "definition": "A dimensionless fraction of volume defined as the fat volume divided per unit of total body weight."
   },
   "volume of gonad": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00087",
     "id": "PBPKO_00087",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "vgonad"
+    ],
     "related_synonyms": [],
     "definition": "A volume parameter representing the total volume of the gonad compartment."
   },
   "fraction of gonad": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00088",
     "id": "PBPKO_00088",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fgonad"
+    ],
     "related_synonyms": [],
     "definition": "A dimensionless fraction of volume defined as the gonad volume divided per unit of total body weight."
   },
   "volume of skin": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00089",
     "id": "PBPKO_00089",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "vskin"
+    ],
     "related_synonyms": [],
     "definition": "A volume parameter representing the total volume of the skin compartment."
   },
   "fraction of skin": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00090",
     "id": "PBPKO_00090",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fskin"
+    ],
     "related_synonyms": [],
     "definition": "A dimensionless fraction of volume defined as the skin volume divided per unit of total body weight."
   },
   "volume of bone": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00091",
     "id": "PBPKO_00091",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "vbone"
+    ],
     "related_synonyms": [],
     "definition": "A volume parameter representing the total volume of bone compartment."
   },
   "fraction of bone": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00092",
     "id": "PBPKO_00092",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fbone"
+    ],
     "related_synonyms": [],
     "definition": "A dimensionless fraction of volume defined as the bone volume divided per unit of total body weight."
   },
   "volume of brain": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00093",
     "id": "PBPKO_00093",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "vbrain"
+    ],
     "related_synonyms": [],
     "definition": "A volume parameter representing the total volume of the brain compartment."
   },
   "fraction of brain": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00094",
     "id": "PBPKO_00094",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fbrain"
+    ],
     "related_synonyms": [],
     "definition": "A dimensionless fraction of volume defined as the brain volume divided per unit of total body weight."
   },
   "volume of spleen": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00095",
     "id": "PBPKO_00095",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "vspleen"
+    ],
     "related_synonyms": [],
     "definition": "A volume parameter representing the total volume of the spleen compartment."
   },
   "fraction of spleen": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00096",
     "id": "PBPKO_00096",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fspleen"
+    ],
     "related_synonyms": [],
     "definition": "A dimensionless fraction of volume defined as the spleen volume divided per unit of total body weight."
   },
   "volume of lung": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00097",
     "id": "PBPKO_00097",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "vlung"
+    ],
     "related_synonyms": [],
     "definition": "A volume parameter representing the total volume of the lung compartment."
   },
   "fraction of lung": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00098",
     "id": "PBPKO_00098",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "flung"
+    ],
     "related_synonyms": [],
     "definition": "A dimensionless fraction of volume defined as the lung volume divided per unit of total body weight."
   },
   "volume of poorly perfused": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00099",
     "id": "PBPKO_00099",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "vpoorly perfused"
+    ],
     "related_synonyms": [],
     "definition": "A volume parameter representing the total volume of the poorly perfused compartment."
   },
   "fraction of poorly perfused": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00100",
     "id": "PBPKO_00100",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fpoorly perfused"
+    ],
     "related_synonyms": [],
     "definition": "A dimensionless fraction of volume defined as the poorly perfused compartment volume divided per unit of total body weight."
   },
   "volume of richly perfused": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00101",
     "id": "PBPKO_00101",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "vrichly perfused"
+    ],
     "related_synonyms": [],
     "definition": "A volume parameter representing the total volume of the richly perfused compartment."
   },
   "fraction of richly perfused": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00102",
     "id": "PBPKO_00102",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "frichly perfused"
+    ],
     "related_synonyms": [],
     "definition": "A dimensionless fraction of volume defined as the richly perfused compartment volume divided per unit of total body weight."
   },
   "volume of plasma": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00103",
     "id": "PBPKO_00103",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "vplasma"
+    ],
     "related_synonyms": [],
     "definition": "A volume parameter representing the total volume of plasma compartment."
   },
   "fraction of plasma": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00104",
     "id": "PBPKO_00104",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fplasma"
+    ],
     "related_synonyms": [],
     "definition": "A dimensionless fraction of volume defined as the plasma volume divided per unit of total body weight."
   },
   "volume of rest body": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00105",
     "id": "PBPKO_00105",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "vrest body"
+    ],
     "related_synonyms": [],
     "definition": "A volume parameter representing the total volume of the rest of body compartment."
   },
   "fraction of rest body": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00106",
     "id": "PBPKO_00106",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "frest body"
+    ],
     "related_synonyms": [],
     "definition": "A dimensionless fraction of volume defined as the rest of body volume divided per unit of total body weight."
   },
   "volume of stratum corneum with respect to blood": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00107",
     "id": "PBPKO_00107",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "scvblood"
+    ],
     "related_synonyms": [],
     "definition": "A volume parameter representing the total volume of stratum corneum compartment with respect to blood/plasma."
   },
   "volume of blood": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00108",
     "id": "PBPKO_00108",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "vblood"
+    ],
     "related_synonyms": [],
     "definition": "A volume parameter representing the total volume of blood compartment."
   },
   "volume of exposed skin": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00109",
     "id": "PBPKO_00109",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "vskin e"
+    ],
     "related_synonyms": [],
     "definition": "A volume parameter representing the total volume of the exposed skin compartment."
   },
   "fraction of surface area exposed": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00110",
     "id": "PBPKO_00110",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fsa exposed"
+    ],
     "related_synonyms": [],
     "definition": "A surface area parameter representing the fraction of skin surface area actually exposed."
   },
   "volume of unexposed skin": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00111",
     "id": "PBPKO_00111",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "vskin u"
+    ],
     "related_synonyms": [],
     "definition": "A volume parameter representing the total volume of the unexposed skin compartment."
   },
   "volume of stratum corneum exposed": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00112",
     "id": "PBPKO_00112",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "vskin sc e"
+    ],
     "related_synonyms": [],
     "definition": "A volume parameter representing the total volume of the exposed stratum corneum compartment."
   },
   "volume of unexposed stratum corneum": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00113",
     "id": "PBPKO_00113",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "vskin sc u"
+    ],
     "related_synonyms": [],
     "definition": "A volume parameter representing the total volume of the unexposed stratum corneum compartment."
   },
   "fraction alveolar volume": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00114",
     "id": "PBPKO_00114",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "falv"
+    ],
     "related_synonyms": [],
     "definition": "A dimensionless fraction of volume defined as the alveolar volume divided per unit of total body weight."
   },
   "volume of gall bladder": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00115",
     "id": "PBPKO_00115",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "vgall bladder"
+    ],
     "related_synonyms": [],
     "definition": "A volume parameter representing the total volume of the gall bladder compartment."
   },
   "fraction of gall bladder": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00116",
     "id": "PBPKO_00116",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fgall bladder"
+    ],
     "related_synonyms": [],
     "definition": "A dimensionless fraction of volume defined as the gall bladder volume divided per unit of total body weight."
   },
   "volume of portal vein": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00117",
     "id": "PBPKO_00117",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "vportal vein"
+    ],
     "related_synonyms": [],
     "definition": "A volume parameter representing the total volume of the portal vein compartment."
   },
   "fraction of portal vein": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00118",
     "id": "PBPKO_00118",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fportal vein"
+    ],
     "related_synonyms": [],
     "definition": "A dimensionless fraction of volume defined as the portal vein volume divided per unit of total body weight."
   },
   "volume of lymph": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00119",
     "id": "PBPKO_00119",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "vlymph"
+    ],
     "related_synonyms": [],
     "definition": "A volume parameter representing the total volume of lymph compartment."
   },
   "fraction of lymph": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00120",
     "id": "PBPKO_00120",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "flymph"
+    ],
     "related_synonyms": [],
     "definition": "A dimensionless fraction of volume defined as the lymph volume divided per unit of total body weight."
   },
@@ -849,7 +1069,9 @@
   "molecular weight": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00127",
     "id": "PBPKO_00127",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "MW"
+    ],
     "related_synonyms": [],
     "definition": "A physicochemical parameter representing the sum of the weights of all atoms in a molecule."
   },
@@ -863,7 +1085,9 @@
   "distribution coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00129",
     "id": "PBPKO_00129",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "Log D"
+    ],
     "related_synonyms": [],
     "definition": "A physicochemical parameter representing the logarithm of the ratio of concentrations of a compound in a mixture of two immiscible phases at equilibrium, specifically describing lipophilicity (LogD)."
   },
@@ -877,7 +1101,9 @@
   "logarithmic solubility": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00131",
     "id": "PBPKO_00131",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "log S"
+    ],
     "related_synonyms": [],
     "definition": "A physicochemical parameter representing the 10-based logarithm of a compound's solubility (typically in mol/L)."
   },
@@ -891,14 +1117,19 @@
   "acid dissociation constant": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00133",
     "id": "PBPKO_00133",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "pka"
+    ],
     "related_synonyms": [],
     "definition": "A physicochemical parameter representing the negative base-10 logarithm (pKa) of the acid dissociation constant (Ka)."
   },
   "basic dissociation constant": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00134",
     "id": "PBPKO_00134",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "pKb pK(b) pK(B) affinity constant",
+      "Base dissociation constant"
+    ],
     "related_synonyms": [],
     "definition": "A physicochemical parameter representing the negative base-10 logarithm (pKb) of the base dissociation constant (Kb)."
   },
@@ -912,7 +1143,9 @@
   "hydrogen acceptor count": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00136",
     "id": "PBPKO_00136",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "A"
+    ],
     "related_synonyms": [],
     "definition": "A physicochemical parameter representing the integer number of hydrogen bond acceptors in a molecular entity."
   },
@@ -947,21 +1180,27 @@
   "absorption rate constant gut": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00141",
     "id": "PBPKO_00141",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "Kac gut"
+    ],
     "related_synonyms": [],
     "definition": "An absorption rate constant parameter representing the rate constant for the movement of a compound from the gut to systemic circulation or another compartment."
   },
   "absorption rate constant intestine": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00142",
     "id": "PBPKO_00142",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "Kac intestine"
+    ],
     "related_synonyms": [],
     "definition": "An absorption rate constant parameter representing the movement of a compound from the intestine to systemic circulation or another compartment."
   },
   "gastric emptying rate": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00143",
     "id": "PBPKO_00143",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "ge"
+    ],
     "related_synonyms": [],
     "definition": "A biochemical parameter representing the rate at which the stomach empties its contents into the small intestine."
   },
@@ -989,7 +1228,9 @@
   "volume of distribution": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00147",
     "id": "PBPKO_00147",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "Vd"
+    ],
     "related_synonyms": [],
     "definition": "A biochemical parameter representing the apparent volume into which a compound distributes in the body relative to its plasma concentration."
   },
@@ -1003,252 +1244,326 @@
   "unbound fraction": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00149",
     "id": "PBPKO_00149",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "FU"
+    ],
     "related_synonyms": [],
     "definition": "A biochemical parameter representing the fraction of a compound that is not bound (e.g., to proteins)."
   },
   "fraction unbound gut": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00150",
     "id": "PBPKO_00150",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fugut"
+    ],
     "related_synonyms": [],
     "definition": "An unbound fraction parameter specifically for the gut compartment."
   },
   "fraction unbound stomach": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00151",
     "id": "PBPKO_00151",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fustomach"
+    ],
     "related_synonyms": [],
     "definition": "An unbound fraction parameter specifically for the stomach compartment."
   },
   "fraction unbound intestine": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00152",
     "id": "PBPKO_00152",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fuintestine"
+    ],
     "related_synonyms": [],
     "definition": "An unbound fraction parameter specifically for the intestine compartment."
   },
   "fraction unbound pancreas": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00153",
     "id": "PBPKO_00153",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fupancreas"
+    ],
     "related_synonyms": [],
     "definition": "An unbound fraction parameter specifically for the pancreas compartment."
   },
   "fraction unbound liver": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00154",
     "id": "PBPKO_00154",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fuliver"
+    ],
     "related_synonyms": [],
     "definition": "An unbound fraction parameter specifically for the liver compartment."
   },
   "fraction unbound kidney": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00155",
     "id": "PBPKO_00155",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fukidney"
+    ],
     "related_synonyms": [],
     "definition": "An unbound fraction parameter specifically for the kidney compartment."
   },
   "fraction unbound muscle": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00156",
     "id": "PBPKO_00156",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fumuscle"
+    ],
     "related_synonyms": [],
     "definition": "An unbound fraction parameter specifically for the muscle compartment."
   },
   "fraction unbound heart": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00157",
     "id": "PBPKO_00157",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fuheart"
+    ],
     "related_synonyms": [],
     "definition": "An unbound fraction parameter specifically for the heart compartment."
   },
   "fraction unbound fat": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00158",
     "id": "PBPKO_00158",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fufat"
+    ],
     "related_synonyms": [],
     "definition": "An unbound fraction parameter specifically for the fat (adipose) compartment."
   },
   "fraction unbound gonad": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00159",
     "id": "PBPKO_00159",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fugonad"
+    ],
     "related_synonyms": [],
     "definition": "An unbound fraction parameter specifically for the gonad compartment."
   },
   "fraction unbound skin": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00160",
     "id": "PBPKO_00160",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fuskin"
+    ],
     "related_synonyms": [],
     "definition": "An unbound fraction parameter specifically for the skin compartment."
   },
   "fraction unbound bone": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00161",
     "id": "PBPKO_00161",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fubone"
+    ],
     "related_synonyms": [],
     "definition": "An unbound fraction parameter specifically for the bone compartment."
   },
   "fraction unbound spleen": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00162",
     "id": "PBPKO_00162",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fuspleen"
+    ],
     "related_synonyms": [],
     "definition": "An unbound fraction parameter specifically for the spleen compartment."
   },
   "fraction unbound lung": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00163",
     "id": "PBPKO_00163",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fulung"
+    ],
     "related_synonyms": [],
     "definition": "An unbound fraction parameter specifically for the lung compartment."
   },
   "fraction unbound enterocytes": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00164",
     "id": "PBPKO_00164",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fuenterocytes"
+    ],
     "related_synonyms": [],
     "definition": "An unbound fraction parameter specifically within enterocytes."
   },
   "partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00165",
     "id": "PBPKO_00165",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "Kp"
+    ],
     "related_synonyms": [],
     "definition": "A biochemical parameter representing the ratio of the concentration of a compound in a particular tissue to its concentration in plasma/blood at equilibrium."
   },
   "gut plasma partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00166",
     "id": "PBPKO_00166",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "gut plasma pc"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient representing the ratio of compound concentration in gut to plasma."
   },
   "stomach plasma partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00167",
     "id": "PBPKO_00167",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "stomach plasma pc"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient representing the ratio of compound concentration in stomach to plasma."
   },
   "intestine plasma partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00168",
     "id": "PBPKO_00168",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "intestine plasma pc"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient representing the ratio of compound concentration in intestine to plasma."
   },
   "pancreas plasma partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00169",
     "id": "PBPKO_00169",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "pancreas plasma pc"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient representing the ratio of compound concentration in pancreas to plasma."
   },
   "liver plasma partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00170",
     "id": "PBPKO_00170",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "liver plasma pc"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient representing the ratio of compound concentration in liver to plasma."
   },
   "kidney plasma partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00171",
     "id": "PBPKO_00171",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "kidney plasma pc"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient representing the ratio of compound concentration in kidney to plasma."
   },
   "muscle plasma partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00172",
     "id": "PBPKO_00172",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "muscle plasma pc"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient representing the ratio of compound concentration in muscle to plasma."
   },
   "heart plasma partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00173",
     "id": "PBPKO_00173",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "heart plasma pc"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient representing the ratio of compound concentration in heart to plasma."
   },
   "fat plasma partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00174",
     "id": "PBPKO_00174",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fat plasma pc",
+      "k_fat_plasma"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient representing the ratio of compound concentration in fat (adipose tissue) to plasma."
   },
   "gonad plasma partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00175",
     "id": "PBPKO_00175",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "gonads plasma pc"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient representing the ratio of compound concentration in gonads to plasma."
   },
   "skin plasma partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00176",
     "id": "PBPKO_00176",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "skin plasma pc"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient representing the ratio of compound concentration in skin to plasma."
   },
   "bone plasma partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00177",
     "id": "PBPKO_00177",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "bone plasma pc",
+      "k_bone_plasma"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient representing the ratio of compound concentration in bone to plasma."
   },
   "spleen plasma partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00178",
     "id": "PBPKO_00178",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "spleen plasma pc"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient representing the ratio of compound concentration in spleen to plasma."
   },
   "lung plasma partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00179",
     "id": "PBPKO_00179",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "lung plasma pc"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient representing the ratio of compound concentration in lung to plasma."
   },
   "rich perfused plasma partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00180",
     "id": "PBPKO_00180",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "rich perfused plasma pc"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient representing the ratio of compound concentration in the lumped richly perfused compartment to plasma."
   },
   "poor perfused plasma partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00181",
     "id": "PBPKO_00181",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "poor perfused plasma pc"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient representing the ratio of compound concentration in the lumped poorly perfused compartment to plasma."
   },
   "skin stratum corneum partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00182",
     "id": "PBPKO_00182",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "skin sc pc"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient representing the ratio of compound concentration in the stratum corneum to the rest of the skin."
   },
   "air plasma partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00183",
     "id": "PBPKO_00183",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "air plasma pc"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient representing the ratio of compound concentration in air to plasma."
   },
   "skin diffusion coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00184",
     "id": "PBPKO_00184",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "kp sc"
+    ],
     "related_synonyms": [],
     "definition": "A diffusion coefficient representing the diffusion of a compound across the skin."
   },
@@ -1262,14 +1577,18 @@
   "blood:plasma ratio": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00187",
     "id": "PBPKO_00187",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "bp"
+    ],
     "related_synonyms": [],
     "definition": "A biochemical parameter representing the ratio of compound concentration in whole blood to that in plasma."
   },
   "catalytic rate constant": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00189",
     "id": "PBPKO_00189",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "kcat"
+    ],
     "related_synonyms": [],
     "definition": "A biochemical parameter quantifying enzymatic reaction velocity (kcat), representing the maximum number of substrate molecules converted per active site per unit time."
   },
@@ -1304,28 +1623,36 @@
   "maximum rate in intestine": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00211",
     "id": "PBPKO_00211",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "vmax intestine"
+    ],
     "related_synonyms": [],
     "definition": "A maximum rate (Vmax) of an enzyme catalysed reaction for a compound in the intestine when the enzyme is saturated with substrate."
   },
   "Michaelis constant  intestine": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00212",
     "id": "PBPKO_00212",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "km intestine"
+    ],
     "related_synonyms": [],
     "definition": "Michaelis constant representing the substrate concentration at which the reaction rate in the intestine is half of Vmax (Km)."
   },
   "maximum rate in liver": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00213",
     "id": "PBPKO_00213",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "vmax liver"
+    ],
     "related_synonyms": [],
     "definition": "A maximum rate (Vmax) of an enzyme catalysed reaction for a compound in the liver when the enzyme is saturated with substrate."
   },
   "Michaelis constant  liver": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00214",
     "id": "PBPKO_00214",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "km liver"
+    ],
     "related_synonyms": [],
     "definition": "Michaelis constant representing the substrate concentration at which the reaction rate in the liver is half of Vmax (Km)."
   },
@@ -1339,7 +1666,9 @@
   "dissociation constant": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00216",
     "id": "PBPKO_00216",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "kd"
+    ],
     "related_synonyms": [],
     "definition": "A biochemical parameter (Kd) measuring the affinity of a compound for its binding partner (e.g., receptor, protein)."
   },
@@ -1374,14 +1703,18 @@
   "degradation rate constant": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00221",
     "id": "PBPKO_00221",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "kdeg"
+    ],
     "related_synonyms": [],
     "definition": "A biochemical parameter (kdeg) representing the rate constant for the degradation of a metabolizing enzyme or transporter."
   },
   "inhibition constant": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00222",
     "id": "PBPKO_00222",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "ki"
+    ],
     "related_synonyms": [],
     "definition": "A biochemical parameter (Ki) representing the inhibition constant for a specific enzyme or transporter interaction."
   },
@@ -1430,7 +1763,9 @@
   "clearance rate": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00229",
     "id": "PBPKO_00229",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "cl"
+    ],
     "related_synonyms": [],
     "definition": "A biochemical parameter representing the volume of biological fluid cleared of a compound per unit time."
   },
@@ -1472,7 +1807,9 @@
   "intrinsic clearance rate": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00235",
     "id": "PBPKO_00235",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "clint"
+    ],
     "related_synonyms": [],
     "definition": "A clearance rate representing the inherent ability of an organ or tissue to eliminate a compound, independent of blood flow or binding."
   },
@@ -1528,14 +1865,18 @@
   "intravenous bolus exposure": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00243",
     "id": "PBPKO_00243",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "IVB"
+    ],
     "related_synonyms": [],
     "definition": "A route of exposure involving rapid injection directly into a vein."
   },
   "intravenous infusion exposure": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00244",
     "id": "PBPKO_00244",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "IVI"
+    ],
     "related_synonyms": [],
     "definition": "A route of exposure involving continuous administration directly into a vein over time."
   },
@@ -1598,112 +1939,144 @@
   "peak concentration": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00253",
     "id": "PBPKO_00253",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "Cmax"
+    ],
     "related_synonyms": [],
     "definition": "An output parameter representing the highest concentration (Cmax) of a compound achieved after exposure."
   },
   "maximum steady state concentration": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00254",
     "id": "PBPKO_00254",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "cmaxss"
+    ],
     "related_synonyms": [],
     "definition": "An output parameter representing the maximum concentration (Cmax,ss) achieved at steady state during repeated dosing."
   },
   "maximum time": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00255",
     "id": "PBPKO_00255",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "tmax"
+    ],
     "related_synonyms": [],
     "definition": "An output parameter representing the time (Tmax) required to reach the peak concentration."
   },
   "area under curve": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00256",
     "id": "PBPKO_00256",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "AUC"
+    ],
     "related_synonyms": [],
     "definition": "An output parameter representing the integral of the concentration-time curve (AUC), indicating total exposure."
   },
   "area under curve 0 to t": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00257",
     "id": "PBPKO_00257",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "auc 0 to t"
+    ],
     "related_synonyms": [],
     "definition": "An area under curve parameter calculated from time zero to a specific time point t (AUC0-t)."
   },
   "area under curve last": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00258",
     "id": "PBPKO_00258",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "auclast"
+    ],
     "related_synonyms": [],
     "definition": "An area under curve parameter calculated from time zero to the time of the last measurable concentration (AUClast)."
   },
   "area under curve 0 to infinity": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00259",
     "id": "PBPKO_00259",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "auc 0 infinity"
+    ],
     "related_synonyms": [],
     "definition": "An area under curve parameter extrapolated from time zero to infinity (AUC0-inf), representing total exposure after a single dose."
   },
   "area under moment curve": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00260",
     "id": "PBPKO_00260",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "aumc"
+    ],
     "related_synonyms": [],
     "definition": "An output parameter calculated as the integral of the product of time and concentration versus time (AUMC)."
   },
   "mean residence time": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00261",
     "id": "PBPKO_00261",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "MRT"
+    ],
     "related_synonyms": [],
     "definition": "An output parameter representing the average time a compound resides in the body (MRT)."
   },
   "half-life": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00262",
     "id": "PBPKO_00262",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "t1/2"
+    ],
     "related_synonyms": [],
     "definition": "An output parameter representing the time required for the compound concentration to decrease by half (t1/2)."
   },
   "bioavailability": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00263",
     "id": "PBPKO_00263",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "f"
+    ],
     "related_synonyms": [],
     "definition": "An output parameter representing the rate and extent to which an active compound is absorbed and becomes available at the site of action or systemic circulation."
   },
   "relative bioavailability": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00264",
     "id": "PBPKO_00264",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "frel"
+    ],
     "related_synonyms": [],
     "definition": "A bioavailability parameter comparing the rate and extent of absorption of a test compound to a reference compound."
   },
   "mean absorption time": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00265",
     "id": "PBPKO_00265",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "MAT"
+    ],
     "related_synonyms": [],
     "definition": "An output parameter representing the average time for a compound to be absorbed into systemic circulation (MAT)."
   },
   "mean dissolution time": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00266",
     "id": "PBPKO_00266",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "MDT"
+    ],
     "related_synonyms": [],
     "definition": "An output parameter representing the average time for a compound to dissolve in the body (MDT)."
   },
   "bioequivalence": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00267",
     "id": "PBPKO_00267",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "be"
+    ],
     "related_synonyms": [],
     "definition": "An output parameter indicating comparable bioavailability between test and reference formulations under similar conditions."
   },
   "absolute bioavailability": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00268",
     "id": "PBPKO_00268",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fabs"
+    ],
     "related_synonyms": [],
     "definition": "A bioavailability parameter comparing the amount reaching systemic circulation after non-IV administration to the amount available after IV administration."
   },
@@ -1724,14 +2097,18 @@
   "amount in urine": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00272",
     "id": "PBPKO_00272",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "aurine"
+    ],
     "related_synonyms": [],
     "definition": "The amount of compound in the urine compartment."
   },
   "amount in feces": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00273",
     "id": "PBPKO_00273",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "afeces"
+    ],
     "related_synonyms": [],
     "definition": "The amount of compound in the feces compartment."
   },
@@ -1752,7 +2129,9 @@
   "steady state area under curve": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00277",
     "id": "PBPKO_00277",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "aucss"
+    ],
     "related_synonyms": [],
     "definition": "An area under curve parameter calculated over a dosing interval at steady state (AUCss)."
   },
@@ -1794,7 +2173,9 @@
   "tolerable daily intake": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00284",
     "id": "PBPKO_00284",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "tdi"
+    ],
     "related_synonyms": [],
     "definition": "An output parameter (or exposure limit) estimating the amount of a substance that can be ingested daily over a lifetime without appreciable health risk (TDI)."
   },
@@ -1808,28 +2189,36 @@
   "estimated daily intake": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00286",
     "id": "PBPKO_00286",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "edi"
+    ],
     "related_synonyms": [],
     "definition": "An output parameter estimating the amount of a compound consumed daily (EDI)."
   },
   "biomonitoring equivalent": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00287",
     "id": "PBPKO_00287",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "be"
+    ],
     "related_synonyms": [],
     "definition": "An output parameter representing the concentration of a chemical (or metabolite) in a biological medium consistent with exposure guidance values (BE)."
   },
   "reference dose": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00289",
     "id": "PBPKO_00289",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "RfD"
+    ],
     "related_synonyms": [],
     "definition": "An output parameter (or exposure limit) estimating the daily oral or dermal exposure likely to be without appreciable risk over a lifetime (RfD)."
   },
   "acceptable daily intake": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00290",
     "id": "PBPKO_00290",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "adi"
+    ],
     "related_synonyms": [],
     "definition": "An output parameter (or exposure limit) estimating the amount of a substance in food/water that can be consumed daily without appreciable health risk (ADI)."
   },
@@ -1850,35 +2239,45 @@
   "concentration in hair": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00298",
     "id": "PBPKO_00298",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "chair"
+    ],
     "related_synonyms": [],
     "definition": "The total concentration of compound in the hair compartment."
   },
   "concentration in nail": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00299",
     "id": "PBPKO_00299",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "cnail"
+    ],
     "related_synonyms": [],
     "definition": "A biological matrix concentration specifically representing the total concentration of compound in the nail compartment."
   },
   "concentration in teeth": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00300",
     "id": "PBPKO_00300",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "cteeth"
+    ],
     "related_synonyms": [],
     "definition": "A biological matrix concentration specifically representing the total concentration of compound in the teeth compartment."
   },
   "concentration in blood": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00301",
     "id": "PBPKO_00301",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "cblood"
+    ],
     "related_synonyms": [],
     "definition": "The total concentration of compound in the blood compartment."
   },
   "concentration in urine": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00302",
     "id": "PBPKO_00302",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "curine"
+    ],
     "related_synonyms": [],
     "definition": "A biological matrix concentration specifically representing the total concentration of compound in the urine compartment."
   },
@@ -1892,42 +2291,54 @@
   "maximum rate of basolateral transporter in vitro": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00304",
     "id": "PBPKO_00304",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "vmax baso in vitro"
+    ],
     "related_synonyms": [],
     "definition": "Maximum rate (Vmax) of transport via a basolateral transporter, measured in vitro."
   },
   "Michaelis constant baso": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00305",
     "id": "PBPKO_00305",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "km baso"
+    ],
     "related_synonyms": [],
     "definition": "Michaelis constant representing the substrate concentration at half-maximal velocity (Km) for a basolateral transporter."
   },
   "maximum rate of apical transporter in vitro": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00306",
     "id": "PBPKO_00306",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "vmax apical in vitro"
+    ],
     "related_synonyms": [],
     "definition": "A maximum rate (Vmax) of an enzyme catalysed reaction for a compound across the apical membrane of an organ, measured in vitro, when the enzyme is saturated with substrate."
   },
   "Michaelis constant apical": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00307",
     "id": "PBPKO_00307",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "km apical"
+    ],
     "related_synonyms": [],
     "definition": "Michaelis constant representing the substrate concentration at half-maximal velocity (Km) for an apical transporter."
   },
   "influx constant": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00310",
     "id": "PBPKO_00310",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "kiff"
+    ],
     "related_synonyms": [],
     "definition": "A biochemical parameter (kin) describing the rate constant for compound movement into a cell or compartment."
   },
   "efflux rate constant": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00311",
     "id": "PBPKO_00311",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "keffluxc"
+    ],
     "related_synonyms": [],
     "definition": "A biochemical parameter (kefflux) describing the rate constant for compound movement out of a cell or compartment."
   },
@@ -1955,7 +2366,9 @@
   "effective permeability": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00315",
     "id": "PBPKO_00315",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "peff"
+    ],
     "related_synonyms": [],
     "definition": "A biochemical parameter (Peff) representing the rate at which a compound passes through a biological barrier (e.g., intestinal wall)."
   },
@@ -2039,14 +2452,18 @@
   "infant lifestage": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00334",
     "id": "PBPKO_00334",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "Inf"
+    ],
     "related_synonyms": [],
     "definition": "A lifestage parameter representing a very young child, typically under one year of age."
   },
   "toddler lifestage": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00335",
     "id": "PBPKO_00335",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "Tdl"
+    ],
     "related_synonyms": [],
     "definition": "A lifestage parameter representing a young child, typically between one and three years old."
   },
@@ -2116,14 +2533,18 @@
   "cerebrospinal fluid volume": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00348",
     "id": "PBPKO_00348",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "spinal csf volume"
+    ],
     "related_synonyms": [],
     "definition": "A volume parameter representing the total volume of cerebrospinal fluid (CSF) compartment in the spinal region."
   },
   "cranial cerebrospinal fluid volume": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00349",
     "id": "PBPKO_00349",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "cranial csf volume"
+    ],
     "related_synonyms": [],
     "definition": "A volume parameter representing the total volume of cerebrospinal fluid (CSF) compartment in the cranial region."
   },
@@ -2144,7 +2565,9 @@
   "spinal cerebrospinal fluid flow rate": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00352",
     "id": "PBPKO_00352",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "spinal csf flow"
+    ],
     "related_synonyms": [],
     "definition": "A bodily fluid flow rate parameter representing the flow rate of cerebrospinal fluid (CSF) compartment in the spinal region."
   },
@@ -2165,112 +2588,144 @@
   "volume of hippocampus": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00355",
     "id": "PBPKO_00355",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "vhippocampus"
+    ],
     "related_synonyms": [],
     "definition": "A volume parameter representing the total volume of the hippocampus compartment."
   },
   "volume of frontal cortex": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00356",
     "id": "PBPKO_00356",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "vfrontal cortex"
+    ],
     "related_synonyms": [],
     "definition": "A volume parameter representing the total volume of the frontal cortex compartment."
   },
   "volume of cerebrum": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00357",
     "id": "PBPKO_00357",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "vcerebrum"
+    ],
     "related_synonyms": [],
     "definition": "A volume parameter representing the total volume of the cerebrum compartment."
   },
   "volume of cerebellum": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00358",
     "id": "PBPKO_00358",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "vcerebellum"
+    ],
     "related_synonyms": [],
     "definition": "A volume parameter representing the total volume of the cerebellum compartment."
   },
   "blood flow rate to hippocampus": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00359",
     "id": "PBPKO_00359",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "qhippocampus"
+    ],
     "related_synonyms": [],
     "definition": "A blood flow rate parameter specifically describing the rate to the hippocampus compartment."
   },
   "blood flow rate to frontal cortex": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00360",
     "id": "PBPKO_00360",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "qfrontalcortex"
+    ],
     "related_synonyms": [],
     "definition": "A blood flow rate parameter specifically describing the rate to the frontal cortex compartment."
   },
   "blood flow rate to cerebrum": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00361",
     "id": "PBPKO_00361",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "qcerebrum"
+    ],
     "related_synonyms": [],
     "definition": "A blood flow rate parameter specifically describing the rate to the cerebrum compartment."
   },
   "blood flow rate to cerebellum": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00362",
     "id": "PBPKO_00362",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "qcerebellum"
+    ],
     "related_synonyms": [],
     "definition": "A blood flow rate parameter specifically describing the rate to the cerebellum compartment."
   },
   "hippocampus brain partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00363",
     "id": "PBPKO_00363",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "hippocampus brain pc"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient representing the ratio of compound concentration in the hippocampus to the overall brain."
   },
   "cerebrum brain partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00364",
     "id": "PBPKO_00364",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "cerebrum brain pc"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient representing the ratio of compound concentration in the cerebrum to the overall brain."
   },
   "cerebellum brain partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00365",
     "id": "PBPKO_00365",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "cerebellum brain pc"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient representing the ratio of compound concentration in the cerebellum to the overall brain."
   },
   "frontalcortex brain partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00366",
     "id": "PBPKO_00366",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "frontalcortex brain pc"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient representing the ratio of compound concentration in the frontal cortex to the overall brain."
   },
   "apparent permeability cerebrum to rest of brain": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00367",
     "id": "PBPKO_00367",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "papp cerebrum brain"
+    ],
     "related_synonyms": [],
     "definition": "Apparent permeability of a compound specifically between the cerebrum and the rest of the brain."
   },
   "apparent permeability cerebellum to rest of brain": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00368",
     "id": "PBPKO_00368",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "papp cerebellum brain"
+    ],
     "related_synonyms": [],
     "definition": "Apparent permeability of a compound specifically between the cerebellum and the rest of the brain."
   },
   "apparent permeability hippocampus to rest of brain": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00369",
     "id": "PBPKO_00369",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "papp hippocampus brain"
+    ],
     "related_synonyms": [],
     "definition": "Apparent permeability of a compound specifically between the hippocampus and the rest of the brain."
   },
   "apparent permeability cortex to rest of brain": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00370",
     "id": "PBPKO_00370",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "papp cortex brain"
+    ],
     "related_synonyms": [],
     "definition": "Apparent permeability of a compound specifically between the cortex and the rest of the brain."
   },
@@ -2291,49 +2746,63 @@
   "volume of fetus": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00373",
     "id": "PBPKO_00373",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "vfetus"
+    ],
     "related_synonyms": [],
     "definition": "A volume parameter representing the total volume of the fetus."
   },
   "volume of placenta": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00374",
     "id": "PBPKO_00374",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "vplacenta"
+    ],
     "related_synonyms": [],
     "definition": "A volume parameter representing the total volume of the placental compartment."
   },
   "volume of amniotic fluid": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00375",
     "id": "PBPKO_00375",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "vaf"
+    ],
     "related_synonyms": [],
     "definition": "A volume parameter representing the total volume of the amniotic fluid compartment."
   },
   "volume of liver fetus": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00376",
     "id": "PBPKO_00376",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "vliver fetus"
+    ],
     "related_synonyms": [],
     "definition": "A volume parameter representing the total volume of the fetal liver compartment."
   },
   "volume of brain fetus": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00377",
     "id": "PBPKO_00377",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "vbrainfetus"
+    ],
     "related_synonyms": [],
     "definition": "A volume parameter representing the total volume of the fetal brain compartment."
   },
   "volume of kidney fetus": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00378",
     "id": "PBPKO_00378",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "vkidneyfetus"
+    ],
     "related_synonyms": [],
     "definition": "A volume parameter representing the total volume of the fetal kidney compartment."
   },
   "volume of rest body fetus": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00379",
     "id": "PBPKO_00379",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "vrest body fetus"
+    ],
     "related_synonyms": [],
     "definition": "A volume parameter representing the total volume of the rest of body compartment within the fetus."
   },
@@ -2347,91 +2816,117 @@
   "fetal cardiac output rate": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00382",
     "id": "PBPKO_00382",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fco"
+    ],
     "related_synonyms": [],
     "definition": "A blood flow rate parameter representing the volume of blood pumped by the fetal heart compartment per unit time."
   },
   "blood flow rate to liverfetus": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00383",
     "id": "PBPKO_00383",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "qliverfetus"
+    ],
     "related_synonyms": [],
     "definition": "A blood flow rate parameter specifically describing the rate to the fetal liver compartment."
   },
   "blood flow rate to kidneyfetus": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00384",
     "id": "PBPKO_00384",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "qkidneyfetus"
+    ],
     "related_synonyms": [],
     "definition": "A blood flow rate parameter specifically describing the rate to the fetal kidney compartment."
   },
   "blood flow rate to brain fetus": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00385",
     "id": "PBPKO_00385",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "qbrainfetus"
+    ],
     "related_synonyms": [],
     "definition": "A blood flow rate parameter specifically describing the rate to the fetal brain compartment."
   },
   "blood flow rate to restbody fetus": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00386",
     "id": "PBPKO_00386",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "qrestbodyfetus"
+    ],
     "related_synonyms": [],
     "definition": "A blood flow rate parameter specifically describing the rate to the rest of body compartment within the fetus."
   },
   "gestational age": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00387",
     "id": "PBPKO_00387",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "ga"
+    ],
     "related_synonyms": [],
     "definition": "A physiological parameter representing the age of a pregnancy, typically measured in weeks."
   },
   "gestational week": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00388",
     "id": "PBPKO_00388",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "gw"
+    ],
     "related_synonyms": [],
     "definition": "A physiological parameter representing the specific week of gestation."
   },
   "maximum rate in fetus": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00389",
     "id": "PBPKO_00389",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "vmax fetus"
+    ],
     "related_synonyms": [],
     "definition": "A maximum rate (Vmax) of an enzyme catalysed reaction for a compound in fetus when the enzyme is saturated with substrate."
   },
   "amniotic transfer coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00390",
     "id": "PBPKO_00390",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "atc"
+    ],
     "related_synonyms": [],
     "definition": "A biochemical parameter representing the rate at which a compound transfers from maternal circulation to amniotic fluid."
   },
   "liverfetus plasma partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00391",
     "id": "PBPKO_00391",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "liverfetus plasma pc"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient representing the ratio of compound concentration in the fetal liver to plasma."
   },
   "brainfetus plasma partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00392",
     "id": "PBPKO_00392",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "brainfetus plasma pc"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient representing the ratio of compound concentration in the fetal brain to plasma."
   },
   "kidneyfetus plasma partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00393",
     "id": "PBPKO_00393",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "kidneyfetus plasma pc"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient representing the ratio of compound concentration in the fetal kidney to plasma."
   },
   "restbodyfetus plasma partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00394",
     "id": "PBPKO_00394",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "restbody plasma pc"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient representing the ratio of compound concentration in the fetal rest of body compartment to plasma."
   },
@@ -2536,140 +3031,180 @@
   "fraction of blood flow to duodenum": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00409",
     "id": "PBPKO_00409",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fqduodenum"
+    ],
     "related_synonyms": [],
     "definition": "The dimensionless fraction of cardiac output delivered to the duodenum compartment."
   },
   "fraction of blood flow to jejunum": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00410",
     "id": "PBPKO_00410",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fqjejunum"
+    ],
     "related_synonyms": [],
     "definition": "The dimensionless fraction of cardiac output delivered to the jejunum compartment."
   },
   "fraction of blood flow to ileum": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00411",
     "id": "PBPKO_00411",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fqileum"
+    ],
     "related_synonyms": [],
     "definition": "The dimensionless fraction of cardiac output delivered to the ileum compartment."
   },
   "fraction of blood flow to colon": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00412",
     "id": "PBPKO_00412",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fqcolon"
+    ],
     "related_synonyms": [],
     "definition": "The dimensionless fraction of cardiac output delivered to the colon compartment."
   },
   "fraction of blood flow to cecum": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00413",
     "id": "PBPKO_00413",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fqcecum"
+    ],
     "related_synonyms": [],
     "definition": "The dimensionless fraction of cardiac output delivered to the cecum compartment."
   },
   "blood flow rate to duodenum": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00414",
     "id": "PBPKO_00414",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "qduodenum"
+    ],
     "related_synonyms": [],
     "definition": "A blood flow rate parameter specifically describing the rate to the duodenum compartment."
   },
   "blood flow rate to jejunum": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00415",
     "id": "PBPKO_00415",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "qjejunum"
+    ],
     "related_synonyms": [],
     "definition": "A blood flow rate parameter specifically describing the rate to the jejunum compartment."
   },
   "blood flow rate to ileum": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00416",
     "id": "PBPKO_00416",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "qileum"
+    ],
     "related_synonyms": [],
     "definition": "A blood flow rate parameter specifically describing the rate to the ileum compartment."
   },
   "blood flow rate to colon": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00417",
     "id": "PBPKO_00417",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "qcolon"
+    ],
     "related_synonyms": [],
     "definition": "A blood flow rate parameter specifically describing the rate to the colon compartment."
   },
   "blood flow rate to cecum": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00418",
     "id": "PBPKO_00418",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "qcecum"
+    ],
     "related_synonyms": [],
     "definition": "A blood flow rate parameter specifically describing the rate to the cecum compartment."
   },
   "fraction of duodenum": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00419",
     "id": "PBPKO_00419",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fduodenum"
+    ],
     "related_synonyms": [],
     "definition": "A dimensionless fraction of volume defined as the duodenum volume divided per unit of total body weight."
   },
   "fraction of jejunum": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00420",
     "id": "PBPKO_00420",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fjejunum"
+    ],
     "related_synonyms": [],
     "definition": "A dimensionless fraction of volume defined as the jejunum volume divided per unit of total body weight."
   },
   "fraction of ileum": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00421",
     "id": "PBPKO_00421",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fileum"
+    ],
     "related_synonyms": [],
     "definition": "A dimensionless fraction of volume defined as the ileum volume divided per unit of total body weight."
   },
   "fraction of colon": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00422",
     "id": "PBPKO_00422",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fcolon"
+    ],
     "related_synonyms": [],
     "definition": "A dimensionless fraction of volume defined as the colon volume divided per unit of total body weight."
   },
   "fraction of cecum": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00423",
     "id": "PBPKO_00423",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fcecum"
+    ],
     "related_synonyms": [],
     "definition": "A dimensionless fraction of volume defined as the cecum volume divided per unit of total body weight."
   },
   "volume of duodenum": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00424",
     "id": "PBPKO_00424",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "vduodenum"
+    ],
     "related_synonyms": [],
     "definition": "A volume parameter representing the total volume of the duodenum compartment."
   },
   "volume of jejunum": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00425",
     "id": "PBPKO_00425",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "vjejunum"
+    ],
     "related_synonyms": [],
     "definition": "A volume parameter representing the total volume of the jejunum compartment."
   },
   "volume of ileum": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00426",
     "id": "PBPKO_00426",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "vileum"
+    ],
     "related_synonyms": [],
     "definition": "A volume parameter representing the total volume of the ileum compartment."
   },
   "volume of colon": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00427",
     "id": "PBPKO_00427",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "vcolon"
+    ],
     "related_synonyms": [],
     "definition": "A volume parameter representing the total volume of the colon compartment."
   },
   "volume of cecum": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00428",
     "id": "PBPKO_00428",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "vcecum"
+    ],
     "related_synonyms": [],
     "definition": "A volume parameter representing the total volume of the cecum compartment."
   },
@@ -2690,14 +3225,18 @@
   "diffusion coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00431",
     "id": "PBPKO_00431",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "D"
+    ],
     "related_synonyms": [],
     "definition": "A physicochemical parameter representing the amount of substance diffusing across a unit area per unit time under a unit concentration gradient."
   },
   "particle density": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00432",
     "id": "PBPKO_00432",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "ps"
+    ],
     "related_synonyms": [],
     "definition": "A biochemical/physical parameter representing the mass per unit volume of particles (e.g., of the administered compound)."
   },
@@ -2711,7 +3250,9 @@
   "intestinal transit time": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00434",
     "id": "PBPKO_00434",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "itt"
+    ],
     "related_synonyms": [],
     "definition": "A biochemical parameter representing the time required for a compound to move through the intestine."
   },
@@ -2732,14 +3273,18 @@
   "fraction unbound milk": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00437",
     "id": "PBPKO_00437",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fumilk"
+    ],
     "related_synonyms": [],
     "definition": "An unbound fraction parameter specifically for milk."
   },
   "concentration in milk": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00438",
     "id": "PBPKO_00438",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "cmilk"
+    ],
     "related_synonyms": [],
     "definition": "The total concentration of compound in the milk compartment."
   },
@@ -2767,7 +3312,9 @@
   "milk plasma partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00442",
     "id": "PBPKO_00442",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "milk plasma pc"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient representing the ratio of compound concentration in milk to plasma."
   },
@@ -3103,168 +3650,216 @@
   "amount in gut": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00496",
     "id": "PBPKO_00496",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "agut"
+    ],
     "related_synonyms": [],
     "definition": "The amount of compound in the gut compartment."
   },
   "amount in liver": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00497",
     "id": "PBPKO_00497",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "aliver"
+    ],
     "related_synonyms": [],
     "definition": "The amount of compound in the liver compartment."
   },
   "amount in kidney": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00498",
     "id": "PBPKO_00498",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "akidney"
+    ],
     "related_synonyms": [],
     "definition": "The amount of compound in the kidney compartment."
   },
   "amount in filtrate": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00499",
     "id": "PBPKO_00499",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "afiltrate"
+    ],
     "related_synonyms": [],
     "definition": "The amount of compound in the filtrate compartment."
   },
   "amount in delay": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00500",
     "id": "PBPKO_00500",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "adelay"
+    ],
     "related_synonyms": [],
     "definition": "The amount of compound in the hypothetical delay compartment."
   },
   "amount in restbody": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00501",
     "id": "PBPKO_00501",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "arestbody"
+    ],
     "related_synonyms": [],
     "definition": "The amount of compound in the rest of the body compartment."
   },
   "amount in plasma": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00502",
     "id": "PBPKO_00502",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "aplasma"
+    ],
     "related_synonyms": [],
     "definition": "The amount of compound in the plasma compartment."
   },
   "amount in brain": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00503",
     "id": "PBPKO_00503",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "abrain"
+    ],
     "related_synonyms": [],
     "definition": "The amount of compound in the brain compartment."
   },
   "amount in lung": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00504",
     "id": "PBPKO_00504",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "alung"
+    ],
     "related_synonyms": [],
     "definition": "The amount of compound in the lung compartment."
   },
   "amount in bone marrow": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00505",
     "id": "PBPKO_00505",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "abm"
+    ],
     "related_synonyms": [],
     "definition": "The amount of compound in the bone marrow compartment."
   },
   "amount in skin": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00506",
     "id": "PBPKO_00506",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "askin"
+    ],
     "related_synonyms": [],
     "definition": "The amount of compound in the skin compartment."
   },
   "amount in mammary gland": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00507",
     "id": "PBPKO_00507",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "amam"
+    ],
     "related_synonyms": [],
     "definition": "The amount of compound in the mammary gland compartment."
   },
   "fraction of filtrate": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00508",
     "id": "PBPKO_00508",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "ffiltrate"
+    ],
     "related_synonyms": [],
     "definition": "A dimensionless fraction of volume defined as the filtrate volume divided per unit of total body weight."
   },
   "fraction of gut": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00509",
     "id": "PBPKO_00509",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fgut"
+    ],
     "related_synonyms": [],
     "definition": "A dimensionless fraction of volume defined as the gut volume divided per unit of total body weight."
   },
   "fraction of mammary gland": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00510",
     "id": "PBPKO_00510",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fmam"
+    ],
     "related_synonyms": [],
     "definition": "A dimensionless fraction of volume defined as the mammary gland volume divided per unit of total body weight."
   },
   "fraction of blood flow to filtrate": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00511",
     "id": "PBPKO_00511",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fqfiltrate"
+    ],
     "related_synonyms": [],
     "definition": "The dimensionless fraction of cardiac output delivered to the filtrate compartment."
   },
   "fraction of blood flow to bone marrow": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00512",
     "id": "PBPKO_00512",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fqbm"
+    ],
     "related_synonyms": [],
     "definition": "The dimensionless fraction of cardiac output delivered to the bone marrow compartment."
   },
   "fraction of blood flow to gut": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00513",
     "id": "PBPKO_00513",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fqgut"
+    ],
     "related_synonyms": [],
     "definition": "The dimensionless fraction of cardiac output delivered to the gut compartment."
   },
   "fraction of blood flow to mammary gland": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00514",
     "id": "PBPKO_00514",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fqmam"
+    ],
     "related_synonyms": [],
     "definition": "The dimensionless fraction of cardiac output delivered to the mammary gland compartment."
   },
   "brain plasma partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00515",
     "id": "PBPKO_00515",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "brain plasma pc"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient representing the ratio of compound concentration in the brain to plasma."
   },
   "mammary gland plasma partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00517",
     "id": "PBPKO_00517",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "mam plasma pc"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient representing the ratio of compound concentration in the mammary gland to plasma."
   },
   "restbody plasma partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00518",
     "id": "PBPKO_00518",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "restbody plasma pc"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient representing the ratio of compound concentration in the rest of body compartment to plasma."
   },
   "tissue plasma partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00519",
     "id": "PBPKO_00519",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "kt"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient representing the ratio of compound concentration in a generic tissue to plasma."
   },
   "urinary rate constant": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00520",
     "id": "PBPKO_00520",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "kurine c"
+    ],
     "related_synonyms": [],
     "definition": "A biochemical parameter (rate constant) representing the rate at which a compound is cleared via urine, often scaled by body weight."
   },
@@ -3278,203 +3873,262 @@
   "volume of filtrate": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00522",
     "id": "PBPKO_00522",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "vfiltrate"
+    ],
     "related_synonyms": [],
     "definition": "A volume parameter representing the total volume of the filtrate compartment."
   },
   "volume of bone marrow": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00523",
     "id": "PBPKO_00523",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "vbm"
+    ],
     "related_synonyms": [],
     "definition": "A volume parameter representing the total volume of the bone marrow compartment."
   },
   "volume of gut": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00524",
     "id": "PBPKO_00524",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "vgut"
+    ],
     "related_synonyms": [],
     "definition": "A volume parameter representing the total volume of the gut compartment."
   },
   "volume of mammary gland": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00525",
     "id": "PBPKO_00525",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "vmam"
+    ],
     "related_synonyms": [],
     "definition": "A volume parameter representing the total volume of the mammary gland compartment."
   },
   "volume of mass balance": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00526",
     "id": "PBPKO_00526",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "vmass bal"
+    ],
     "related_synonyms": [],
     "definition": "A volume parameter representing the check for total mass balance of all compartments (sum of organ volumes should equal body volume/weight equivalent, depending on units)."
   },
   "hematocrit volume": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00527",
     "id": "PBPKO_00527",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "vhct"
+    ],
     "related_synonyms": [],
     "definition": "A volume parameter representing the total volume of red blood cells in whole blood."
   },
   "cardiac output rate of plasma": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00528",
     "id": "PBPKO_00528",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "qcplasma"
+    ],
     "related_synonyms": [],
     "definition": "A blood flow rate parameter representing the cardiac output specifically related to plasma flow."
   },
   "blood flow rate to filtrate": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00529",
     "id": "PBPKO_00529",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "qfiltrate"
+    ],
     "related_synonyms": [],
     "definition": "A blood flow rate parameter specifically describing the rate to the filtrate compartment (representing glomerular filtration)."
   },
   "blood flow rate to bone marrow": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00530",
     "id": "PBPKO_00530",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "qbm"
+    ],
     "related_synonyms": [],
     "definition": "A blood flow parameter specifically describing the rate to the bone marrow compartment."
   },
   "blood flow rate to gut": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00531",
     "id": "PBPKO_00531",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "qgut"
+    ],
     "related_synonyms": [],
     "definition": "A blood flow rate parameter specifically describing the rate to the gut compartment."
   },
   "blood flow rate to mammary gland": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00532",
     "id": "PBPKO_00532",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "qmam"
+    ],
     "related_synonyms": [],
     "definition": "A blood flow rate parameter specifically describing the rate to the mammary gland compartment."
   },
   "blood flow rate for mass balance": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00533",
     "id": "PBPKO_00533",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "qmassbal"
+    ],
     "related_synonyms": [],
     "definition": "A blood flow rate parameter representing the check for total blood flow mass balance of all the compartments (sum of organ flows should equal cardiac output)."
   },
   "urinary rate": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00534",
     "id": "PBPKO_00534",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "kurine"
+    ],
     "related_synonyms": [],
     "definition": "A biochemical parameter representing the rate at which a compound is cleared via urine."
   },
   "resorption maximum": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00535",
     "id": "PBPKO_00535",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "tmc"
+    ],
     "related_synonyms": [],
     "definition": "A biochemical parameter (Tm) representing the maximum rate of tubular resorption (e.g., in the kidney)."
   },
   "resorption": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00536",
     "id": "PBPKO_00536",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "tm"
+    ],
     "related_synonyms": [],
     "definition": "A biochemical parameter or process representing the resorption of a compound (e.g., tubular resorption)."
   },
   "octanol air partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00537",
     "id": "PBPKO_00537",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "koa"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient (Koa) representing the ratio of compound concentration in octanol to air at equilibrium."
   },
   "concentration in gut": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00538",
     "id": "PBPKO_00538",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "cgut"
+    ],
     "related_synonyms": [],
     "definition": "The total concentration of compound in the gut compartment."
   },
   "concentration in liver": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00539",
     "id": "PBPKO_00539",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "cliver"
+    ],
     "related_synonyms": [],
     "definition": "The total concentration of compound in the liver compartment."
   },
   "concentration in brain": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00540",
     "id": "PBPKO_00540",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "cbrain"
+    ],
     "related_synonyms": [],
     "definition": "The total concentration of compound in the brain compartment."
   },
   "concentration in kidney": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00541",
     "id": "PBPKO_00541",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "ckidney"
+    ],
     "related_synonyms": [],
     "definition": "The total concentration of compound in the kidney compartment."
   },
   "concentration in filtrate": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00542",
     "id": "PBPKO_00542",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "cfiltrate"
+    ],
     "related_synonyms": [],
     "definition": "The total concentration of compound in the filtrate compartment."
   },
   "concentration in lung": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00543",
     "id": "PBPKO_00543",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "clung"
+    ],
     "related_synonyms": [],
     "definition": "The total concentration of compound in the lung compartment."
   },
   "concentration in fat": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00544",
     "id": "PBPKO_00544",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "cfat"
+    ],
     "related_synonyms": [],
     "definition": "The total concentration of compound in the fat compartment."
   },
   "concentration in bone marrow": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00545",
     "id": "PBPKO_00545",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "cbm"
+    ],
     "related_synonyms": [],
     "definition": "The total concentration of compound in the bone marrow compartment."
   },
   "concentration in skin": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00546",
     "id": "PBPKO_00546",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "cksin"
+    ],
     "related_synonyms": [],
     "definition": "The total concentration of compound in the skin compartment."
   },
   "concentration in mammary gland": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00547",
     "id": "PBPKO_00547",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "cmam"
+    ],
     "related_synonyms": [],
     "definition": "The total concentration of compound in the mammary gland compartment."
   },
   "concentration in restbody": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00548",
     "id": "PBPKO_00548",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "crestbody"
+    ],
     "related_synonyms": [],
     "definition": "The total concentration of compound in the rest of body compartment."
   },
   "concentration in plasma": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00549",
     "id": "PBPKO_00549",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "cplasma",
+      "cplasma_total"
+    ],
     "related_synonyms": [],
     "definition": "The total concentration of compound in the plasma compartment."
   },
   "amount in fat": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00550",
     "id": "PBPKO_00550",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "afat"
+    ],
     "related_synonyms": [],
     "definition": "The amount of compound in the fat compartment."
   },
@@ -3551,28 +4205,36 @@
   "blood flow rate to unexposed skin": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00562",
     "id": "PBPKO_00562",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "qskinu"
+    ],
     "related_synonyms": [],
     "definition": "A blood flow rate to skin parameter specifically describing the rate to the unexposed portion of the skin compartment."
   },
   "blood flow rate to exposed skin": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00563",
     "id": "PBPKO_00563",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "qskine"
+    ],
     "related_synonyms": [],
     "definition": "A blood flow rate to skin parameter specifically describing the rate to the exposed portion of the skin compartment."
   },
   "blood flow rate to skin stratum corneum unexposed": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00564",
     "id": "PBPKO_00564",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "qskinscu"
+    ],
     "related_synonyms": [],
     "definition": "A blood flow rate to skin parameter specifically describing the rate to the unexposed stratum corneum compartment."
   },
   "blood flow rate to skin stratum corneum exposed": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00565",
     "id": "PBPKO_00565",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "qskinsce"
+    ],
     "related_synonyms": [],
     "definition": "A blood flow rate to skin parameter specifically describing the rate to the exposed stratum corneum compartment."
   },
@@ -3586,189 +4248,243 @@
   "bone blood partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00567",
     "id": "PBPKO_00567",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "bone blood pc"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient representing the ratio of compound concentration in bone to blood."
   },
   "air blood partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00568",
     "id": "PBPKO_00568",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "air blood pc"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient representing the ratio of compound concentration in air to blood."
   },
   "brain blood partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00569",
     "id": "PBPKO_00569",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "brain blood pc"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient representing the ratio of compound concentration in brain to blood."
   },
   "brainfetus blood partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00570",
     "id": "PBPKO_00570",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "brainfetus blood pc"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient representing the ratio of compound concentration in the fetal brain to blood."
   },
   "gonad blood partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00571",
     "id": "PBPKO_00571",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "gonad blood pc"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient representing the ratio of compound concentration in gonads to blood."
   },
   "gut blood partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00572",
     "id": "PBPKO_00572",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "gut blood pc"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient representing the ratio of compound concentration in the gut to blood."
   },
   "heart blood partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00573",
     "id": "PBPKO_00573",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "heart blood pc"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient representing the ratio of compound concentration in the heart to blood."
   },
   "intestine blood partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00574",
     "id": "PBPKO_00574",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "intestine blood pc"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient representing the ratio of compound concentration in the intestine to blood."
   },
   "kidney blood partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00575",
     "id": "PBPKO_00575",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "kidney blood pc"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient representing the ratio of compound concentration in the kidney to blood."
   },
   "kidneyfetus blood partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00576",
     "id": "PBPKO_00576",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "kidneyfetus blood pc"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient representing the ratio of compound concentration in the fetal kidney to blood."
   },
   "liver blood partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00577",
     "id": "PBPKO_00577",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "liver blood pc"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient representing the ratio of compound concentration in the liver to blood."
   },
   "liverfetus blood partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00578",
     "id": "PBPKO_00578",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "liverfetus blood pc"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient representing the ratio of compound concentration in the fetal liver to blood."
   },
   "lung blood partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00579",
     "id": "PBPKO_00579",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "lung blood pc"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient representing the ratio of compound concentration in the lung to blood."
   },
   "mammary gland blood partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00580",
     "id": "PBPKO_00580",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "mam blood pc"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient representing the ratio of compound concentration in the mammary gland to blood."
   },
   "milk blood partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00581",
     "id": "PBPKO_00581",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "milk blood pc"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient representing the ratio of compound concentration in milk to blood."
   },
   "muscle blood partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00582",
     "id": "PBPKO_00582",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "muscle blood pc"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient representing the ratio of compound concentration in muscle to blood."
   },
   "pancreas blood partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00583",
     "id": "PBPKO_00583",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "pancreas blood pc"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient representing the ratio of compound concentration in the pancreas to blood."
   },
   "poor perfused blood partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00584",
     "id": "PBPKO_00584",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "poor perfused blood pc"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient representing the ratio of compound concentration in the poorly perfused compartment to blood."
   },
   "restbody blood partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00585",
     "id": "PBPKO_00585",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "restbody blood pc"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient representing the ratio of compound concentration in the rest of body compartment to blood."
   },
   "restbodyfetus blood partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00586",
     "id": "PBPKO_00586",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "restbodyfetus blood pc"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient representing the ratio of compound concentration in the fetal rest of body compartment to blood."
   },
   "rich perfused blood partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00587",
     "id": "PBPKO_00587",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "rich perfused blood pc"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient representing the ratio of compound concentration in the richly perfused compartment to blood."
   },
   "skin blood partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00588",
     "id": "PBPKO_00588",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "skin blood pc"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient representing the ratio of compound concentration in the skin to blood."
   },
   "spleen blood partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00589",
     "id": "PBPKO_00589",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "spleen blood pc"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient representing the ratio of compound concentration in the spleen to blood."
   },
   "stomach blood partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00590",
     "id": "PBPKO_00590",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "stomach blood pc"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient representing the ratio of compound concentration in the stomach to blood."
   },
   "fraction unbound plasma": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00591",
     "id": "PBPKO_00591",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fuplasma"
+    ],
     "related_synonyms": [],
     "definition": "An unbound fraction parameter specifically for plasma."
   },
   "maximum rate of apical transporter": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00592",
     "id": "PBPKO_00592",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "Vmax apical"
+    ],
     "related_synonyms": [],
     "definition": "A maximum rate (Vmax) of an enzyme catalysed reaction for a compound across the apical membrane of an organ when the enzyme is saturated with substrate."
   },
   "maximum rate of basolateral transporter": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00593",
     "id": "PBPKO_00593",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "vmax baso"
+    ],
     "related_synonyms": [],
     "definition": "Maximum rate (Vmax) of transport via a basolateral transporter."
   },
@@ -3852,21 +4568,27 @@
   "fraction unbound blood": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00622",
     "id": "PBPKO_00622",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fublood"
+    ],
     "related_synonyms": [],
     "definition": "An unbound fraction parameter specifically for the blood compartment."
   },
   "amount in blood": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00623",
     "id": "PBPKO_00623",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "ablood"
+    ],
     "related_synonyms": [],
     "definition": "The amount of compound in the blood compartment."
   },
   "fraction unbound restbody": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00624",
     "id": "PBPKO_00624",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "furestbody"
+    ],
     "related_synonyms": [],
     "definition": "An unbound fraction parameter specifically for the rest of the body compartment."
   },
@@ -3887,49 +4609,63 @@
   "fraction of arterial plasma volume": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00627",
     "id": "PBPKO_00627",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "farterialplasma"
+    ],
     "related_synonyms": [],
     "definition": "A dimensionless fraction of volume defined as the arterial plasma volume divided per unit of total body weight."
   },
   "fraction of venous plasma volume": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00628",
     "id": "PBPKO_00628",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fvenousplasma"
+    ],
     "related_synonyms": [],
     "definition": "A dimensionless fraction of volume defined as the venous plasma volume divided per unit of total body weight."
   },
   "amount in richly perfused tissue": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00629",
     "id": "PBPKO_00629",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "arichlyperfused"
+    ],
     "related_synonyms": [],
     "definition": "The amount of compound in the richly perfused tissue compartment."
   },
   "amount in poorly perfused tissue": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00630",
     "id": "PBPKO_00630",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "apoorlyperfused"
+    ],
     "related_synonyms": [],
     "definition": "The amount of compound in the poorly perfused tissue compartment."
   },
   "amount in arterial blood": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00631",
     "id": "PBPKO_00631",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "aarterialblood"
+    ],
     "related_synonyms": [],
     "definition": "The amount of compound in the arterial blood compartment."
   },
   "amount in venous blood": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00632",
     "id": "PBPKO_00632",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "avenousblood"
+    ],
     "related_synonyms": [],
     "definition": "The amount of compound in the venous blood compartment."
   },
   "amount in alveolar air": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00633",
     "id": "PBPKO_00633",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "aalveolar"
+    ],
     "related_synonyms": [],
     "definition": "The amount of compound in the alveolar air compartment."
   },
@@ -3957,63 +4693,81 @@
   "amount in viable epidermis of unexposed skin": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00637",
     "id": "PBPKO_00637",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "askin_u"
+    ],
     "related_synonyms": [],
     "definition": "The amount of chemical\u00a0in viable epidermis of unexposed skin"
   },
   "amount\u00a0in viable epidermis of exposed skin": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00638",
     "id": "PBPKO_00638",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "askin_e"
+    ],
     "related_synonyms": [],
     "definition": "The amount of chemical\u00a0in viable epidermis of exposed skin"
   },
   "amount\u00a0in skin stratum\u00a0corneum of unexposed skin": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00639",
     "id": "PBPKO_00639",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "askin_sc_u"
+    ],
     "related_synonyms": [],
     "definition": "The amount of chemical\u00a0in skin stratum\u00a0corneum of unexposed skin"
   },
   "amount\u00a0in skin stratum\u00a0corneum of exposed skin": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00640",
     "id": "PBPKO_00640",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "askin_sc_e"
+    ],
     "related_synonyms": [],
     "definition": "The amount of chemical\u00a0in skin stratum\u00a0corneum of exposed skin"
   },
   "dermal absorption\u00a0rate\u00a0unexposed skin": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00641",
     "id": "PBPKO_00641",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fs_u"
+    ],
     "related_synonyms": [],
     "definition": "An absorption rate constant parameter representing dermal absorption\u00a0rate flux\u00a0through\u00a0unexposed skin"
   },
   "dermal absorption\u00a0rate\u00a0exposed skin": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00642",
     "id": "PBPKO_00642",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fs_e"
+    ],
     "related_synonyms": [],
     "definition": "An absorption rate constant parameter representing dermal absorption\u00a0rate flux through\u00a0exposed skin"
   },
   "thickness stratum corneum": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00643",
     "id": "PBPKO_00643",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "height_sc\nThickness_SC"
+    ],
     "related_synonyms": [],
     "definition": "A skin thickness parameter representing the thickness of stratum corneum."
   },
   "thickness viable epidermis": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00644",
     "id": "PBPKO_00644",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "height_vs\nthickness_ve"
+    ],
     "related_synonyms": [],
     "definition": "A skin thickness parameter representing the thickness of viable epidermis."
   },
   "fat blood partition coefficient": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00645",
     "id": "PBPKO_00645",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "fat blood pc\nPCFat"
+    ],
     "related_synonyms": [],
     "definition": "A partition coefficient representing the ratio of compound concentration in fat to blood."
   },
@@ -4034,7 +4788,9 @@
   "diffusion\u00a0rate stratum\u00a0corneum\u00a0viable epidermis": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00648",
     "id": "PBPKO_00648",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "kp_sc_vs"
+    ],
     "related_synonyms": [],
     "definition": "A diffusion rate skin parameter representing diffusion\u00a0rate from stratum\u00a0corneum to\u00a0viable epidermis"
   },
@@ -4055,7 +4811,9 @@
   "fraction of arterial\u00a0blood\u00a0volume": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_00651",
     "id": "PBPKO_00651",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "farterialblood\nscvart"
+    ],
     "related_synonyms": [],
     "definition": "A dimensionless fraction of volume defined as the arterial blood volume divided per unit of total body weight."
   },
@@ -4216,28 +4974,36 @@
   "intrinsic gastric emptying rate": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_03001",
     "id": "PBPKO_03001",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "kstoC"
+    ],
     "related_synonyms": [],
     "definition": "The absorption rate constant parameter representing the intrinsic rate of the chemical release from stomach to lumen or the jejunum segment"
   },
   "intrinsic absorption rate": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_03002",
     "id": "PBPKO_03002",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "kabsC"
+    ],
     "related_synonyms": [],
     "definition": "The absorption rate constant parameter representing the intrinsic absorption rate from the gut or any intestinal segment to the liver or the portal vein"
   },
   "intrinsic stomach uptake rate": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_03003",
     "id": "PBPKO_03003",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "k0C"
+    ],
     "related_synonyms": [],
     "definition": "The absorption rate constant parameter representing the intrinsic absorption rate of a chemical from the stomach to the gut tissue or any intestinal segment"
   },
   "stomach uptake rate": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_03004",
     "id": "PBPKO_03004",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "k0"
+    ],
     "related_synonyms": [],
     "definition": "The absorption rate constant parameter representing the absorption rate from stomach to gut tissue or any intestine segment"
   },
@@ -4720,7 +5486,9 @@
   "absorption rate constant": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_03075",
     "id": "PBPKO_03075",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "ka"
+    ],
     "related_synonyms": [],
     "definition": "A biochemical parameter representing the rate constant at which a compound is absorbed into systemic circulation or a target compartment from the site of administration"
   },
@@ -4734,7 +5502,9 @@
   "plasma flow rate": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_04001",
     "id": "PBPKO_04001",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "qplasma"
+    ],
     "related_synonyms": [],
     "definition": "A bodily fluid flow rate parameter specifically describing the flow of plasma to a compartment."
   },
@@ -4804,7 +5574,9 @@
   "plasma flow rate to fat": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_04011",
     "id": "PBPKO_04011",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "qfat_p"
+    ],
     "related_synonyms": [],
     "definition": "A plasma flow rate parameter specifically describing the rate to the fat compartment."
   },
@@ -4825,14 +5597,18 @@
   "plasma flow rate to bone": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_04014",
     "id": "PBPKO_04014",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "qbone_p"
+    ],
     "related_synonyms": [],
     "definition": "A plasma flow rate parameter specifically describing the rate to the bone compartment."
   },
   "plasma flow rate to brain": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_04015",
     "id": "PBPKO_04015",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "qbrain_p"
+    ],
     "related_synonyms": [],
     "definition": "A plasma flow rate parameter specifically describing the rate to the brain compartment."
   },
@@ -4895,7 +5671,9 @@
   "plasma flow rate to duodenum": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_04024",
     "id": "PBPKO_04024",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "qduodenum_p"
+    ],
     "related_synonyms": [],
     "definition": "A plasma flow rate parameter specifically describing the rate to the duodenum compartment."
   },
@@ -4916,28 +5694,36 @@
   "plasma flow rate to colon": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_04027",
     "id": "PBPKO_04027",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "qcolon_p"
+    ],
     "related_synonyms": [],
     "definition": "A plasma flow rate parameter specifically describing the rate to the colon compartment."
   },
   "plasma flow rate to cecum": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_04028",
     "id": "PBPKO_04028",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "qcecum_p"
+    ],
     "related_synonyms": [],
     "definition": "A plasma flow rate parameter specifically describing the rate to the cecum compartment."
   },
   "plasma flow rate to filtrate": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_04029",
     "id": "PBPKO_04029",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "qfiltrate_p"
+    ],
     "related_synonyms": [],
     "definition": "A plasma flow rate parameter specifically describing the rate to the filtrate compartment."
   },
   "plasma flow rate to bone marrow": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_04030",
     "id": "PBPKO_04030",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "qbm_p"
+    ],
     "related_synonyms": [],
     "definition": "A plasma flow parameter specifically describing the rate to the bone marrow compartment."
   },
@@ -4958,7 +5744,9 @@
   "plasma flow rate for mass balance": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_04033",
     "id": "PBPKO_04033",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "qmassbal_p"
+    ],
     "related_synonyms": [],
     "definition": "A plasma flow rate parameter representing the check for total plasma flow mass balance of all the compartments (sum of organ flows should equal cardiac output)."
   },
@@ -4972,7 +5760,9 @@
   "plasma flow rate to exposed skin": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_04035",
     "id": "PBPKO_04035",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "qskine_p"
+    ],
     "related_synonyms": [],
     "definition": "A plasma flow rate parameter specifically describing the rate to the exposed skin compartment."
   },
@@ -5511,21 +6301,27 @@
   "molar volume": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_05001",
     "id": "PBPKO_05001",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "MV"
+    ],
     "related_synonyms": [],
     "definition": "A physicochemical parameter representing the volume of one mole of a molecule."
   },
   "Henry's law constant": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_05002",
     "id": "PBPKO_05002",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "Henry"
+    ],
     "related_synonyms": [],
     "definition": "A physicochemical parameter describing the volatily of a compound"
   },
   "vapor pressure": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_05003",
     "id": "PBPKO_05003",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "VP"
+    ],
     "related_synonyms": [],
     "definition": "A physicochemical parameter describing the vapor pressure of the compound"
   },
@@ -5546,175 +6342,225 @@
   "amount in stomach": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_06004",
     "id": "PBPKO_06004",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "asto"
+    ],
     "related_synonyms": [],
     "definition": "The amount of chemical in stomach compartment."
   },
   "amount in small intestine": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_06005",
     "id": "PBPKO_06005",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "asi"
+    ],
     "related_synonyms": [],
     "definition": "The amount of chemical in small intestine compartment"
   },
   "amount in jejunum": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_06006",
     "id": "PBPKO_06006",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "aj"
+    ],
     "related_synonyms": [],
     "definition": "The amount of chemical in jejunum compartment."
   },
   "amount in ileum": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_06007",
     "id": "PBPKO_06007",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "ai"
+    ],
     "related_synonyms": [],
     "definition": "The amount of chemical in ileum compartment."
   },
   "amount in  large intestine": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_06008",
     "id": "PBPKO_06008",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "ali"
+    ],
     "related_synonyms": [],
     "definition": "The amount of chemical in large intestine compartment."
   },
   "amount in lumen": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_06009",
     "id": "PBPKO_06009",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "alumen"
+    ],
     "related_synonyms": [],
     "definition": "The amount of chemical in lumen of the intestine."
   },
   "amount in small intestine segment": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_06010",
     "id": "PBPKO_06010",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "asi_segment"
+    ],
     "related_synonyms": [],
     "definition": "The amount of chemical in segment of small intestine."
   },
   "amount in colon": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_06011",
     "id": "PBPKO_06011",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "acolon"
+    ],
     "related_synonyms": [],
     "definition": "The amount of chemical in colon compartment."
   },
   "amount in bile": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_06012",
     "id": "PBPKO_06012",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "abile"
+    ],
     "related_synonyms": [],
     "definition": "The amount of chemical in bile."
   },
   "amount in spleen": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_06013",
     "id": "PBPKO_06013",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "aspleen"
+    ],
     "related_synonyms": [],
     "definition": "The amount of chemical in spleen compartment"
   },
   "amount in duodenum": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_06014",
     "id": "PBPKO_06014",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "aduo"
+    ],
     "related_synonyms": [],
     "definition": "The amount of chemical in duodenum compartment."
   },
   "amount in intestinal tissue": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_06015",
     "id": "PBPKO_06015",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "ait"
+    ],
     "related_synonyms": [],
     "definition": "The amount of chemical in intestinal tissue"
   },
   "amount in portal vein": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_06016",
     "id": "PBPKO_06016",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "apv"
+    ],
     "related_synonyms": [],
     "definition": "The amount of chemical in portal vein."
   },
   "unbound concentration in plasma": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_06017",
     "id": "PBPKO_06017",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "cplasma_unbound"
+    ],
     "related_synonyms": [],
     "definition": "The unbound concentration of compound in the plasma compartment."
   },
   "unbound venous liver concentration": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_06018",
     "id": "PBPKO_06018",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "cvliver_unbound"
+    ],
     "related_synonyms": [],
     "definition": "The unbound venous concentration of compound in the liver compartment."
   },
   "unbound venous gut concentration": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_06019",
     "id": "PBPKO_06019",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "cvgut_unbound"
+    ],
     "related_synonyms": [],
     "definition": "The unbound venous concentration of compound in the gut compartment."
   },
   "unbound venous brain concentration": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_06020",
     "id": "PBPKO_06020",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "cvbrain_unbound"
+    ],
     "related_synonyms": [],
     "definition": "The unbound venous concentration of compound in the brain compartment."
   },
   "unbound venous kidney concentration": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_06021",
     "id": "PBPKO_06021",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "cvkidney_unbound"
+    ],
     "related_synonyms": [],
     "definition": "The unbound venous concentration of compound in the kidney compartment."
   },
   "unbound venous filtrate concentration": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_06022",
     "id": "PBPKO_06022",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "cvfiltrate_unbound"
+    ],
     "related_synonyms": [],
     "definition": "The unbound venous concentration of compound in the filtrate compartment."
   },
   "unbound venous lung concentration": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_06023",
     "id": "PBPKO_06023",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "cvlung_unbound"
+    ],
     "related_synonyms": [],
     "definition": "The unbound venous concentration of compound in the lung compartment."
   },
   "unbound venous fat concentration": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_06024",
     "id": "PBPKO_06024",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "cvfat_unbound"
+    ],
     "related_synonyms": [],
     "definition": "The unbound venous concentration of compound in the fat compartment."
   },
   "unbound venous bone marrow concentration": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_06025",
     "id": "PBPKO_06025",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "cvbm_unbound"
+    ],
     "related_synonyms": [],
     "definition": "The unbound venous concentration of compound in the bone marrow compartment."
   },
   "unbound venous skin concentration": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_06026",
     "id": "PBPKO_06026",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "cvksin_unbound"
+    ],
     "related_synonyms": [],
     "definition": "The unbound venous concentration of compound in the skin compartment."
   },
   "unbound venous mammary gland concentration": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_06027",
     "id": "PBPKO_06027",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "cvmam_unbound"
+    ],
     "related_synonyms": [],
     "definition": "The unbound venous concentration of compound in the mammary gland compartment."
   },
   "unbound venous rest body concentration": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_06028",
     "id": "PBPKO_06028",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "cvrestbody_unbound"
+    ],
     "related_synonyms": [],
     "definition": "The unbound venous concentration of compound in the rest body compartment."
   },
@@ -5728,147 +6574,189 @@
   "total venous liver concentration": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_06030",
     "id": "PBPKO_06030",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "cvliver"
+    ],
     "related_synonyms": [],
     "definition": "The total venous concentration of compound in the liver compartment."
   },
   "total venous gut concentration": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_06031",
     "id": "PBPKO_06031",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "cvgut"
+    ],
     "related_synonyms": [],
     "definition": "The total venous concentration of compound in the gut compartment."
   },
   "total venous kidney concentration": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_06032",
     "id": "PBPKO_06032",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "cvkidney"
+    ],
     "related_synonyms": [],
     "definition": "The total venous concentration of compound in the kidney compartment."
   },
   "total venous brain concentration": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_06033",
     "id": "PBPKO_06033",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "cvbrain"
+    ],
     "related_synonyms": [],
     "definition": "The total venous concentration of compound in the brain compartment."
   },
   "total venous filtrate concentration": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_06034",
     "id": "PBPKO_06034",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "cvfiltrate"
+    ],
     "related_synonyms": [],
     "definition": "The total venous concentration of compound in the filtrate compartment."
   },
   "total venous lung concentration": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_06035",
     "id": "PBPKO_06035",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "cvlung"
+    ],
     "related_synonyms": [],
     "definition": "The total venous concentration of compound in the lung compartment."
   },
   "total venous fat concentration": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_06036",
     "id": "PBPKO_06036",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "cvfat"
+    ],
     "related_synonyms": [],
     "definition": "The total venous concentration of compound in the fat compartment."
   },
   "total venous bone marrow concentration": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_06037",
     "id": "PBPKO_06037",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "cvbm"
+    ],
     "related_synonyms": [],
     "definition": "The total venous concentration of compound in the bone marrow compartment."
   },
   "total venous skin concentration": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_06038",
     "id": "PBPKO_06038",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "cvksin"
+    ],
     "related_synonyms": [],
     "definition": "The total venous concentration of compound in the skin compartment."
   },
   "total venous mammary gland concentration": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_06039",
     "id": "PBPKO_06039",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "cvmam"
+    ],
     "related_synonyms": [],
     "definition": "The total venous concentration of compound in the mammary gland compartment."
   },
   "total venous rest body concentration": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_06040",
     "id": "PBPKO_06040",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "cvrestbody"
+    ],
     "related_synonyms": [],
     "definition": "The total venous concentration of compound in the rest of the body compartment."
   },
   "concentration in stomach": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_06041",
     "id": "PBPKO_06041",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "csto"
+    ],
     "related_synonyms": [],
     "definition": "The concentration of chemical in stomach compartment."
   },
   "concentration in small intestine": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_06042",
     "id": "PBPKO_06042",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "csi"
+    ],
     "related_synonyms": [],
     "definition": "The concentration of chemical in small intestine compartment."
   },
   "concentration in jejunum": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_06043",
     "id": "PBPKO_06043",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "cj"
+    ],
     "related_synonyms": [],
     "definition": "The concentration of chemical in jejunum compartment."
   },
   "concentration in ileum": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_06044",
     "id": "PBPKO_06044",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "ci"
+    ],
     "related_synonyms": [],
     "definition": "The concentration of chemical in ileum compartment."
   },
   "concentration in large intestine": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_06045",
     "id": "PBPKO_06045",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "cli"
+    ],
     "related_synonyms": [],
     "definition": "The concentration of chemical in large intestine compartment."
   },
   "concentration in intestinal tissue": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_06046",
     "id": "PBPKO_06046",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "cit"
+    ],
     "related_synonyms": [],
     "definition": "The concentration of chemical in tissue of intestine."
   },
   "concentration in lumen": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_06047",
     "id": "PBPKO_06047",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "clumen"
+    ],
     "related_synonyms": [],
     "definition": "The concentration of chemical in lumen of intestine."
   },
   "concentration in bile": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_06048",
     "id": "PBPKO_06048",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "cbile"
+    ],
     "related_synonyms": [],
     "definition": "The concentration of chemical in bile."
   },
   "concentration in spleen": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_06049",
     "id": "PBPKO_06049",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "cspleen"
+    ],
     "related_synonyms": [],
     "definition": "The concentration of chemical in spleen compartment."
   },
   "concentration in feces": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_06050",
     "id": "PBPKO_06050",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "cfeces"
+    ],
     "related_synonyms": [],
     "definition": "The concentration of chemical in feces."
   },
@@ -5882,7 +6770,9 @@
   "maximum amount": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_06052",
     "id": "PBPKO_06052",
-    "exact_synonyms": [],
+    "exact_synonyms": [
+      "amax"
+    ],
     "related_synonyms": [],
     "definition": "The maximum amount of chemical in a compartment"
   },
@@ -6001,6 +6891,20 @@
   "invitro pbpk": {
     "iri": "http://purl.obolibrary.org/obo/PBPKO_07001",
     "id": "PBPKO_07001",
+    "exact_synonyms": [],
+    "related_synonyms": [],
+    "definition": ""
+  },
+  "hepatic arterial blood flow": {
+    "iri": "http://purl.obolibrary.org/obo/PBPKO_04100",
+    "id": "PBPKO_04100",
+    "exact_synonyms": [],
+    "related_synonyms": [],
+    "definition": "A blood flow rate to compartment representing the flow rate of blood entering the liver via the artery."
+  },
+  "Michaelis constant": {
+    "iri": "http://biomodels.net/SBO/SBO_0000027",
+    "id": "SBO:0000027",
     "exact_synonyms": [],
     "related_synonyms": [],
     "definition": ""
